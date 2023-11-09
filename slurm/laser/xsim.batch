@@ -1,0 +1,34 @@
+#!/bin/bash
+
+#SBATCH --job-name=xsim      # Job name
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --time=24:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/xsim/xsim_%j.log # Standard output and error log
+#SBATCH --array=0
+
+echo "### Running $SLURM_JOB_NAME ###"
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source activate laser_env
+
+lang[0]=eng_Latn
+lang[1]=eng_abr1_Latn
+lang[2]=eng_abr2_Latn
+lang[3]=eng_abr3_Latn
+lang[4]=eng_fing_Latn
+lang[5]=eng_case_Latn
+lang[6]=eng_homo_Latn
+lang[7]=eng_cont_Latn
+lang[8]=eng_dysl_Latn
+lang[9]=eng_leet_Latn
+lang[10]=eng_spel_Latn
+lang[11]=eng_slng_Latn
+lang[12]=eng_week_Latn
+lang[13]=eng_spac_Latn
+
+output_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/results
+
+bash $HOME/robust-embeddings/src/laser/xsim.sh -l ${lang[$SLURM_ARRAY_TASK_ID]} -o $output_dir -n # -m (multilingual) -n (n-way) 

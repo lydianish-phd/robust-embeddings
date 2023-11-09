@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#SBATCH --job-name=plot      # Job name
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --time=24:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/plot/plot_%j.log # Standard output and error log
+#SBATCH --array=0
+
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source activate pt_env
+
+# to be able to use unique utils file
+SCRIPTS_PATH=$HOME/robust-embeddings/src/
+export PYTHONPATH=$PYTHONPATH:$SCRIPTS_PATH
+
+#input_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/scores
+#output_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/plots
+
+#output_dir=/home/lnishimw/reports/plots/experiment_023
+
+#transformations_to_remove="eng_fing_Latn eng_leet_Latn eng_spac_Latn"
+
+#python $HOME/robust-embeddings/src/laser/plot_xsim.py -i $input_dir -o $output_dir -p -n
+# -p (pdf) -n (nway) -r $transformations_to_remove
+
+experiment_dir[0]=$EXPERIMENTS/robust-embeddings/laser/experiment_025e
+experiment_dir[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_025f
+
+python $HOME/robust-embeddings/src/laser/plot.py \
+    -i ${experiment_dir[$SLURM_ARRAY_TASK_ID]}/scores \
+    -o ${experiment_dir[$SLURM_ARRAY_TASK_ID]}/plots

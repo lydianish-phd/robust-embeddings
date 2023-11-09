@@ -1,0 +1,30 @@
+#!/bin/bash
+
+#SBATCH --job-name=score      # Job name
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --time=24:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/score/score_%j.log # Standard output and error log
+#SBATCH --array=0
+
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source activate pt_env
+
+# to be able to use unique utils file
+SCRIPTS_PATH=$HOME/robust-embeddings/src/
+export PYTHONPATH=$PYTHONPATH:$SCRIPTS_PATH
+
+experiment_dir[0]=$EXPERIMENTS/robust-embeddings/laser/experiment_025e
+gold_file_name[0]="cleaned.eng_Latn.dev.bin"
+
+experiment_dir[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_025f
+gold_file_name[1]="cleaned.train.uncased.raw.ref.bin"
+
+python $HOME/robust-embeddings/src/laser/score.py \
+    -i ${experiment_dir[$SLURM_ARRAY_TASK_ID]}/embeddings \
+    -o ${experiment_dir[$SLURM_ARRAY_TASK_ID]}/scores \
+    -g ${gold_file_name[$SLURM_ARRAY_TASK_ID]}

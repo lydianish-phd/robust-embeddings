@@ -1,0 +1,78 @@
+#!/bin/bash
+
+#SBATCH --job-name=embed      # Job name
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --time=24:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/embed/embed_%j.log # Standard output and error log
+#SBATCH --array=0-4
+
+set -e 
+
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source activate laser_env
+
+# to be able to use fairseq files
+FAIRSEQ_PATH=$SCRATCH/fairseq/
+export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
+
+MODEL_NAME[0]=laser
+MODEL_PATH[0]=$LASER/models/laser2.pt
+VOCAB_FILE[0]=$LASER/models/laser2.cvocab
+
+MODEL_NAME[1]=roberta-student
+MODEL_PATH[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[1]}
+VOCAB_FILE[1]=$MODELS/checkpoints/roberta-base/roberta.cvocab
+
+MODEL_NAME[2]=roberta-student-init
+MODEL_PATH[2]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[2]}
+VOCAB_FILE[2]=$MODELS/checkpoints/roberta-base/roberta.cvocab
+
+MODEL_NAME[3]=character-roberta-student
+MODEL_PATH[3]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[3]}
+VOCAB_FILE[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+
+MODEL_NAME[4]=character-roberta-student-init
+MODEL_PATH[4]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[4]}
+VOCAB_FILE[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+
+# EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025f
+
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025e
+
+CHECKPOINTS="360000"
+
+INPUT_TOK_DIR=$EXPERIMENT_DIR/tok/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+
+for INPUT_TOK_FILE in $INPUT_TOK_DIR/*
+do    
+    echo "Embedding $INPUT_TOK_FILE with ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} model..."
+    
+    for CHECKPOINT in $CHECKPOINTS
+    do
+        OUTPUT_DIR=$EXPERIMENT_DIR/embeddings/$CHECKPOINT/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+        mkdir -p $OUTPUT_DIR
+        INPUT_TOK_FILE_NAME=$(basename $INPUT_TOK_FILE)
+        INPUT_FILE_NAME=${INPUT_TOK_FILE_NAME%.*} # drops the .tok extension
+        OUTPUT_EMBED_FILE=$OUTPUT_DIR/$INPUT_FILE_NAME.bin
+
+        if [ "$SLURM_ARRAY_TASK_ID" -gt "0" ] # student models
+        then
+            MODEL_FILE=${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}/checkpoint_$CHECKPOINT.pt
+        else # LASER model
+            MODEL_FILE=${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}
+        fi
+        
+        python $LASER/source/embed.py \
+            --input     $INPUT_TOK_FILE        \
+            --encoder   $MODEL_FILE    \
+            --vocab-file   ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]}    \
+            --output    $OUTPUT_EMBED_FILE       \
+            --verbose
+    done
+done
+echo "Done..."
