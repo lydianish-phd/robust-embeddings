@@ -33,7 +33,7 @@ MODEL_PATH=$LASER/models/laser2.pt
 VOCAB_PATH=$LASER/models/laser2.cvocab
 TOKENIZER_PATH=$LASER/models/laser2.spm
 
-MODEL_NAME=laser_case_sensitive
+MODEL_NAME=laser #_case_sensitive
 OUTPUT_DIR=$LASER/tasks/mteb/$MODEL_NAME
 
 python $LASER/source/mteb_tasks.py \
@@ -41,4 +41,5 @@ python $LASER/source/mteb_tasks.py \
     --vocab $VOCAB_PATH \
     --spm-model $TOKENIZER_PATH \
     --output-dir $OUTPUT_DIR \
-    --verbose --case-sensitive
+    --verbose --english-only \
+    #--case-sensitive
