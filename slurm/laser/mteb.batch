@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#SBATCH --job-name=mteb      # Job name
+#SBATCH --nodes=1                # node count
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --partition=gpu          # Name of the partition
+#SBATCH --gres=gpu:rtx8000:1        # GPU nodes are only available in gpu partition
+#SBATCH --hint=nomultithread       # we get physical cores not logical
+#SBATCH --time=48:00:00                # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/mteb/mteb%j.log # Standard output and error log
+
+echo "### Running $SLURM_JOB_NAME ###"
+
+module purge
+module load cuda/10.2
+
+source $HOME/.bashrc 
+source $HOME/.bash_profile
+source activate laser_env_bis
+
+set -e
+
+# to be able to use fairseq files
+FAIRSEQ_PATH=$SCRATCH/fairseq/
+export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
+
+# to be able to use LASER files
+LASER_PATH=$LASER/source/
+export PYTHONPATH=$PYTHONPATH:$LASER_PATH
+
+
+MODEL_PATH=$LASER/models/laser2.pt
+VOCAB_PATH=$LASER/models/laser2.cvocab
+TOKENIZER_PATH=$LASER/models/laser2.spm
+
+MODEL_NAME=laser_case_sensitive
+OUTPUT_DIR=$LASER/tasks/mteb/$MODEL_NAME
+
+python $LASER/source/mteb_tasks.py \
+    --encoder $MODEL_PATH \
+    --vocab $VOCAB_PATH \
+    --spm-model $TOKENIZER_PATH \
+    --output-dir $OUTPUT_DIR \
+    --verbose --case-sensitive
