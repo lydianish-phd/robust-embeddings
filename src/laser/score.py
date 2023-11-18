@@ -8,6 +8,7 @@ from sklearn.preprocessing import normalize
 #from umap import UMAP
 import pandas as pd
 import re
+from embed import EmbedLoad
 
 seed = 0
 dim = 1024
@@ -15,9 +16,8 @@ METRICS = ['checkpoint', 'model', 'cos', 'L1', 'L2']
 SPACE_VIZ = ['PCA dim 1', 'PCA dim 2', 'UMAP dim 1', 'UMAP dim 2', 'T-SNE dim 1', 'T-SNE dim 2']
 
 
-def read_embeddings(input_file, dim=1024, normalized=True):
-    X = np.fromfile(input_file, dtype=np.float32, count=-1)
-    X = np.resize(X, (X.shape[0] // dim, dim))
+def read_embeddings(input_file, dim=1024, normalized=True, verbose=False, fp16=False):
+    X = EmbedLoad(input_file, dim, verbose, fp16)
     if normalized:
         X = normalize(X)
     return X
