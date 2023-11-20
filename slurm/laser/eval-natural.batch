@@ -92,11 +92,9 @@ do
         --output-dir $OUTPUT_DIR \
         --embed-dir $EMBED_DIR \
         --cosine-distances \
-        --do-pretok \
         --verbose 
 
 done
 
 echo "Done..."
 
-        # --do-pretok \

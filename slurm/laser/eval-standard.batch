@@ -98,7 +98,6 @@ do
         --tgt-langs $TARGET_LANG \
         --output-dir $OUTPUT_DIR \
         --cosine-distances \
-        --do-pretok \
         --verbose 
     
     if [ "$CORPUS" == "flores200" ]
@@ -120,7 +119,6 @@ do
             --tgt-langs $TARGET_LANG \
             --tgt-aug-langs $TARGET_LANG \
             --output-dir $OUTPUT_DIR \
-            --do-pretok \
             --verbose 
     fi
 done

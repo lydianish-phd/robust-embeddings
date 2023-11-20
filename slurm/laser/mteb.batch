@@ -33,7 +33,7 @@ MODEL_PATH=$LASER/models/laser2.pt
 VOCAB_PATH=$LASER/models/laser2.cvocab
 TOKENIZER_PATH=$LASER/models/laser2.spm
 
-MODEL_NAME=laser #_lower_case, _no_preprocessing
+MODEL_NAME=laser
 OUTPUT_DIR=$LASER/tasks/mteb/$MODEL_NAME
 
 python $LASER/source/mteb_tasks.py \
@@ -42,6 +42,4 @@ python $LASER/source/mteb_tasks.py \
     --spm-model $TOKENIZER_PATH \
     --output-dir $OUTPUT_DIR \
     --verbose \
-    #--english-only \
-    #--lower-case \
-    #--no-preprocessing \
+    #--english-only

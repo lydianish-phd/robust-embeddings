@@ -10,7 +10,7 @@
 #SBATCH --hint=nomultithread
 #SBATCH --time=24:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/eval/eval_%j.log # Standard output and error log
-#SBATCH --array=3,0,1
+#SBATCH --array=0,1,3
 
 set -e 
 
@@ -18,34 +18,38 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
-source activate laser_env
+source activate laser_env_bis
+
+# to be able to use fairseq files
+FAIRSEQ_PATH=$SCRATCH/fairseq/
+export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
 
 CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
-TOKENIZER_PATH[0]=$HOME/data-preparation/src/spm-tokenizer.sh
+TOKENIZER_PATH[0]=$HOME/data-preparation/src/spm-tokenizer.py
 
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
 VOCAB_FILE[1]=$MODELS/checkpoints/roberta-base/roberta.cvocab
-TOKENIZER_PATH[1]=$HOME/data-preparation/src/roberta-tokenizer.sh
+TOKENIZER_PATH[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
 VOCAB_FILE[2]=$MODELS/checkpoints/roberta-base/roberta.cvocab
-TOKENIZER_PATH[2]=$HOME/data-preparation/src/roberta-tokenizer.sh
+TOKENIZER_PATH[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[3]}/checkpoint_best.pt
 VOCAB_FILE[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
-TOKENIZER_PATH[3]=$HOME/data-preparation/src/char-tokenizer.sh
+TOKENIZER_PATH[3]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[4]=character-roberta-student-init
 MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
 VOCAB_FILE[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
-TOKENIZER_PATH[4]=$HOME/data-preparation/src/char-tokenizer.sh
+TOKENIZER_PATH[4]=$HOME/data-preparation/src/char-tokenizer.py
 
 METRIC=xsim
 
@@ -57,12 +61,12 @@ cleaned.eng_dysl_Latn,cleaned.eng_fing_Latn,cleaned.eng_homo_Latn,\
 cleaned.eng_leet_Latn,cleaned.eng_slng_Latn,cleaned.eng_spac_Latn,\
 cleaned.eng_spel_Latn,cleaned.eng_week_Latn,cleaned.eng_Latn_ugc"
 TARGET_LANG=cleaned.eng_Latn
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_$METRIC
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_${METRIC}_copy
 INPUT_DIR=$DATASETS
 CORPUS=flores200
 CORPUS_PARTS="dev devtest"
 
-for SEED in {100..109}
+for SEED in {100..100}
 do
     for CORPUS_PART in $CORPUS_PARTS
     do
@@ -70,7 +74,6 @@ do
         OUTPUT_DIR=$EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}/$CORPUS/$SEED/$CORPUS_PART
         
         mkdir -p $EMBED_DIR $OUTPUT_DIR
-
         
         echo "$CORPUS_PART"
         
@@ -88,7 +91,6 @@ do
             --tgt-langs $TARGET_LANG \
             --output-dir $OUTPUT_DIR \
             --cosine-distances \
-            --do-pretok \
             --verbose 
 
         echo " - calculating xsim++"
@@ -105,7 +107,6 @@ do
             --tgt-langs $TARGET_LANG \
             --tgt-aug-langs $TARGET_LANG \
             --output-dir $OUTPUT_DIR \
-            --do-pretok \
             --verbose 
     done
 done
