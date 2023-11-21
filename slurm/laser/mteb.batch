@@ -8,6 +8,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=48:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/mteb/mteb%j.log # Standard output and error log
+#SBATCH --array=1,3
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -28,18 +29,39 @@ export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
 LASER_PATH=$LASER/source/
 export PYTHONPATH=$PYTHONPATH:$LASER_PATH
 
+CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz
 
-MODEL_PATH=$LASER/models/laser2.pt
-VOCAB_PATH=$LASER/models/laser2.cvocab
-TOKENIZER_PATH=$LASER/models/laser2.spm
+MODEL_NAME[0]=laser
+MODEL_PATH[0]=$LASER/models/laser2.pt
+VOCAB_PATH[0]=$LASER/models/laser2.cvocab
+TOKENIZER[0]=spm
 
-MODEL_NAME=laser
-OUTPUT_DIR=$LASER/tasks/mteb/$MODEL_NAME
+MODEL_NAME[1]=roberta-student
+MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
+VOCAB_PATH[1]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+TOKENIZER[1]=roberta
+
+MODEL_NAME[2]=roberta-student-init
+MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
+VOCAB_PATH[2]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+TOKENIZER[2]=roberta
+
+MODEL_NAME[3]=character-roberta-student
+MODEL_PATH[3]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[3]}/checkpoint_best.pt
+VOCAB_PATH[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+TOKENIZER[3]=char
+
+MODEL_NAME[4]=character-roberta-student-init
+MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
+VOCAB_PATH[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+TOKENIZER[4]=char
+
+OUTPUT_DIR=$LASER/tasks/mteb/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
 python $LASER/source/mteb_tasks.py \
-    --encoder $MODEL_PATH \
-    --vocab $VOCAB_PATH \
-    --spm-model $TOKENIZER_PATH \
+    --encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
+    --vocab ${VOCAB_PATH[$SLURM_ARRAY_TASK_ID]} \
+    --tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
     --output-dir $OUTPUT_DIR \
     --verbose \
-    #--english-only
+    --english-only
