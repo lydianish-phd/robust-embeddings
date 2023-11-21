@@ -18,7 +18,7 @@ source activate laser_env
 FAIRSEQ_PATH=$SCRATCH/fairseq
 export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
 
-STUDENT_VOCAB=$MODELS/checkpoints/roberta-base/roberta.cvocab
+STUDENT_VOCAB=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
 TEACHER_VOCAB=$LASER/models/laser2.cvocab
 TEACHER_LANG=laserstd
 STUDENT_LANG[0]=robertastd

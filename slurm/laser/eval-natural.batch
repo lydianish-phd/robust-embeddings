@@ -29,12 +29,12 @@ TOKENIZER_PATH[0]=$HOME/data-preparation/src/spm-tokenizer.sh
 
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_FILE[1]=$MODELS/checkpoints/roberta-base/roberta.cvocab
+VOCAB_FILE[1]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
 TOKENIZER_PATH[1]=$HOME/data-preparation/src/roberta-tokenizer.sh
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_FILE[2]=$MODELS/checkpoints/roberta-base/roberta.cvocab
+VOCAB_FILE[2]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
 TOKENIZER_PATH[2]=$HOME/data-preparation/src/roberta-tokenizer.sh
 
 MODEL_NAME[3]=character-roberta-student

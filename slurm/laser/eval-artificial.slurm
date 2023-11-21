@@ -27,11 +27,11 @@ VOCAB_FILE[0]=$MODELS/laser2/laser2.cvocab
 
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_024e/models/checkpoint_best.pt
-VOCAB_FILE[1]=$MODELS/roberta-base/roberta.cvocab
+VOCAB_FILE[1]=$MODELS/roberta-base/roberta-base.cvocab
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$EXPERIMENTS/robust-embeddings/laser/experiment_024f/models/checkpoint_best.pt
-VOCAB_FILE[2]=$MODELS/roberta-base/roberta.cvocab
+VOCAB_FILE[2]=$MODELS/roberta-base/roberta-base.cvocab
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$EXPERIMENTS/robust-embeddings/laser/experiment_024c/models/checkpoint_best.pt
