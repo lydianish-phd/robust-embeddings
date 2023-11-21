@@ -29,7 +29,8 @@ export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
 LASER_PATH=$LASER/source/
 export PYTHONPATH=$PYTHONPATH:$LASER_PATH
 
-CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz
+LASER_EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
+CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_024_jz
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -56,7 +57,7 @@ MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
 VOCAB_PATH[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
 TOKENIZER[4]=char
 
-OUTPUT_DIR=$LASER/tasks/mteb/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_DIR=$LASER_EXPERIMENTS_DIR/experiment_025_lrec_mteb/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
 python $LASER/source/mteb_tasks.py \
     --encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
