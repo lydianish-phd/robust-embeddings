@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     if args.cvocab:
         print("Saving cvocab dictionary...")
-        vocab_file = os.path.join(output_dir, "dict.cvocab")
+        vocab_file = os.path.join(args.output_dir, f"{args.model_name}.cvocab")
         with open(vocab_file, "w") as f:
             for token in tokenizer.vocab:
                 count = str(1)
