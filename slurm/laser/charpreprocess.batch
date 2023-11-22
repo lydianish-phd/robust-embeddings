@@ -41,8 +41,7 @@ fairseq-preprocess --source-lang ${STUDENT_LANG[1]} --target-lang ${STUDENT_LANG
     --joined-dictionary \
     --dict-only \
 
-
-echo "Binarizing data standard data..."
+echo "Binarizing standard data..."
 
 TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[0]}-$TEACHER_LANG
 BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[0]}-$TEACHER_LANG
@@ -55,7 +54,7 @@ fairseq-preprocess --source-lang ${STUDENT_LANG[0]} --target-lang $TEACHER_LANG 
     --dataset-impl cached \
     --workers 16 \
 
-echo "Binarizing data UGC data..."
+echo "Binarizing UGC data..."
 
 TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[1]}-$TEACHER_LANG
 BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[1]}-$TEACHER_LANG

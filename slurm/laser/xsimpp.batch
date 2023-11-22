@@ -11,7 +11,7 @@ echo "### Running $SLURM_JOB_NAME ###"
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
-source activate laser_env_bis
+source activate laser_env
 
 # to be able to use fairseq files
 FAIRSEQ_PATH=$SCRATCH/fairseq/
