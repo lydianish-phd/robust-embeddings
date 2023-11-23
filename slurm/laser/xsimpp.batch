@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=96       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=48:00:00               # Time limit hrs:min:sec
-#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/xsimpp/xsimpp_%j.log # Standard output and error log
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 
 echo "### Running $SLURM_JOB_NAME ###"
 

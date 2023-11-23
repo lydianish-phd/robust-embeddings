@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
-#SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/eval/eval_%j.log # Standard output and error log
+#SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-2
 
 set -e 

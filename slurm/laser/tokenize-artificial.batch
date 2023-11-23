@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=24:00:00               # Time limit hrs:min:sec
-#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/tokenize/tokenize_%j.log # Standard output and error log
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-4
 
 set -e 
