@@ -14,10 +14,6 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source activate laser_env
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 BACKBONE_MODEL=roberta-base
 STUDENT_VOCAB=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TEACHER_VOCAB=$LASER/models/laser2.cvocab

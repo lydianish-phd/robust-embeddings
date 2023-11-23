@@ -21,10 +21,6 @@ source activate laser_env
 
 set -x
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$MODELS/checkpoints/roberta-base/pytorch_model.bin
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024

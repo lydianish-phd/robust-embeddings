@@ -33,8 +33,4 @@ output_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/results
 
 #bash $HOME/robust-embeddings/src/laser/xsim.sh -l ${lang[$SLURM_ARRAY_TASK_ID]} -o $output_dir -n # -m (multilingual) -n (n-way) 
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 bash $LASER/tasks/xsim/eval.sh

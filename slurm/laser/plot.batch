@@ -14,10 +14,6 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source activate pt_env
 
-# to be able to use unique utils file
-SCRIPTS_PATH=$HOME/robust-embeddings/src/
-export PYTHONPATH=$PYTHONPATH:$SCRIPTS_PATH
-
 #input_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/scores
 #output_dir=$EXPERIMENTS/robust-embeddings/laser/experiment_023/plots
 

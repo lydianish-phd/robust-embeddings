@@ -18,10 +18,6 @@ source activate pt_env
 SCRIPTS_PATH=$HOME/robust-embeddings/src/
 export PYTHONPATH=$PYTHONPATH:$SCRIPTS_PATH
 
-# to be able to use LASER files
-LASER_PATH=$LASER/source/
-export PYTHONPATH=$PYTHONPATH:$LASER_PATH
-
 experiment_dir[0]=$EXPERIMENTS/robust-embeddings/laser/experiment_025e
 gold_file_name[0]="cleaned.eng_Latn.dev.bin"
 

@@ -16,10 +16,6 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source activate laser_env
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab

@@ -21,10 +21,6 @@ source $HOME/.bash_profile
 
 set -e
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$HOME/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 TEACHER_MODEL=$WORK/models/laser2/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 

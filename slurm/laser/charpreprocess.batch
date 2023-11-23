@@ -15,10 +15,6 @@ source activate laser_env
 
 set -xe
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 TEACHER_VOCAB=$LASER/models/laser2.cvocab
 
 TEACHER_LANG=laserstd

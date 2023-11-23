@@ -20,10 +20,6 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source activate laser_env
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
 CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz
 
 MODEL_NAME[0]=laser

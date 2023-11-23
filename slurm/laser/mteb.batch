@@ -21,14 +21,6 @@ source activate laser_env
 
 set -e
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$SCRATCH/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
-# to be able to use LASER files
-LASER_PATH=$LASER/source/
-export PYTHONPATH=$PYTHONPATH:$LASER_PATH
-
 LASER_EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_024_jz
 

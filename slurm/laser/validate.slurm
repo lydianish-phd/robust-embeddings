@@ -21,14 +21,6 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-# to be able to use fairseq files
-FAIRSEQ_PATH=$HOME/fairseq/
-export PYTHONPATH=$PYTHONPATH:$FAIRSEQ_PATH
-
-# to be able to use LASER files
-LASER_PATH=$HOME/LASER/source/
-export PYTHONPATH=$PYTHONPATH:$LASER_PATH
-
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$MODELS/laser2/laser2.pt
 VOCAB_FILE[0]=$MODELS/laser2/laser2.cvocab
