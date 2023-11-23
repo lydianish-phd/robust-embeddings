@@ -37,14 +37,15 @@ MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_PATH[0]=$LASER/models/laser2.cvocab
 TOKENIZER[0]=spm
 
+BACKBONE_MODEL=roberta-base
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_PATH[1]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+VOCAB_PATH[1]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TOKENIZER[1]=roberta
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_PATH[2]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+VOCAB_PATH[2]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TOKENIZER[2]=roberta
 
 MODEL_NAME[3]=character-roberta-student

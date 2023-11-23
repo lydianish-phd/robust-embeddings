@@ -25,14 +25,15 @@ MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
 TOKENIZER_PATH[0]=$HOME/data-preparation/src/spm-tokenizer.sh
 
+BACKBONE_MODEL=roberta-base
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_FILE[1]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+VOCAB_FILE[1]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TOKENIZER_PATH[1]=$HOME/data-preparation/src/roberta-tokenizer.sh
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_FILE[2]=$MODELS/checkpoints/roberta-base/roberta-base.cvocab
+VOCAB_FILE[2]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TOKENIZER_PATH[2]=$HOME/data-preparation/src/roberta-tokenizer.sh
 
 MODEL_NAME[3]=character-roberta-student

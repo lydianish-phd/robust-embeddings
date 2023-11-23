@@ -18,7 +18,8 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-STUDENT_VOCAB=$MODELS/roberta-base/roberta-base.cvocab
+BACKBONE_MODEL=roberta-base
+STUDENT_VOCAB=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TEACHER_VOCAB=$LASER/models/laser2.cvocab
 TEACHER_LANG=laserstd
 STUDENT_LANG[0]=robertastd

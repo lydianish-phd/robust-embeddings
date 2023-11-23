@@ -25,13 +25,14 @@ MODEL_NAME[0]=laser
 MODEL_PATH[0]=$MODELS/laser2/laser2.pt
 VOCAB_FILE[0]=$MODELS/laser2/laser2.cvocab
 
+BACKBONE_MODEL=roberta-base
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_024e/models/checkpoint_best.pt
-VOCAB_FILE[1]=$MODELS/roberta-base/roberta-base.cvocab
+VOCAB_FILE[1]=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$EXPERIMENTS/robust-embeddings/laser/experiment_024f/models/checkpoint_best.pt
-VOCAB_FILE[2]=$MODELS/roberta-base/roberta-base.cvocab
+VOCAB_FILE[2]=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$EXPERIMENTS/robust-embeddings/laser/experiment_024c/models/checkpoint_best.pt
