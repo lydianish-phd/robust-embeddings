@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=charpreprocess      # Job name
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-#SBATCH --cpus-per-task=64       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --cpus-per-task=48       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=24:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
@@ -21,7 +21,7 @@ TEACHER_LANG=laserstd
 STUDENT_LANG[0]=charobertastd
 STUDENT_LANG[1]=charobertaugc
 
-DATA_DIR=$DATASETS/oscar/mini/4Mclean
+DATA_DIR=$DATASETS/oscar/mini/4Mlrec
 
 echo "Creating joint dictionary from standard and UGC data..."
 
