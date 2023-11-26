@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=0-3
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -24,11 +24,27 @@ set -e
 TEACHER_MODEL=$WORK/models/laser2/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
+EXPERIMENT_NUM[0]="026e"
 PORT[0]="12345"
-PORT[1]="12346"
+POOLING[0]="maxpool"
+INIT[0]=""
 
-EXPERIMENT_NUM[0]="024c"
-EXPERIMENT_NUM[1]="024d"
+EXPERIMENT_NUM[1]="026f"
+PORT[1]="12346"
+POOLING[1]="maxpool"
+INIT[1]=--student-checkpoint-path $STUDENT_MODEL
+
+EXPERIMENT_NUM[2]="026g"
+PORT[2]="12347"
+POOLING[2]="meanpool"
+INIT[2]=""
+
+EXPERIMENT_NUM[3]="026h"
+PORT[3]="12348"
+POOLING[3]="meanpool"
+INIT[3]=--student-checkpoint-path $STUDENT_MODEL
+
+
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
 
@@ -44,7 +60,7 @@ srun fairseq-train \
     --log-format simple \
     --task laser_distillation \
     --arch laser_transformer \
-    --sentemb-criterion maxpool \
+    --sentemb-criterion ${POOLING[$SLURM_ARRAY_TASK_ID]} \
     --prepend-bos  \
     --criterion encoder_similarity \
     --mse \
@@ -82,6 +98,6 @@ srun fairseq-train \
     --student-teacher-config "distil:charobertaugc-laserstd,distil:charobertastd-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-#    --student-checkpoint-path STUDENT_MODEL \
+    ${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
