@@ -50,22 +50,22 @@ VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[4]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[5]=c-roberta-maxpool
-MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_024e/models
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models
 VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[6]=c-roberta-maxpool-init
-MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_024f/models
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models
 VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[7]=c-roberta-meanpool
-MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_024g/models
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models
 VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[7]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[8]=c-roberta-meanpool-init
-MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_024h/models
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
