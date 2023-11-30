@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-4
+#SBATCH --array=0-8
 
 set -e 
 
@@ -22,31 +22,48 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 
 MODEL_NAME[0]=laser
-MODEL_PATH[0]=$MODELS/laser2/laser2.pt
-VOCAB_FILE[0]=$MODELS/laser2/laser2.cvocab
+MODEL_PATH[0]=$LASER/models/laser2.pt
+VOCAB_FILE[0]=$LASER/models/laser2.cvocab
 
-BACKBONE_MODEL=roberta-base
-MODEL_NAME[1]=roberta-student
-MODEL_PATH[1]=$EXPERIMENTS/robust-embeddings/laser/experiment_024e/models
-VOCAB_FILE[1]=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
+EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser/
+DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin/
 
-MODEL_NAME[2]=roberta-student-init
-MODEL_PATH[2]=$EXPERIMENTS/robust-embeddings/laser/experiment_024f/models
-VOCAB_FILE[2]=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
+MODEL_NAME[1]=roberta-maxpool
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models
+VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 
-MODEL_NAME[3]=character-roberta-student
-MODEL_PATH[3]=$EXPERIMENTS/robust-embeddings/laser/experiment_024c/models
-VOCAB_FILE[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-laserstd/dict.charobertaugc.txt
+MODEL_NAME[2]=roberta-maxpool-init
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models
+VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 
-MODEL_NAME[4]=character-roberta-student-init
-MODEL_PATH[4]=$EXPERIMENTS/robust-embeddings/laser/experiment_024d/models
-VOCAB_FILE[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-laserstd/dict.charobertaugc.txt
+MODEL_NAME[3]=roberta-meanpool
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models
+VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+
+MODEL_NAME[4]=roberta-meanpool-init
+MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models
+VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+
+MODEL_NAME[5]=c-roberta-maxpool
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_024e/models
+VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+
+MODEL_NAME[6]=c-roberta-maxpool-init
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_024f/models
+VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+
+MODEL_NAME[7]=c-roberta-meanpool
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_024g/models
+VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+
+MODEL_NAME[8]=c-roberta-meanpool-init
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_024h/models
+VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 
 VALIDATION_SEED=110
-INPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_valid
+INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026_valid
 PREFIX=flores200/$VALIDATION_SEED/dev
-#PREFIX=lexnorm2015/train
 
 python $HOME/robust-embeddings/src/laser/validate.py \
     --input-tok-dir $INPUT_EXPERIMENT_DIR/tok \
