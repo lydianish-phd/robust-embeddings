@@ -11,9 +11,11 @@ if __name__ == "__main__":
 	parser.add("--teacher-model", dest="teacher_model", help="name of teacher model", type=str, default="laser")
 	parser.add("--teacher-model-path", dest="teacher_model_path", help="path to teacher model", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.pt")
 	parser.add("--teacher-vocab", dest="teacher_vocab", help="path of teacher model vocabulary", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.cvocab")
+	parser.add("--teacher-tok", dest="teacher_tok", help="teacher tokenizer", type=str, default="spm")
 	parser.add("--student-model", dest="student_model", help="name of student model", type=str)
 	parser.add("--student-model-dir", dest="student_model_dir", help="path to student model checkpoints directory", type=str)
 	parser.add("--student-vocab", dest="student_vocab", help="path of student model vocabulary", type=str)
+	parser.add("--student-tok", dest="student_tok", help="student tokenizer", type=str)
 	parser.add("--ugc-file", dest="ugc_file", help="name of UGC data file", type=str)
 	parser.add("--std-file", dest="std_file", help="name of standard data file", type=str)
 	parser.add("--output-dir", dest="output_dir", help="path to directory to save embeddings and results", type=str)
@@ -28,7 +30,7 @@ if __name__ == "__main__":
 
 	ugc_filename = os.path.basename(args.ugc_file)
 	std_filename = os.path.basename(args.std_file)
-	tgt_embed_file =  os.path.join(tgt_embed_dir, std_filename + ".bin")
+	tgt_embed_file = os.path.join(tgt_embed_dir, std_filename + ".bin")
 
 	src_score_dir = os.path.join(args.output_dir, "scores", args.student_model)
 	Path(src_score_dir).mkdir(parents=True, exist_ok=True)
@@ -39,7 +41,8 @@ if __name__ == "__main__":
 		embed_sentences(
 		ifname=args.std_file,
 		encoder_path=args.teacher_model_path,
-		vocab_file=args.teacher_vocab,
+		custom_tokenizer=args.teacher_tok,
+		custom_vocab_file=args.teacher_vocab,
 		verbose=True,
 		output=tgt_embed_file
 		)
@@ -62,7 +65,8 @@ if __name__ == "__main__":
 			embed_sentences(
 			ifname=args.std_file,
 			encoder_path=src_model_file,
-			vocab_file=args.student_vocab,
+			custom_tokenizer=args.student_tok,
+			custom_vocab_file=args.student_vocab,
 			verbose=True,
 			output=src_std_embed_file
 			)
@@ -71,7 +75,8 @@ if __name__ == "__main__":
 			embed_sentences(
 			ifname=args.ugc_file,
 			encoder_path=src_model_file,
-			vocab_file=args.student_vocab,
+			custom_tokenizer=args.student_tok,
+			custom_vocab_file=args.student_vocab,
 			verbose=True,
 			output=src_ugc_embed_file
 			)

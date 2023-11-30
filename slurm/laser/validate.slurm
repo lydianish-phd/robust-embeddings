@@ -24,6 +24,7 @@ source $HOME/.bash_profile
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
+TOKENIZER[0]=spm
 
 EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser/
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin/
@@ -31,34 +32,42 @@ DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin/
 MODEL_NAME[1]=roberta-maxpool
 MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models
 VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[1]=roberta
 
 MODEL_NAME[2]=roberta-maxpool-init
 MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models
 VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[2]=roberta
 
 MODEL_NAME[3]=roberta-meanpool
 MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models
 VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[3]=roberta
 
 MODEL_NAME[4]=roberta-meanpool-init
 MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models
 VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[4]=roberta
 
 MODEL_NAME[5]=c-roberta-maxpool
 MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_024e/models
 VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[5]=char
 
 MODEL_NAME[6]=c-roberta-maxpool-init
 MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_024f/models
 VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[6]=char
 
 MODEL_NAME[7]=c-roberta-meanpool
 MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_024g/models
 VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[7]=char
 
 MODEL_NAME[8]=c-roberta-meanpool-init
 MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_024h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[8]=char
 
 VALIDATION_SEED=110
 INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026
@@ -69,9 +78,11 @@ python $HOME/robust-embeddings/src/laser/validate.py \
     --teacher-model ${MODEL_NAME[0]} \
     --teacher-model-path ${MODEL_PATH[0]} \
     --teacher-vocab ${VOCAB_FILE[0]} \
+    --teacher-tok ${TOKENIZER[0]} \
     --student-model ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
     --student-model-dir ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
     --student-vocab ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --student-tok ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
     --ugc-file $PREFIX/eng_Latn_mix_all.dev \
     --std-file $PREFIX/eng_Latn.dev \
     --output-dir $OUTPUT_EXPERIMENT_DIR \
