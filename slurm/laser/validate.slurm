@@ -5,7 +5,7 @@
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
@@ -63,18 +63,17 @@ VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 VALIDATION_SEED=110
 INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026_valid
-PREFIX=flores200/$VALIDATION_SEED/dev
+PREFIX=$DATASETS/flores200/ugc/$VALIDATION_SEED/dev
 
 python $HOME/robust-embeddings/src/laser/validate.py \
-    --input-tok-dir $INPUT_EXPERIMENT_DIR/tok \
     --teacher-model ${MODEL_NAME[0]} \
     --teacher-model-path ${MODEL_PATH[0]} \
     --teacher-vocab ${VOCAB_FILE[0]} \
     --student-model ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
     --student-model-dir ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
     --student-vocab ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
-    --ugc-file $PREFIX/cleaned.eng_Latn_ugc.dev \
-    --std-file $PREFIX/cleaned.eng_Latn.dev \
+    --ugc-file $PREFIX/eng_Latn_mix_all.dev \
+    --std-file $PREFIX/eng_Latn.dev \
     --output-dir $OUTPUT_EXPERIMENT_DIR \
 
 echo "Done..."

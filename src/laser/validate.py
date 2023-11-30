@@ -8,7 +8,6 @@ from pathlib import Path
 
 if __name__ == "__main__":
 	parser = configargparse.ArgParser()
-	parser.add("--input-tok-dir", dest="input_tok_dir", help="path to tokenized data directory", type=str)
 	parser.add("--teacher-model", dest="teacher_model", help="name of teacher model", type=str, default="laser")
 	parser.add("--teacher-model-path", dest="teacher_model_path", help="path to teacher model", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.pt")
 	parser.add("--teacher-vocab", dest="teacher_vocab", help="path of teacher model vocabulary", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.cvocab")
@@ -20,10 +19,6 @@ if __name__ == "__main__":
 	parser.add("--output-dir", dest="output_dir", help="path to directory to save embeddings and results", type=str)
 	args = parser.parse_args()
 	
-	src_ugc_tok_file = os.path.join(args.input_tok_dir, args.student_model, args.ugc_file)
-	src_std_tok_file = os.path.join(args.input_tok_dir, args.student_model, args.std_file)
-	tgt_tok_file = os.path.join(args.input_tok_dir, args.teacher_model, args.std_file)
-
 	src_embed_dir = os.path.join(args.output_dir, "embeddings", args.student_model)
 	tgt_embed_dir = os.path.join(args.output_dir, "embeddings", args.teacher_model)
 	Path(src_embed_dir).mkdir(parents=True, exist_ok=True)
@@ -42,7 +37,7 @@ if __name__ == "__main__":
 
 	if not os.path.exists(tgt_embed_file):
 		embed_sentences(
-		ifname=tgt_tok_file,
+		ifname=args.std_file,
 		encoder_path=args.teacher_model_path,
 		vocab_file=args.teacher_vocab,
 		verbose=True,
@@ -65,7 +60,7 @@ if __name__ == "__main__":
 
 		if not os.path.exists(src_std_embed_file):
 			embed_sentences(
-			ifname=src_std_tok_file,
+			ifname=args.std_file,
 			encoder_path=src_model_file,
 			vocab_file=args.student_vocab,
 			verbose=True,
@@ -74,7 +69,7 @@ if __name__ == "__main__":
 
 		if not os.path.exists(src_ugc_embed_file):
 			embed_sentences(
-			ifname=src_ugc_tok_file,
+			ifname=args.ugc_file,
 			encoder_path=src_model_file,
 			vocab_file=args.student_vocab,
 			verbose=True,
