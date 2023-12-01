@@ -20,8 +20,8 @@ source activate laser_env
 
 #------------------ LEXNORM ------------------#
 
-# NOISY_LANGS=cleaned.uncased.raw.src
-# TARGET_LANG=cleaned.uncased.raw.ref
+# NOISY_LANGS=uncased.raw.src
+# TARGET_LANG=uncased.raw.ref
 # EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec
 # INPUT_DIR=$EXPERIMENT_DIR/tok/laser/
 # CORPUS=lexnorm2015
@@ -29,8 +29,8 @@ source activate laser_env
 
 #------------------ ROCSMT ------------------#
 
-NOISY_LANGS=cleaned.src.raw-manseg.en
-TARGET_LANG=cleaned.src.norm-manseg.en
+NOISY_LANGS=src.raw-manseg.en
+TARGET_LANG=src.norm-manseg.en
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec
 INPUT_DIR=$EXPERIMENT_DIR/tok/laser/
 CORPUS=rocsmt
