@@ -29,42 +29,42 @@ EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[1]=roberta-maxpool
-MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models/checkpoint_best.pt
 VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-maxpool-init
-MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models/checkpoint_best.pt
 VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=roberta-meanpool
-MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models/checkpoint_best.pt
 VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[4]=roberta-meanpool-init
-MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models
+MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models/checkpoint_best.pt
 VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[4]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[5]=c-roberta-maxpool
-MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models/checkpoint_best.pt
 VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[6]=c-roberta-maxpool-init
-MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models/checkpoint_best.pt
 VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[7]=c-roberta-meanpool
-MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models/checkpoint_best.pt
 VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[7]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[8]=c-roberta-meanpool-init
-MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models/checkpoint_best.pt
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
