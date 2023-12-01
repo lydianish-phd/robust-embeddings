@@ -74,7 +74,7 @@ NOISY_LANGS="eng_abr1_Latn,eng_abr2_Latn,\
 eng_abr3_Latn,eng_cont_Latn,\
 eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
 eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
-eng_spel_Latn,eng_week_Latn,eng_Latn_ugc"
+eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TARGET_LANG=eng_Latn
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
 OUTPUT_DIR=$EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
