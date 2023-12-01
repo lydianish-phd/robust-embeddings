@@ -4,7 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from plot import checkpoint_display_name
 
-input_dir = "/gpfsscratch/rech/ncm/udc54vm/experiments/robust-embeddings/laser/experiment_025_valid/scores"
+input_dir = "/gpfsscratch/rech/rnh/udc54vm/experiments/robust-embeddings/laser/experiment_026_valid/scores"
 
 all_scores = pd.read_csv(os.path.join(input_dir, "all_scores" + ".csv" ))
 #all_scores.drop(all_scores[all_scores['model'] == 'roberta-init'].index, inplace=True)
