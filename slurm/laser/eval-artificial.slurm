@@ -86,7 +86,6 @@ do
     echo "Seed $SEED"
     for CORPUS_PART in $CORPUS_PARTS
     do
-        INPUT_DIR=$DATASETS/$CORPUS/ugc/$SEED/$CORPUS_PART
         OUTPUT_DIR=$OUTPUT_DIR/$CORPUS/$SEED/$CORPUS_PART
         
         echo "$CORPUS_PART"
@@ -94,8 +93,8 @@ do
         echo " - calculating xsim and cos dist"
 
         python3 $LASER/source/eval.py                \
-            --base-dir $INPUT_DIR                         \
-            --corpus $CORPUS/$SEED                        \
+            --base-dir $DATASETS                         \
+            --corpus $CORPUS/ugc/$SEED                        \
             --corpus-part $CORPUS_PART               \
             --margin ratio                           \
             --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
@@ -110,8 +109,8 @@ do
         echo " - calculating xsim++"
 
         python3 $LASER/source/eval.py                \
-            --base-dir $INPUT_DIR                         \
-            --corpus $CORPUS/$SEED                         \
+            --base-dir $DATASETS                         \
+            --corpus $CORPUS/ugc/$SEED                         \
             --corpus-part $CORPUS_PART               \
             --margin ratio                           \
             --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
