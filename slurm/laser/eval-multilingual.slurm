@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=eval-natural      # Job name
+#SBATCH --job-name=eval-multilingual      # Job name
 #SBATCH --account=ncm@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
@@ -72,45 +72,53 @@ TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
-#------------------ LEXNORM ------------------#
-
-NOISY_LANGS[0]=en.src
-TARGET_LANG[0]=en.ref
-CORPUS[0]=multilexnorm2021/en
-CORPUS_PARTS[0]="test"
-
-#------------------ ROCSMT ------------------#
-
-NOISY_LANGS[1]=raw.en
-TARGET_LANG[1]=norm.en
-CORPUS[1]=rocsmt
-CORPUS_PARTS[1]="test"
-
-for i in {0..1}
-do
-    echo "${CORPUS[$i]}"
-    for CORPUS_PART in ${CORPUS_PARTS[$i]}
-    do
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
+CORPUS=rocsmt
+CORPUS_PART="test"
+PIVOT_LANGS="raw.en,norm.en"
+OTHER_LANGS="ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
         
-        echo "$CORPUS_PART"
-        
-        echo " - calculating xsim and cos dist"
+echo "xx-en"
 
-        python3 $LASER/source/eval.py                \
-            --base-dir $DATASETS                         \
-            --corpus ${CORPUS[$i]}                        \
-            --corpus-part $CORPUS_PART               \
-            --margin ratio                           \
-            --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
-            --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
-            --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
-            --src-langs ${NOISY_LANGS[$i]}      \
-            --tgt-langs ${TARGET_LANG[$i]} \
-            --output-dir $OUTPUT_DIR \
-            --cosine-distances \
-            --verbose 
+echo " - calculating xsim and cos dist"
 
-    done
-done
-echo "Done..."
+OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS_PART/xx-en
+
+python3 $LASER/source/eval.py                \
+    --base-dir $DATASETS                         \
+    --corpus $CORPUS                        \
+    --corpus-part $CORPUS_PART               \
+    --margin ratio                           \
+    --src-encoder ${MODEL_PATH[0]} \
+    --src-vocab-file ${VOCAB_FILE[0]} \
+    --src-tokenizer ${TOKENIZER[0]} \
+    --src-langs $OTHER_LANGS \
+    --tgt-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+    --tgt-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --tgt-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+    --tgt-langs $PIVOT_LANGS       \
+    --output-dir $OUTPUT_DIR \
+    --cosine-distances \
+    --verbose 
+
+echo "en-xx"
+
+echo " - calculating xsim and cos dist"
+
+OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS_PART/en-xx
+
+python3 $LASER/source/eval.py                \
+    --base-dir $DATASETS                         \
+    --corpus $CORPUS                        \
+    --corpus-part $CORPUS_PART               \
+    --margin ratio                           \
+    --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+    --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+    --src-langs $PIVOT_LANGS      \
+    --tgt-encoder ${MODEL_PATH[0]} \
+    --tgt-vocab-file ${VOCAB_FILE[0]} \
+    --tgt-tokenizer ${TOKENIZER[0]} \
+    --tgt-langs $OTHER_LANGS \
+    --output-dir $OUTPUT_DIR \
+    --cosine-distances \
+    --verbose 
