@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-4
+#SBATCH --array=0-1
 
 set -e 
 
@@ -71,7 +71,7 @@ VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
-OUTPUT_DIR=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
 #------------------ LEXNORM ------------------#
 
@@ -92,7 +92,7 @@ do
     echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
-        OUTPUT_DIR=$OUTPUT_DIR/${CORPUS[$i]}/$CORPUS_PART
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
         
         echo "$CORPUS_PART"
         

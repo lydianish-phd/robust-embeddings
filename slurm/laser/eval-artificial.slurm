@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-4
+#SBATCH --array=5-8
 
 set -e 
 
@@ -78,7 +78,7 @@ eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TARGET_LANG=eng_Latn
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
-OUTPUT_DIR=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
 CORPUS_PARTS="dev"
 
@@ -87,7 +87,7 @@ do
     echo "Seed $SEED"
     for CORPUS_PART in $CORPUS_PARTS
     do
-        OUTPUT_DIR=$OUTPUT_DIR/$CORPUS/$SEED/$CORPUS_PART
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$CORPUS_PART
         
         echo "$CORPUS_PART"
         

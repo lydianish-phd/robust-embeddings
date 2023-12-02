@@ -21,7 +21,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     seeds = [ str(s) for s in range(100,110) ]
-    corpus_parts = [ "dev", "devtest" ]
+    corpus_parts = [ "devtest" ]
     metrics = ["cosine_distance", "xsim", "xsimpp"]
 
     for metric in metrics:
