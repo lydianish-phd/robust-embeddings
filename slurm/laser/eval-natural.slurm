@@ -1,62 +1,117 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval-natural      # Job name
-#SBATCH --account=rnh@v100
+#SBATCH --account=ncm@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
+#SBATCH --array=0-4
 
 set -e 
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
+
+module purge
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+
 source $HOME/.bashrc
 source $HOME/.bash_profile
-source activate laser_env
+
+MODEL_NAME[0]=laser
+MODEL_PATH[0]=$LASER/models/laser2.pt
+VOCAB_FILE[0]=$LASER/models/laser2.cvocab
+TOKENIZER[0]=$HOME/data-preparation/src/spm-tokenizer.py
+
+EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
+DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
+
+MODEL_NAME[1]=roberta-maxpool
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models/checkpoint_best.pt
+VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[2]=roberta-maxpool-init
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models/checkpoint_best.pt
+VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[3]=roberta-meanpool
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models/checkpoint_best.pt
+VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[4]=roberta-meanpool-init
+MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models/checkpoint_best.pt
+VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[4]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[5]=c-roberta-maxpool
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models/checkpoint_best.pt
+VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[6]=c-roberta-maxpool-init
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models/checkpoint_best.pt
+VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[7]=c-roberta-meanpool
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models/checkpoint_best.pt
+VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[7]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[8]=c-roberta-meanpool-init
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models/checkpoint_best.pt
+VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
+
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
+OUTPUT_DIR=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
 #------------------ LEXNORM ------------------#
 
-# NOISY_LANGS=uncased.raw.src
-# TARGET_LANG=uncased.raw.ref
-# EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec
-# INPUT_DIR=$EXPERIMENT_DIR/tok/laser/
-# CORPUS=lexnorm2015
-# CORPUS_PARTS="train test"
+NOISY_LANGS[0]=en.src
+TARGET_LANG[0]=en.ref
+CORPUS[0]=multilexnorm2021/en
+CORPUS_PARTS[0]="test"
 
 #------------------ ROCSMT ------------------#
 
-NOISY_LANGS=src.raw-manseg.en
-TARGET_LANG=src.norm-manseg.en
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec
-INPUT_DIR=$EXPERIMENT_DIR/tok/laser/
-CORPUS=rocsmt
-CORPUS_PARTS="test"
+NOISY_LANGS[1]=raw.en
+TARGET_LANG[1]=norm.en
+CORPUS[1]=rocsmt
+CORPUS_PARTS[1]="test"
 
-for CORPUS_PART in $CORPUS_PARTS
+for i in {0..1}
 do
-    OUTPUT_DIR=$INPUT_DIR/$CORPUS/$CORPUS_PART
-    
-    echo "$CORPUS_PART"
-    
-    echo " - calculating xsim and cos dist"
+    echo "${CORPUS[$i]}"
+    for CORPUS_PART in ${CORPUS_PARTS[$i]}
+    do
+        OUTPUT_DIR=$OUTPUT_DIR/${CORPUS[$i]}/$CORPUS_PART
+        
+        echo "$CORPUS_PART"
+        
+        echo " - calculating xsim and cos dist"
 
-    python3 $LASER/source/eval.py                \
-        --base-dir $INPUT_DIR                         \
-        --corpus $CORPUS                        \
-        --corpus-part $CORPUS_PART               \
-        --margin ratio                           \
-        --src-encoder   $LASER/models/laser2.pt  \
-        --src-vocab-file $LASER/models/laser2.cvocab \
-        --src-langs $NOISY_LANGS      \
-        --tgt-langs $TARGET_LANG \
-        --output-dir $OUTPUT_DIR \
-        --cosine-distances \
-        --verbose 
+        python3 $LASER/source/eval.py                \
+            --base-dir $DATASETS                         \
+            --corpus ${CORPUS[$i]}                        \
+            --corpus-part $CORPUS_PART               \
+            --margin ratio                           \
+            --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+            --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+            --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+            --src-langs ${NOISY_LANGS[$i]}      \
+            --tgt-langs ${TARGET_LANG[$i]} \
+            --output-dir $OUTPUT_DIR \
+            --cosine-distances \
+            --verbose 
 
+    done
 done
-
 echo "Done..."
