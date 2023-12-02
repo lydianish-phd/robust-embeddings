@@ -20,6 +20,7 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
+
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
@@ -76,8 +77,8 @@ eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
 eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TARGET_LANG=eng_Latn
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
-OUTPUT_DIR=$EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
+OUTPUT_DIR=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
 CORPUS_PARTS="dev"
 
