@@ -1,6 +1,6 @@
 import pandas as pd
 from scipy.stats import ttest_ind
-import os, configargparse
+import os, argparse
 import numpy as np
 
 def _name(m):
@@ -14,18 +14,18 @@ def _file(m):
     return m + "_matrix.csv"
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-dir", dest="input_dir", help="path to ugc directory with outputs of different seeds", type=str)
+    parser = argparse.ArgParser()
+    parser.add("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str)
     parser.add("-m", "--model", help="name of model to compare to LASER", type=str)
     parser.add("-c", "--corpus", help="name of corpus", type=str, default="flores200")
+    parser.add("-p", "--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])
     args = parser.parse_args()
 
     seeds = [ str(s) for s in range(100,110) ]
-    corpus_parts = [ "devtest" ]
     metrics = ["cosine_distance", "xsim", "xsimpp"]
 
     for metric in metrics:
-        for corpus_part in corpus_parts:
+        for corpus_part in args.corpus_parts:
             output_file = os.path.join(args.input_dir, args.model, args.corpus, corpus_part + '-' + _file(metric))
             all_data = pd.DataFrame(columns=["dataset", "src-tgt", _name(metric)])
             for seed in seeds:
