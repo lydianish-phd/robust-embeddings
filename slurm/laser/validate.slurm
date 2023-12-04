@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=5-8
+#SBATCH --array=0-8
 
 set -e 
 
@@ -30,48 +30,48 @@ EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[1]=roberta-maxpool
-MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_028/models
 VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-maxpool-init
-MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_028b/models
 VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=roberta-meanpool
-MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_028c/models
 VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[4]=roberta-meanpool-init
-MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models
+MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_028d/models
 VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[4]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[5]=c-roberta-maxpool
-MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_028e/models
 VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[6]=c-roberta-maxpool-init
-MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_028f/models
 VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[7]=c-roberta-meanpool
-MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_028g/models
 VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[7]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[8]=c-roberta-meanpool-init
-MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_028h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
 VALIDATION_SEED=110
-INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_026_valid
+INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_028
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_028_valid
 PREFIX=$DATASETS/flores200/ugc/$VALIDATION_SEED/dev
 
 python $HOME/robust-embeddings/src/laser/validate.py \

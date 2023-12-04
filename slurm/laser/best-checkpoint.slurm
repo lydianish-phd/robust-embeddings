@@ -18,7 +18,7 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_026_valid/scores
+INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_028_valid/scores
 
 echo "Selecting best checkpoint..."
 
