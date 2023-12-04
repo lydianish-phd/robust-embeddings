@@ -18,28 +18,29 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 
 set -e
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="030"
+EXPERIMENT_NUM[0]="029"
 PORT[0]="12341"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="030b"
+EXPERIMENT_NUM[1]="029b"
 PORT[1]="12342"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="030c"
+EXPERIMENT_NUM[2]="029c"
 PORT[2]="12343"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="030d"
+EXPERIMENT_NUM[3]="029d"
 PORT[3]="12344"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"

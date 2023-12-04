@@ -18,28 +18,29 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 
 set -e
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="030e"
+EXPERIMENT_NUM[0]="028e"
 PORT[0]="12345"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="030f"
+EXPERIMENT_NUM[1]="028f"
 PORT[1]="12346"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="030g"
+EXPERIMENT_NUM[2]="028g"
 PORT[2]="12347"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="030h"
+EXPERIMENT_NUM[3]="028h"
 PORT[3]="12348"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
@@ -68,7 +69,7 @@ srun fairseq-train \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \
     --adam-eps 1e-6 \
-    --lr 0.00001 \
+    --lr 0.00005 \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
