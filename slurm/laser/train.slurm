@@ -24,22 +24,22 @@ set -e
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="026"
+EXPERIMENT_NUM[0]="028"
 PORT[0]="12341"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="026b"
+EXPERIMENT_NUM[1]="028b"
 PORT[1]="12342"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="026c"
+EXPERIMENT_NUM[2]="028c"
 PORT[2]="12343"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="026d"
+EXPERIMENT_NUM[3]="028d"
 PORT[3]="12344"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
@@ -68,7 +68,7 @@ srun fairseq-train \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \
     --adam-eps 1e-6 \
-    --lr 0.0001 \
+    --lr 0.00005 \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \

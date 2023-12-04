@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0,3
+#SBATCH --array=0-3
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -24,22 +24,22 @@ set -e
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="026e"
+EXPERIMENT_NUM[0]="028e"
 PORT[0]="12345"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="026f"
+EXPERIMENT_NUM[1]="028f"
 PORT[1]="12346"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="026g"
+EXPERIMENT_NUM[2]="028g"
 PORT[2]="12347"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="026h"
+EXPERIMENT_NUM[3]="028h"
 PORT[3]="12348"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
@@ -68,7 +68,7 @@ srun fairseq-train \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \
     --adam-eps 1e-6 \
-    --lr 0.0001 \
+    --lr 0.00005 \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \

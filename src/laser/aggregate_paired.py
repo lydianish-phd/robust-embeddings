@@ -14,11 +14,11 @@ def _file(m):
     return m + "_matrix.csv"
 
 if __name__ == "__main__":
-    parser = argparse.ArgParser()
-    parser.add("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str)
-    parser.add("-m", "--model", help="name of model to compare to LASER", type=str)
-    parser.add("-c", "--corpus", help="name of corpus", type=str, default="flores200")
-    parser.add("-p", "--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str)
+    parser.add_argument("-m", "--model", help="name of model to compare to LASER", type=str)
+    parser.add_argument("-c", "--corpus", help="name of corpus", type=str, default="flores200")
+    parser.add_argument("-p", "--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])
     args = parser.parse_args()
 
     seeds = [ str(s) for s in range(100,110) ]

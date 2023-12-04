@@ -81,7 +81,7 @@ echo "xx-en"
 
 echo " - calculating xsim and cos dist"
 
-OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS_PART/xx-en
+OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART/xx-en
 
 python3 $LASER/source/eval.py                \
     --base-dir $DATASETS                         \
@@ -104,7 +104,7 @@ echo "en-xx"
 
 echo " - calculating xsim and cos dist"
 
-OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS_PART/en-xx
+OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART/en-xx
 
 python3 $LASER/source/eval.py                \
     --base-dir $DATASETS                         \
