@@ -11,6 +11,7 @@ echo "### Running $SLURM_JOB_NAME ###"
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 source activate laser_env
 
 STUDENT_LANG[0]=charbertstd

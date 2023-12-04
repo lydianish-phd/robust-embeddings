@@ -17,6 +17,7 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 
 TEACHER_VOCAB=$LASER/models/laser2.cvocab
 

@@ -18,6 +18,7 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 source activate laser_env
 
 CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz

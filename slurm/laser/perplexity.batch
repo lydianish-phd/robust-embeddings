@@ -17,7 +17,8 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
-source activate laser_env
+source $HOME/.bash_python_exports
+ activate laser_env
 
 INPUT_DIR=$DATASETS
 

@@ -17,6 +17,7 @@ module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 
 INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_028_valid/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
