@@ -24,22 +24,22 @@ set -e
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="028"
+EXPERIMENT_NUM[0]="030"
 PORT[0]="12341"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="028b"
+EXPERIMENT_NUM[1]="030b"
 PORT[1]="12342"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="028c"
+EXPERIMENT_NUM[2]="030c"
 PORT[2]="12343"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="028d"
+EXPERIMENT_NUM[3]="030d"
 PORT[3]="12344"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
@@ -68,7 +68,7 @@ srun fairseq-train \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \
     --adam-eps 1e-6 \
-    --lr 0.00005 \
+    --lr 0.00001 \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
@@ -98,6 +98,6 @@ srun fairseq-train \
     --student-teacher-config "distil:robertaugc-laserstd,distil:robertastd-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    #${INIT[$SLURM_ARRAY_TASK_ID]}
+    ${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
