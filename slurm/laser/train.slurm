@@ -99,6 +99,6 @@ srun fairseq-train \
     --student-teacher-config "distil:robertaugc-laserstd,distil:robertastd-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    ${INIT[$SLURM_ARRAY_TASK_ID]}
+    #${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
