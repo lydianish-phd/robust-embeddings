@@ -22,25 +22,28 @@ source $HOME/.bash_python_exports
 
 set -e
 
+EXPERIMENT_BASE_NUM="029"
+LEARNING_RATE=0.00001
+
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
-EXPERIMENT_NUM[0]="029"
+EXPERIMENT_NUM[0]="${EXPERIMENT_BASE_NUM}"
 PORT[0]="12341"
 POOLING[0]="maxpool"
 INIT[0]=""
 
-EXPERIMENT_NUM[1]="029b"
+EXPERIMENT_NUM[1]="${EXPERIMENT_BASE_NUM}b"
 PORT[1]="12342"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
-EXPERIMENT_NUM[2]="029c"
+EXPERIMENT_NUM[2]="${EXPERIMENT_BASE_NUM}c"
 PORT[2]="12343"
 POOLING[2]="meanpool"
 INIT[2]=""
 
-EXPERIMENT_NUM[3]="029d"
+EXPERIMENT_NUM[3]="${EXPERIMENT_BASE_NUM}d"
 PORT[3]="12344"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
@@ -69,7 +72,7 @@ srun fairseq-train \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \
     --adam-eps 1e-6 \
-    --lr 0.00001 \
+    --lr $LEARNING_RATE \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
