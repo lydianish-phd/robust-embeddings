@@ -22,6 +22,8 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
+EXPERIMENT_BASE_NUM="027"
+
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
@@ -31,42 +33,42 @@ EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[1]=roberta-maxpool
-MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_026/models/checkpoint_best.pt
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_best.pt
 VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-maxpool-init
-MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_026b/models/checkpoint_best.pt
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}b/models/checkpoint_best.pt
 VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=roberta-meanpool
-MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_026c/models/checkpoint_best.pt
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}c/models/checkpoint_best.pt
 VOCAB_FILE[3]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[4]=roberta-meanpool-init
-MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_026d/models/checkpoint_best.pt
+MODEL_PATH[4]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}d/models/checkpoint_best.pt
 VOCAB_FILE[4]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[4]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[5]=c-roberta-maxpool
-MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_026e/models/checkpoint_best.pt
+MODEL_PATH[5]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}e/models/checkpoint_best.pt
 VOCAB_FILE[5]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[6]=c-roberta-maxpool-init
-MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_026f/models/checkpoint_best.pt
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}f/models/checkpoint_best.pt
 VOCAB_FILE[6]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[7]=c-roberta-meanpool
-MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_026g/models/checkpoint_best.pt
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}g/models/checkpoint_best.pt
 VOCAB_FILE[7]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[7]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[8]=c-roberta-meanpool-init
-MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_026h/models/checkpoint_best.pt
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}h/models/checkpoint_best.pt
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
@@ -78,7 +80,7 @@ eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
 eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TARGET_LANG=eng_Latn
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
 CORPUS_PARTS="dev"
