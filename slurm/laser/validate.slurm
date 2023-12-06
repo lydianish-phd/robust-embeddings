@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="027"
+EXPERIMENT_BASE_NUM="029"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -73,7 +73,6 @@ VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
 VALIDATION_SEED=110
-INPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}_valid
 PREFIX=$DATASETS/flores200/ugc/$VALIDATION_SEED/dev
 

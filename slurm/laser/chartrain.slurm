@@ -22,8 +22,8 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="029"
-LEARNING_RATE=0.00001
+EXPERIMENT_BASE_NUM="030"
+LEARNING_RATE="0.0001 --lr-scheduler inverse_sqrt"
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
@@ -102,6 +102,6 @@ srun fairseq-train \
     --student-teacher-config "distil:charobertaugc-laserstd,distil:charobertastd-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    #${INIT[$SLURM_ARRAY_TASK_ID]}
+   ${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
