@@ -19,7 +19,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_029_valid/scores
+INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_027_valid/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
 echo "Selecting best checkpoint..."

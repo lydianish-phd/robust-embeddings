@@ -83,7 +83,7 @@ CORPUS_PART=test
 
 OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART
 mkdir -p $OUTPUT_DIR
-rm -r $OUTPUT_DIR/* # overwrite
+rm -f $OUTPUT_DIR/* # overwrite
 
 for LANG in $LANGS
 do
