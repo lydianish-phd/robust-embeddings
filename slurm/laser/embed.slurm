@@ -77,7 +77,12 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/embeddings/${MODEL_NAME[$SLURM_ARRAY_TA
 
 #------------------ ROCSMT ------------------#
 
-LANGS="raw.en norm.en ref.cs ref.de ref.fr ref.ru ref.uk"
+LANGS[0]="raw.en norm.en ref.cs ref.de ref.fr ref.ru ref.uk"
+for i in {1..8}
+do
+    LANGS[$i]="raw.en norm.en"
+done
+
 CORPUS=rocsmt
 CORPUS_PART=test
 
@@ -85,7 +90,7 @@ OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART
 mkdir -p $OUTPUT_DIR
 rm -f $OUTPUT_DIR/* # overwrite
 
-for LANG in $LANGS
+for LANG in ${LANGS[$SLURM_ARRAY_TASK_ID]}
 do
     INPUT_FILE_NAME=$DATASETS/$CORPUS/$CORPUS_PART/$LANG.$CORPUS_PART
     OUTPUT_EMBED_FILE=$OUTPUT_DIR/$LANG.$CORPUS_PART.bin
