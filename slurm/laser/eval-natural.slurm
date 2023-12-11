@@ -7,9 +7,9 @@
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=20:00:00               # Time limit hrs:min:sec
+#SBATCH --time=1:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-1
+#SBATCH --array=1-4
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="027"
+EXPERIMENT_BASE_NUM="031"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
