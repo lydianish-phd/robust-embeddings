@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=20:00:00
+#SBATCH --time=6:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-8
 
