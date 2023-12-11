@@ -1,11 +1,11 @@
-import os, configargparse
+import os, argparse
 import pandas as pd
 import numpy as np
 from score import model_display_name
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-dir", dest="input_dir", help="path to ugc directory with outputs of different seeds", type=str)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str)
     args = parser.parse_args()
 
     models = [ f.name for f in os.scandir(args.input_dir) if f.is_dir() and f.name != "laser" ]
@@ -25,3 +25,5 @@ if __name__ == "__main__":
     all_scores.loc[idx_best_loss_std_gold].to_csv(os.path.join(args.input_dir, "idx_best_loss_std_gold" + ".csv" ))
     all_scores.loc[idx_best_loss_ugc_gold].to_csv(os.path.join(args.input_dir, "idx_best_loss_ugc_gold" + ".csv" ))
     all_scores.to_csv(os.path.join(args.input_dir, "all_scores" + ".csv" ))
+
+

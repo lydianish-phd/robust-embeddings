@@ -19,7 +19,8 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-INPUT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_029_valid/scores
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_029
+INPUT_DIR=${EXPERIMENT_DIR}_valid/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
 echo "Selecting best checkpoint..."
@@ -27,5 +28,7 @@ echo "Selecting best checkpoint..."
 python $SRC_DIR/best.py -i $INPUT_DIR
 
 python $SRC_DIR/plot_train_valid.py -i $INPUT_DIR
+
+python $SRC_DIR/rename_best.py -d $EXPERIMENT_DIR
 
 echo "Done..."
