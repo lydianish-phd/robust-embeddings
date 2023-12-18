@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0,2
+#SBATCH --array=0
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,8 +22,8 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="029"
-LEARNING_RATE="0.00001" #--lr-scheduler inverse_sqrt"
+EXPERIMENT_BASE_NUM="028"
+LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin

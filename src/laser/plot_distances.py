@@ -123,6 +123,7 @@ if __name__ == "__main__":
     data["sentence"] = [ f"sent {i%n_sentences}" for i in range(X.shape[0]) ]
 
     subset = data[data["sentence"] == f"sent 986"]
+    subset = subset[subset["model"] != "c-RoLASER"]
     subset_multi = subset[subset["type"] == "tra"]
 
     print("Plotting sentences in reduced embedding space...")
