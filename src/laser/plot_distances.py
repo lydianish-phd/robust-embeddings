@@ -93,6 +93,19 @@ if __name__ == "__main__":
         }
     ]
 
+    examples = [
+        {
+            "id": 986,
+            "ugc": "eye wud liek 2 aply 4 vilage idot",
+            "std": "I would like to apply for village idiot."
+        },
+        {
+            "id": 760,
+            "ugc": "But tmrw im no longer putting up with it.",
+            "std": "But tomorrow I’m no longer putting up with it."            
+        }
+    ]
+
     seed = 0
     X_multi_files = [ read_embeddings(file) for file in multilingual_files.values() ] 
     X_noisy_files = [ read_embeddings(file["file"]) for file in noisy_files ]
@@ -122,19 +135,20 @@ if __name__ == "__main__":
     data["type"] = np.concatenate([X_multi_types, X_noisy_types])
     data["sentence"] = [ f"sent {i%n_sentences}" for i in range(X.shape[0]) ]
 
-    subset = data[data["sentence"] == f"sent 986"]
-    subset = subset[subset["model"] != "c-RoLASER"]
-    subset_multi = subset[subset["type"] == "tra"]
-
     print("Plotting sentences in reduced embedding space...")
-    fig, ax = plt.subplots(figsize=(6,6))
-    plot_circles(ax, subset)
-    plot_langs(ax, subset_multi)
-    ax.set_title("UGC: eye wud liek 2 aply 4 vilage idot \n(STD: I would like to apply for village idiot.)")
-    ax.set_aspect("equal")
-    ax.legend(loc='lower right')
-    fig.tight_layout(pad=0.25)
-    plt.savefig(os.path.join(args.evaldir, "scores", "pca_distances.pdf"), format="pdf")
+    for i, example in enumerate(examples):
+        subset = data[data["sentence"] == f"sent {example['id']}"]
+        subset = subset[subset["model"] != "c-RoLASER"]
+        subset_multi = subset[subset["type"] == "tra"]
+        plt.clf()
+        fig, ax = plt.subplots(figsize=(6,6))
+        plot_circles(ax, subset)
+        plot_langs(ax, subset_multi)
+        ax.set_title(f"UGC: {example['ugc']}\n(STD: {example['std']})")
+        ax.set_aspect("equal")
+        ax.legend(loc='lower right')
+        fig.tight_layout(pad=0.25)
+        plt.savefig(os.path.join(args.evaldir, "scores", f"pca_distances_{i}.pdf"), format="pdf")
     
     print("Computing distance preservation correlation...")
     pca_r = distance_preservation_correlation(X, data)
