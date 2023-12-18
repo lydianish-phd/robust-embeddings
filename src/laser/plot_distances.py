@@ -57,37 +57,37 @@ if __name__ == "__main__":
     c_rolaser_embed_dir = os.path.join(args.evaldir, "embeddings", "c-roberta-maxpool", "rocsmt", "test")
     
     multilingual_files = {
-        "en": os.path.join(laser_embed_dir, "norm.en.test"),
-        "cs": os.path.join(laser_embed_dir, "ref.cs.test"),
-        "de": os.path.join(laser_embed_dir, "ref.de.test"),
-        "fr": os.path.join(laser_embed_dir, "ref.fr.test"),
-        "ru": os.path.join(laser_embed_dir, "ref.ru.test"),
-        "uk": os.path.join(laser_embed_dir, "ref.uk.test")
+        "en": os.path.join(laser_embed_dir, "norm.en.test.bin"),
+        "cs": os.path.join(laser_embed_dir, "ref.cs.test.bin"),
+        "de": os.path.join(laser_embed_dir, "ref.de.test.bin"),
+        "fr": os.path.join(laser_embed_dir, "ref.fr.test.bin"),
+        "ru": os.path.join(laser_embed_dir, "ref.ru.test.bin"),
+        "uk": os.path.join(laser_embed_dir, "ref.uk.test.bin")
     }
     
     noisy_files = [
         {
-            "file": os.path.join(laser_embed_dir, "raw.en.test"),
+            "file": os.path.join(laser_embed_dir, "raw.en.test.bin"),
             "model": "LASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(rolaser_embed_dir, "raw.en.test"),
+            "file": os.path.join(rolaser_embed_dir, "raw.en.test.bin"),
             "model": "RoLASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(rolaser_embed_dir, "norm.en.test"),
+            "file": os.path.join(rolaser_embed_dir, "norm.en.test.bin"),
             "model": "RoLASER",
             "type": "std"
         },
         {
-            "file": os.path.join(c_rolaser_embed_dir, "raw.en.test"),
+            "file": os.path.join(c_rolaser_embed_dir, "raw.en.test.bin"),
             "model": "c-RoLASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(c_rolaser_embed_dir, "norm.en.test"),
+            "file": os.path.join(c_rolaser_embed_dir, "norm.en.test.bin"),
             "model": "c-RoLASER",
             "type": "std"
         }

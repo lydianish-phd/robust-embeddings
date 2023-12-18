@@ -110,27 +110,26 @@ python3 $LASER/source/eval.py                \
 
 if [ "$CORPUS" = "flores200" ]
 then
+    echo " - calculating xsim++"
 
-echo " - calculating xsim++"
+    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART/xx-en
 
-OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART/xx-en
-
-python3 $LASER/source/eval.py                \
-    --base-dir $DATASETS                         \
-    --corpus $CORPUS                        \
-    --corpus-part $CORPUS_PART               \
-    --margin ratio                           \
-    --src-encoder ${MODEL_PATH[0]} \
-    --src-vocab-file ${VOCAB_FILE[0]} \
-    --src-tokenizer ${TOKENIZER[0]} \
-    --src-langs $OTHER_LANGS \
-    --tgt-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
-    --tgt-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
-    --tgt-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
-    --tgt-langs $PIVOT_LANGS       \
-    --tgt-aug-langs $PIVOT_LANGS \
-    --output-dir $OUTPUT_DIR \
-    --verbose
+    python3 $LASER/source/eval.py                \
+        --base-dir $DATASETS                         \
+        --corpus $CORPUS                        \
+        --corpus-part $CORPUS_PART               \
+        --margin ratio                           \
+        --src-encoder ${MODEL_PATH[0]} \
+        --src-vocab-file ${VOCAB_FILE[0]} \
+        --src-tokenizer ${TOKENIZER[0]} \
+        --src-langs $OTHER_LANGS \
+        --tgt-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+        --tgt-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+        --tgt-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+        --tgt-langs $PIVOT_LANGS       \
+        --tgt-aug-langs $PIVOT_LANGS \
+        --output-dir $OUTPUT_DIR \
+        --verbose
 fi
 
 echo "en-xx"
