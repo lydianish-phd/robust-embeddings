@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=5-8
+#SBATCH --array=0-1
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="029"
+EXPERIMENT_BASE_NUM="032"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -83,7 +83,7 @@ TARGET_LANG=eng_Latn
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
-CORPUS_PARTS="dev"
+CORPUS_PARTS="devtest"
 
 for SEED in {100..109}
 do

@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="027"
+EXPERIMENT_BASE_NUM="032"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -79,7 +79,12 @@ CORPUS=rocsmt
 CORPUS_PART="test"
 PIVOT_LANGS="raw.en,norm.en"
 OTHER_LANGS="ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
-        
+ 
+#CORPUS=flores200
+#CORPUS_PART="dev"
+#PIVOT_LANGS="eng_Latn"
+#OTHER_LANGS="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
+
 echo "xx-en"
 
 echo " - calculating xsim and cos dist"
@@ -102,6 +107,31 @@ python3 $LASER/source/eval.py                \
     --output-dir $OUTPUT_DIR \
     --cosine-distances \
     --verbose 
+
+if [ "$CORPUS" = "flores200" ]
+then
+
+echo " - calculating xsim++"
+
+OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$CORPUS_PART/xx-en
+
+python3 $LASER/source/eval.py                \
+    --base-dir $DATASETS                         \
+    --corpus $CORPUS                        \
+    --corpus-part $CORPUS_PART               \
+    --margin ratio                           \
+    --src-encoder ${MODEL_PATH[0]} \
+    --src-vocab-file ${VOCAB_FILE[0]} \
+    --src-tokenizer ${TOKENIZER[0]} \
+    --src-langs $OTHER_LANGS \
+    --tgt-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+    --tgt-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --tgt-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+    --tgt-langs $PIVOT_LANGS       \
+    --tgt-aug-langs $PIVOT_LANGS \
+    --output-dir $OUTPUT_DIR \
+    --verbose
+fi
 
 echo "en-xx"
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=validate      # Job name
-#SBATCH --account=rnh@v100
+#SBATCH --account=ncm@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-8
+#SBATCH --array=5,7
 
 set -e 
 

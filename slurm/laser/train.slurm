@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-3
+#SBATCH --array=2-3
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,8 +22,9 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="031"
-LEARNING_RATE="0.000001" #--lr-scheduler inverse_sqrt"
+EXPERIMENT_BASE_NUM="032"
+LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
+CONFIG="distil:robertaugc-laserstd" #,distil:robertastd-laserstd"
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
@@ -78,7 +79,7 @@ srun fairseq-train \
     --update-freq 1 \
     --dropout 0.3 \
     --max-tokens 4000 \
-    --max-epoch 50 \
+    --max-epoch 100 \
     --student-bpe-symbol roberta \
     --left-pad-source False \
     --left-pad-target True \
@@ -99,7 +100,7 @@ srun fairseq-train \
     --lambda-self 0 \
     --lambda-mask 0 \
     --lambda-distil 1.0 \
-    --student-teacher-config "distil:robertaugc-laserstd,distil:robertastd-laserstd" \
+    --student-teacher-config $CONFIG \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
     #${INIT[$SLURM_ARRAY_TASK_ID]}

@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=1:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-4
+#SBATCH --array=0,1,5
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="031"
+EXPERIMENT_BASE_NUM="028"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -74,6 +74,7 @@ TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+EMBED_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/embeddings/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 
 #------------------ LEXNORM ------------------#
 
@@ -95,7 +96,8 @@ do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
-        
+        EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
+
         echo "$CORPUS_PART"
         
         echo " - calculating xsim and cos dist"
@@ -111,6 +113,7 @@ do
             --src-langs ${NOISY_LANGS[$i]}      \
             --tgt-langs ${TARGET_LANG[$i]} \
             --output-dir $OUTPUT_DIR \
+	    --embed-dir $EMBED_DIR \
             --cosine-distances \
             --verbose 
 

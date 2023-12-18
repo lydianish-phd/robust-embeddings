@@ -57,37 +57,37 @@ if __name__ == "__main__":
     c_rolaser_embed_dir = os.path.join(args.evaldir, "embeddings", "c-roberta-maxpool", "rocsmt", "test")
     
     multilingual_files = {
-        "en": os.path.join(laser_embed_dir, "norm.en.test.bin"),
-        "cs": os.path.join(laser_embed_dir, "ref.cs.test.bin"),
-        "de": os.path.join(laser_embed_dir, "ref.de.test.bin"),
-        "fr": os.path.join(laser_embed_dir, "ref.fr.test.bin"),
-        "ru": os.path.join(laser_embed_dir, "ref.ru.test.bin"),
-        "uk": os.path.join(laser_embed_dir, "ref.uk.test.bin")
+        "en": os.path.join(laser_embed_dir, "norm.en.test"),
+        "cs": os.path.join(laser_embed_dir, "ref.cs.test"),
+        "de": os.path.join(laser_embed_dir, "ref.de.test"),
+        "fr": os.path.join(laser_embed_dir, "ref.fr.test"),
+        "ru": os.path.join(laser_embed_dir, "ref.ru.test"),
+        "uk": os.path.join(laser_embed_dir, "ref.uk.test")
     }
     
     noisy_files = [
         {
-            "file": os.path.join(laser_embed_dir, "raw.en.test.bin"),
+            "file": os.path.join(laser_embed_dir, "raw.en.test"),
             "model": "LASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(rolaser_embed_dir, "raw.en.test.bin"),
+            "file": os.path.join(rolaser_embed_dir, "raw.en.test"),
             "model": "RoLASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(rolaser_embed_dir, "norm.en.test.bin"),
+            "file": os.path.join(rolaser_embed_dir, "norm.en.test"),
             "model": "RoLASER",
             "type": "std"
         },
         {
-            "file": os.path.join(c_rolaser_embed_dir, "raw.en.test.bin"),
+            "file": os.path.join(c_rolaser_embed_dir, "raw.en.test"),
             "model": "c-RoLASER",
             "type": "ugc"
         },
         {
-            "file": os.path.join(c_rolaser_embed_dir, "norm.en.test.bin"),
+            "file": os.path.join(c_rolaser_embed_dir, "norm.en.test"),
             "model": "c-RoLASER",
             "type": "std"
         }
@@ -125,6 +125,7 @@ if __name__ == "__main__":
     subset = data[data["sentence"] == f"sent 986"]
     subset_multi = subset[subset["type"] == "tra"]
 
+    print("Plotting sentences in reduced embedding space...")
     fig, ax = plt.subplots(figsize=(6,6))
     plot_circles(ax, subset)
     plot_langs(ax, subset_multi)
@@ -133,8 +134,9 @@ if __name__ == "__main__":
     ax.legend(loc='lower right')
     fig.tight_layout(pad=0.25)
     plt.savefig(os.path.join(args.evaldir, "scores", "pca_distances.pdf"), format="pdf")
-
+    
+    print("Computing distance preservation correlation...")
     pca_r = distance_preservation_correlation(X, data)
-
-    with open(os.path.join(args.evaldir, "scores", "pca_distances_correlation.txt")) as f:
+    
+    with open(os.path.join(args.evaldir, "scores", "pca_distances_correlation.txt"), "w") as f:
         f.write(f"PCA: {pca_r}\n")

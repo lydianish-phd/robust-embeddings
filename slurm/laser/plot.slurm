@@ -21,6 +21,8 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_027_eval
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_028_eval
 
 python $HOME/robust-embeddings/src/laser/plot_distances.py -d $OUTPUT_EXPERIMENT_DIR
+
+echo "Done..."
