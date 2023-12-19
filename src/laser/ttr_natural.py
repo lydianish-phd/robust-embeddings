@@ -14,7 +14,7 @@ if __name__ == "__main__":
     print("Processing", args.corpus)
     for corpus_part in corpus_parts:
         results = []
-        files = [ file for file in os.scandir(os.path.join(args.input_dir, args.corpus, corpus_part)) if file.name.endswith(f"{corpus_part}.tok") ]
+        files = [ file for file in os.scandir(os.path.join(args.input_dir, corpus_part)) if file.name.endswith(f"{corpus_part}.tok") ]
         for file in files:
             print(file.name)
             with open(file.path, "r") as f:
@@ -26,4 +26,4 @@ if __name__ == "__main__":
             results.append({"file": file.name[:-4], "tokens": len(tokens), "types": len(types), "ttr": ttr})
 
         results_df = pd.DataFrame(results)
-        results_df.to_csv(os.path.join(args.input_dir, args.corpus, corpus_part, _file(metric)))
+        results_df.to_csv(os.path.join(args.input_dir, corpus_part, _file(metric)))
