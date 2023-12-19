@@ -14,7 +14,7 @@ set -e
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load pytorch-gpu/py3/1.13.0
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
