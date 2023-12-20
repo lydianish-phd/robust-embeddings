@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=charpreprocess      # Job name
-#SBATCH --account=ncm@cpu
+#SBATCH --account=rnh@cpu
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --hint=multithread       # we get physical cores not logical

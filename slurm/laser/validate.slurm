@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=validate      # Job name
-#SBATCH --account=ncm@v100
+#SBATCH --account=rnh@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --account=ncm@v100
+#SBATCH --account=rnh@v100
 #SBATCH --nodes=2		# node count
 #SBATCH --ntasks-per-node=4               # total number of tasks across all nodes
 #SBATCH --gres=gpu:4        # GPU nodes are only available in gpu partition
