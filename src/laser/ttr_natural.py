@@ -26,4 +26,4 @@ if __name__ == "__main__":
             results.append({"file": file.name[:-4], "tokens": len(tokens), "types": len(types), "ttr": ttr})
 
         results_df = pd.DataFrame(results)
-        results_df.to_csv(os.path.join(args.input_dir, corpus_part, _file(metric)))
+        results_df.to_csv(os.path.join(args.input_dir, f"{corpus_part}-{_file(metric)}"))

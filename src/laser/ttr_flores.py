@@ -35,7 +35,7 @@ if __name__ == "__main__":
     print("\tAggregating results...")
     for corpus_part in corpus_parts:
         output_file = os.path.join(args.input_dir, corpus_part + '-' + _file(metric))
-        all_data = pd.DataFrame(columns=["file", "types", "tokens", "ttr"])
+        all_data = pd.DataFrame(columns=["file", "types", "tokens", "ttr"]).astype({"tokens": "int", "types": "int", "ttr": "float"})
         for seed in range(100,110):
             input_file = os.path.join(args.input_dir, str(seed), corpus_part, _file(metric))
             data = pd.read_csv(input_file)
