@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=3
+#SBATCH --array=0
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -79,7 +79,7 @@ srun fairseq-train \
     --update-freq 1 \
     --dropout 0.3 \
     --max-tokens 4000 \
-    --max-epoch 100 \
+    --max-epoch 200 \
     --student-bpe-symbol roberta \
     --left-pad-source False \
     --left-pad-target True \

@@ -1,10 +1,11 @@
 #!/bin/bash
 
 #SBATCH --job-name=best      # Job name
-#SBATCH --account=rnh@cpu
+#SBATCH --account=rnh@v100
+#SBATCH --gres=gpu:1
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
-#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --hint=nomultithread       # we get physical cores not logiical
 #SBATCH --time=1:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 

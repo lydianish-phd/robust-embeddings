@@ -15,7 +15,7 @@ if __name__ == "__main__":
     def plot_loss(lossname):
         plt.clf()
         g = sns.lineplot(all_scores, x='steps', y=lossname, hue='model')
-        g.set(ylim=(0, 0.005))
+        g.set(ylim=(0, 0.001))
         g.set_xticklabels([checkpoint_display_name(str(int(c))) for c in g.get_xticks()])
         plt.savefig(os.path.join(args.input_dir, lossname + ".pdf"), format="pdf")
 

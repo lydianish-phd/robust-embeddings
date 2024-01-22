@@ -1,4 +1,4 @@
-import os, configargparse
+import os, argparse
 from transformers import AutoModel, AutoTokenizer
 
 FAIRSEQ_SPECIAL_TOKENS = [
@@ -9,10 +9,10 @@ FAIRSEQ_SPECIAL_TOKENS = [
 ]
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-m", "--model-name", dest="model_name", help="name of pretrained model on HuggingFace", type=str, default="roberta-base")
-    parser.add("-o", "--output-dir", dest="output_dir", help="path to directory to save plots", type=str, default="/home/lnishimw/scratch/models/checkpoints/")
-    parser.add("--cvocab", help="save dictionary in cvocab format", default=False, action="store_true")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model-name", help="name of pretrained model on HuggingFace", type=str, default="roberta-base")
+    parser.add_argument("-o", "--output-dir", help="path to directory to save plots", type=str, default="/home/lnishimw/scratch/models/checkpoints/")
+    parser.add_argument("--cvocab", help="save dictionary in cvocab format", default=False, action="store_true")
     args = parser.parse_args()
 
     output_dir = os.path.join(args.output_dir, args.model_name)

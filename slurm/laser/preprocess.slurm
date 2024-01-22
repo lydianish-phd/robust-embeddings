@@ -7,6 +7,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
+#SBATCH --array=1
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -26,7 +27,7 @@ TEACHER_LANG=laserstd
 STUDENT_LANG[0]=robertastd
 STUDENT_LANG[1]=robertaugc
 
-DATA_DIR=$DATASETS/oscar/mini/4Mlrec
+DATA_DIR=$DATASETS/oscar/mini/4M_40
 TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[$SLURM_ARRAY_TASK_ID]}-$TEACHER_LANG
 BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[$SLURM_ARRAY_TASK_ID]}-$TEACHER_LANG
 
