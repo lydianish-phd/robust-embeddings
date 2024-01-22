@@ -22,34 +22,29 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="032"
-LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
-CONFIG="distil:robertaugc-laserstd" #,distil:robertastd-laserstd"
-MAX_EPOCH=200
+EXPERIMENT_BASE_NUM="033"
+LEARNING_RATE="0.00005" 
+CONFIG="distil:robertaugc-laserstd" 
+POOLING="maxpool"
+MAX_EPOCH=100
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
 
 EXPERIMENT_NUM[0]="${EXPERIMENT_BASE_NUM}"
 PORT[0]="12341"
-POOLING[0]="maxpool"
-INIT[0]=""
 
 EXPERIMENT_NUM[1]="${EXPERIMENT_BASE_NUM}b"
 PORT[1]="12342"
-POOLING[1]="maxpool"
-INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
 
 EXPERIMENT_NUM[2]="${EXPERIMENT_BASE_NUM}c"
 PORT[2]="12343"
-POOLING[2]="meanpool"
-INIT[2]=""
 
 EXPERIMENT_NUM[3]="${EXPERIMENT_BASE_NUM}d"
 PORT[3]="12344"
-POOLING[3]="meanpool"
-INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
 
+EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}e"
+PORT[4]="12345"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
@@ -66,7 +61,7 @@ srun fairseq-train \
     --log-format simple \
     --task laser_distillation \
     --arch laser_transformer \
-    --sentemb-criterion ${POOLING[$SLURM_ARRAY_TASK_ID]} \
+    --sentemb-criterion $POOLING \
     --prepend-bos  \
     --criterion encoder_similarity \
     --mse \
@@ -104,6 +99,5 @@ srun fairseq-train \
     --student-teacher-config $CONFIG \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    #${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
