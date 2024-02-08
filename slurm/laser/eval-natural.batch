@@ -49,8 +49,6 @@ MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
 VOCAB_FILE[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[4]=$HOME/data-preparation/src/char-tokenizer.py
 
-METRIC=xsim
-
 #------------------ MULTILEXNORM ------------------#
 
 # NOISY_LANGS=cleaned.en.src
