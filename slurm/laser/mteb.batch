@@ -33,22 +33,22 @@ TOKENIZER[0]=spm
 
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+VOCAB_PATH[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=roberta
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+VOCAB_PATH[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=roberta
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[3]}/checkpoint_best.pt
-VOCAB_FILE[3]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+VOCAB_PATH[3]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[3]=char
 
 MODEL_NAME[4]=character-roberta-student-init
 MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
-VOCAB_FILE[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+VOCAB_PATH[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[4]=char
 
 OUTPUT_DIR=$LASER_EXPERIMENTS_DIR/experiment_032_jz/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}/mteb
