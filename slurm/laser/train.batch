@@ -23,7 +23,7 @@ source activate laser_env
 set -x
 
 TEACHER_MODEL=$LASER/models/laser2.pt
-STUDENT_MODEL=$MODELS/checkpoints/roberta-base/pytorch_model.bin
+STUDENT_MODEL=$MODELS/roberta-base/pytorch_model.bin
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035
 OUTPUT_DIR=$EXPERIMENT_DIR/models
 TENSORBOARD_DIR=$EXPERIMENT_DIR/tensorboard
@@ -50,6 +50,7 @@ fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
+    --dropout 0.1 \
     --activation-dropout 0.1 \
     --attention-dropout 0.1 \
     --max-tokens 4000 \
@@ -77,6 +78,7 @@ fairseq-train \
     --lambda-distil 1.0 \
     --student-teacher-config "distil:robertaugc-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
+    --student-checkpoint-path $STUDENT_MODEL \
 
 echo "Done..."
 
