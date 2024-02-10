@@ -4,9 +4,10 @@ import pandas as pd
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--basedir", help="path to experiment directory", type=str)
+    parser.add_argument("-s", "--seed", help="validation seed", type=int)
     args = parser.parse_args()
 
-    best_scores = pd.read_csv(os.path.join(f"{args.basedir}_valid", "scores", "idx_best_valid_distil_loss.csv"))
+    best_scores = pd.read_csv(os.path.join(f"{args.basedir}_valid", str(args.seed), "scores", "idx_best_valid_distil_loss.csv"))
     
     for _, row in best_scores.iterrows():
         if row['model'] == "roberta-maxpool":

@@ -22,9 +22,9 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="032"
+EXPERIMENT_BASE_NUM="034"
 LEARNING_RATE="0.00001" #--lr-scheduler inverse_sqrt"
-CONFIG="distil:charobertaugc-laserstd" #,distil:charobertastd-laserstd"
+CONFIG="distil:charobertastd-laserstd" #,distil:charobertastd-laserstd"
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin

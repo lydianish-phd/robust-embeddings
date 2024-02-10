@@ -1,13 +1,14 @@
 #!/bin/bash
 
 #SBATCH --job-name=best      # Job name
-#SBATCH --account=rnh@v100
-#SBATCH --gres=gpu:1
+#SBATCH --account=rnh@cpu
+##SBATCH --gres=gpu:1
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
-#SBATCH --hint=nomultithread       # we get physical cores not logiical
+#SBATCH --hint=multithread       # we get physical cores not logiical
 #SBATCH --time=1:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
+#SBATCH --array=110
 
 set -e 
 
@@ -20,8 +21,8 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_032
-INPUT_DIR=${EXPERIMENT_DIR}_valid/scores
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_034
+INPUT_DIR=${EXPERIMENT_DIR}_valid/$SLURM_ARRAY_TASK_ID/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
 echo "Selecting best checkpoint..."
@@ -30,6 +31,6 @@ python $SRC_DIR/best.py -i $INPUT_DIR
 
 python $SRC_DIR/plot_train_valid.py -i $INPUT_DIR
 
-python $SRC_DIR/rename_best.py -d $EXPERIMENT_DIR
+python $SRC_DIR/rename_best.py -d $EXPERIMENT_DIR -s $SLURM_ARRAY_TASK_ID
 
 echo "Done..."
