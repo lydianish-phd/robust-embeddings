@@ -23,8 +23,8 @@ source activate laser_env
 set -x
 
 TEACHER_MODEL=$LASER/models/laser2.pt
-STUDENT_MODEL=$MODELS/checkpoints/roberta-base/pytorch_model.bin
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024d
+STUDENT_MODEL=$MODELS/character-bert/pytorch_model.bin
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035e
 OUTPUT_DIR=$EXPERIMENT_DIR/models
 TENSORBOARD_DIR=$EXPERIMENT_DIR/tensorboard
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
@@ -50,17 +50,21 @@ fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
-    --dropout 0.3 \
+    --dropout 0.1 \
+    --activation-dropout 0.1 \
+    --attention-dropout 0.1 \
     --max-tokens 14000 \
     --max-epoch 50 \
     --student-bpe-symbol _EOW \
     --left-pad-source False \
     --left-pad-target True \
+    --layernorm-embedding \
     --encoder-character-embeddings \
     --encoder-embed-dim 768 \
     --encoder-layers 12 \
     --encoder-ffn-embed-dim 3072 \
     --encoder-attention-heads 12 \
+    --encoder-normalize-before \
     --decoder-embed-dim 1 \
     --decoder-layers 1 \
     --decoder-ffn-embed-dim 1 \
@@ -73,8 +77,9 @@ fairseq-train \
     --lambda-self 0 \
     --lambda-mask 0 \
     --lambda-distil 1.0 \
-    --student-teacher-config "distil:charobertaugc-laserstd,distil:charobertastd-laserstd" \
+    --student-teacher-config "distil:charobertaugc-laserstd" \
     --tensorboard-logdir $TENSORBOARD_DIR \
+    --student-checkpoint-path $STUDENT_MODEL \
 
 echo "Done..."
 
