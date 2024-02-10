@@ -22,10 +22,10 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="034"
-LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
+EXPERIMENT_BASE_NUM="035"
+LEARNING_RATE="0.0001" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:robertastd-laserstd" #,distil:robertastd-laserstd"
-MAX_EPOCH=300
+MAX_EPOCH=100
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
@@ -78,16 +78,19 @@ srun fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
-    --dropout 0.3 \
+    --activation-dropout 0.1 \
+    --attention-dropout 0.1 \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
     --student-bpe-symbol roberta \
     --left-pad-source False \
     --left-pad-target True \
+    --layernorm-embedding \
     --encoder-embed-dim 768 \
     --encoder-layers 12 \
     --encoder-ffn-embed-dim 3072 \
     --encoder-attention-heads 12 \
+    --encoder-normalize-before \
     --decoder-embed-dim 1 \
     --decoder-layers 1 \
     --decoder-embed-dim 1 \
