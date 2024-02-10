@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=6:00:00
+#SBATCH --time=06:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=1,5
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="032"
+EXPERIMENT_BASE_NUM="034"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -72,8 +72,12 @@ MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
-VALIDATION_SEED=110
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}_valid
+for VALIDATION_SEED in {110..110}
+do
+
+echo "seed $VALIDATION_SEED..."
+
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}_valid/$VALIDATION_SEED
 PREFIX=$DATASETS/flores200/ugc/$VALIDATION_SEED/dev
 
 python $HOME/robust-embeddings/src/laser/validate.py \
@@ -88,5 +92,7 @@ python $HOME/robust-embeddings/src/laser/validate.py \
     --ugc-file $PREFIX/eng_Latn_mix_all.dev \
     --std-file $PREFIX/eng_Latn.dev \
     --output-dir $OUTPUT_EXPERIMENT_DIR \
+
+done
 
 echo "Done..."

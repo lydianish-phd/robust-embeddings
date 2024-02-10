@@ -13,7 +13,7 @@ set -e
 
 echo "### Running $SLURM_JOB_NAME ###"
 
-EXPERIMENT_NUM=029
+EXPERIMENT_NUM=033
 EXPERIMENT_DIR=experiments/robust-embeddings/laser
 
 echo "Backing up files..."
