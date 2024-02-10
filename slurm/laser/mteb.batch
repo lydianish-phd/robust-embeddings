@@ -8,7 +8,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=48:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x%j.log # Standard output and error log
-##SBATCH --array=0,1,3
+#SBATCH --array=0,1,3
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -23,35 +23,35 @@ source activate laser_env
 set -e
 
 LASER_EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
-CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_024_jz
+CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_032_jz
+DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_PATH[0]=$LASER/models/laser2.cvocab
 TOKENIZER[0]=spm
 
-BACKBONE_MODEL=roberta-base
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_PATH[1]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
+VOCAB_PATH[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=roberta
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_PATH[2]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
+VOCAB_PATH[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=roberta
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[3]}/checkpoint_best.pt
-VOCAB_PATH[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+VOCAB_PATH[3]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[3]=char
 
 MODEL_NAME[4]=character-roberta-student-init
 MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
-VOCAB_PATH[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
+VOCAB_PATH[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[4]=char
 
-OUTPUT_DIR=$LASER_EXPERIMENTS_DIR/experiment_025_mteb/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_DIR=$LASER_EXPERIMENTS_DIR/experiment_032_jz/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}/mteb
 
 python $LASER/source/mteb_tasks.py \
     --encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
@@ -59,4 +59,4 @@ python $LASER/source/mteb_tasks.py \
     --tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
     --output-dir $OUTPUT_DIR \
     --verbose \
-    --english-only 
+    --ugc-only 

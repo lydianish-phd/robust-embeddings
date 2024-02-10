@@ -10,7 +10,7 @@
 #SBATCH --hint=nomultithread
 #SBATCH --time=24:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1,3
+#SBATCH --array=0,1,3
 
 set -e 
 
@@ -21,35 +21,33 @@ source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 source activate laser_env
 
-CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_024_jz
+CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_032_jz
+DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
-TOKENIZER_PATH[0]=$HOME/data-preparation/src/spm-tokenizer.sh
+TOKENIZER[0]=$HOME/data-preparation/src/spm-tokenizer.py
 
-BACKBONE_MODEL=roberta-base
 MODEL_NAME[1]=roberta-student
 MODEL_PATH[1]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[1]}/checkpoint_best.pt
-VOCAB_FILE[1]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
-TOKENIZER_PATH[1]=$HOME/data-preparation/src/roberta-tokenizer.sh
+VOCAB_FILE[1]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-student-init
 MODEL_PATH[2]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[2]}/checkpoint_best.pt
-VOCAB_FILE[2]=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
-TOKENIZER_PATH[2]=$HOME/data-preparation/src/roberta-tokenizer.sh
+VOCAB_FILE[2]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=character-roberta-student
 MODEL_PATH[3]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[3]}/checkpoint_best.pt
-VOCAB_FILE[3]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
-TOKENIZER_PATH[3]=$HOME/data-preparation/src/char-tokenizer.sh
+VOCAB_FILE[3]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[3]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[4]=character-roberta-student-init
 MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
-VOCAB_FILE[4]=$DATASETS/oscar/mini/4M/bin/charobertaugc-charobertastd/dict.charobertaugc.txt
-TOKENIZER_PATH[4]=$HOME/data-preparation/src/char-tokenizer.sh
-
-METRIC=xsim
+VOCAB_FILE[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[4]=$HOME/data-preparation/src/char-tokenizer.py
 
 #------------------ MULTILEXNORM ------------------#
 
@@ -62,9 +60,9 @@ METRIC=xsim
 
 #------------------ ROCSMT ------------------#
 
-NOISY_LANGS=cleaned.src.raw-manseg.en
-TARGET_LANG=cleaned.src.norm-manseg.en
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_$METRIC
+NOISY_LANGS=raw.en
+TARGET_LANG=norm.en
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_032_jz
 INPUT_DIR=$DATASETS
 CORPUS=rocsmt
 CORPUS_PARTS="test"
@@ -82,14 +80,13 @@ do
 
     python3 $LASER/source/eval.py                \
         --base-dir $INPUT_DIR                         \
-        --corpus $CORPUS/cleaned                        \
+        --corpus $CORPUS                        \
         --corpus-part $CORPUS_PART               \
         --margin ratio                           \
         --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
-        --src-tokenizer ${TOKENIZER_PATH[$SLURM_ARRAY_TASK_ID]}  \
+        --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]}  \
         --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
         --src-langs $NOISY_LANGS \
-        --tgt-langs $TARGET_LANG \
         --tgt-langs $TARGET_LANG \
         --output-dir $OUTPUT_DIR \
         --embed-dir $EMBED_DIR \
