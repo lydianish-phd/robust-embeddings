@@ -1,4 +1,4 @@
-import os, configargparse
+import os, argparse
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
@@ -60,11 +60,11 @@ def get_data_type(filename):
     return 'ugc'
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-dir", dest="input_dir", help="path to results directory", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/scores")
-    parser.add("-o", "--output-dir", dest="output_dir", help="path to directory to save plots", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/plots")
-    parser.add("-p", "--plot-types", dest="plot_types", help="types of plots", nargs="+", type=str, default=['gold-metrics', 'gold-space-viz', 'paired-metrics'])
-    parser.add("-c", "--checkpoints", help="list of checkpoint names/numbers subdirectories. Leave empty to process all checkpoints.", nargs="+", type=str, default=[])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-dir", help="path to results directory", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/scores")
+    parser.add_argument("-o", "--output-dir", help="path to directory to save plots", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/plots")
+    parser.add_argument("-p", "--plot-types", help="types of plots", nargs="+", type=str, default=['gold-metrics', 'gold-space-viz', 'paired-metrics'])
+    parser.add_argument("-c", "--checkpoints", help="list of checkpoint names/numbers subdirectories. Leave empty to process all checkpoints.", nargs="+", type=str, default=[])
     args = parser.parse_args()
     
     checkpoints = args.checkpoints if args.checkpoints else [ f for f in os.scandir(args.input_dir) if f.is_dir() ]

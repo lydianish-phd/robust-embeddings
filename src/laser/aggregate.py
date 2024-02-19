@@ -1,6 +1,6 @@
 import pandas as pd
 from scipy.stats import ttest_1samp
-import os, configargparse
+import os, argparse
 
 def _name(m):
     if m == "xsimpp":
@@ -13,8 +13,8 @@ def _file(m):
     return m + "_matrix.csv"
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-dir", dest="input_dir", help="path to ugc directory with outputs of different seeds", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/ugc")
+    parser = configargparse.ArgumentParser()
+    parser.add_argument("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/ugc")
     args = parser.parse_args()
  
     seeds = [ str(s) for s in range(100,110) ]

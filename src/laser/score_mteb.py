@@ -13,6 +13,7 @@ if __name__ == "__main__":
         "-i", "--input-dir", required=True, help="Directory to MTEB json score files"
     )
     args = parser.parse_args()
+    
     models = [ f.name for f in os.scandir(args.input_dir) if f.is_dir() ]
     tasks_lists = {
         "pair_classification": TASK_LIST_PAIR_CLASSIFICATION,
