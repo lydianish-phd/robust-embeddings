@@ -51,11 +51,11 @@ TOKENIZER[4]=$HOME/data-preparation/src/char-tokenizer.py
 
 #------------------ MULTILEXNORM ------------------#
 
-# NOISY_LANGS=cleaned.en.src
-# TARGET_LANG=cleaned.en.ref
+# NOISY_LANGS=en.src
+# TARGET_LANG=en.ref
 # EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_$METRIC
 # INPUT_DIR=$DATASETS
-# CORPUS=multilexnorm2021
+# CORPUS=multilexnorm2021/en
 # CORPUS_PARTS="train dev test"
 
 #------------------ ROCSMT ------------------#
