@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval-natural      # Job name
-#SBATCH --account=rnh@v100
+#SBATCH --account=ncm@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=1:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=1-8
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="032"
+EXPERIMENT_BASE_NUM="035"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -80,7 +80,7 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 NOISY_LANGS[0]=en.src
 TARGET_LANG[0]=en.ref
 CORPUS[0]=multilexnorm2021/en
-CORPUS_PARTS[0]="test"
+CORPUS_PARTS[0]="train"
 
 #------------------ ROCSMT ------------------#
 
@@ -89,7 +89,7 @@ TARGET_LANG[1]=norm.en
 CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
 
-for i in {0..1}
+for i in {0..0}
 do
     echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}

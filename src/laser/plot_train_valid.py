@@ -7,6 +7,7 @@ from plot import checkpoint_display_name
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to directory to read validation scores", type=str)
+    parser.add_argument("-y", "--ylim", help="upper limit of y axis", type=float, default=0.001)
     args = parser.parse_args()
 
     all_scores = pd.read_csv(os.path.join(args.input_dir, "all_scores" + ".csv" ))
@@ -15,7 +16,7 @@ if __name__ == "__main__":
     def plot_loss(lossname):
         plt.clf()
         g = sns.lineplot(all_scores, x='steps', y=lossname, hue='model')
-        g.set(ylim=(0, 0.001))
+        g.set(ylim=(0, args.ylim))
         g.set_xticklabels([checkpoint_display_name(str(int(c))) for c in g.get_xticks()])
         plt.savefig(os.path.join(args.input_dir, lossname + ".pdf"), format="pdf")
 

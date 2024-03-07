@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-4
+#SBATCH --array=1
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,8 +22,8 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="035"
-LEARNING_RATE="0.0001" #--lr-scheduler inverse_sqrt"
+EXPERIMENT_BASE_NUM="036"
+LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:robertaugc-laserstd" #,distil:robertastd-laserstd"
 MAX_EPOCH=100
 
@@ -78,6 +78,7 @@ srun fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
+    --dropout 0.1 \
     --activation-dropout 0.1 \
     --attention-dropout 0.1 \
     --max-tokens 4000 \
