@@ -21,7 +21,7 @@ source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 source activate laser_env
 
-CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_032_jz
+CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035_jz
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[0]=laser
@@ -51,18 +51,18 @@ TOKENIZER[4]=$HOME/data-preparation/src/char-tokenizer.py
 
 #------------------ MULTILEXNORM ------------------#
 
-# NOISY_LANGS=cleaned.en.src
-# TARGET_LANG=cleaned.en.ref
+# NOISY_LANGS=en.src
+# TARGET_LANG=en.ref
 # EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_$METRIC
 # INPUT_DIR=$DATASETS
-# CORPUS=multilexnorm2021
+# CORPUS=multilexnorm2021/en
 # CORPUS_PARTS="train dev test"
 
 #------------------ ROCSMT ------------------#
 
 NOISY_LANGS=raw.en
 TARGET_LANG=norm.en
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_032_jz
+EXPERIMENT_DIR=$CHECKPOINT_DIR
 INPUT_DIR=$DATASETS
 CORPUS=rocsmt
 CORPUS_PARTS="test"

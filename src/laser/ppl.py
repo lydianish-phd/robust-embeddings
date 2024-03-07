@@ -1,9 +1,9 @@
-import torch, configargparse
+import torch, argparse
 from transformers import GPT2LMHeadModel, GPT2TokenizerFast
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-file", dest="input_file", help="path to raw input file", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/dev/cleaned.eng_Latn.dev")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-file", help="path to raw input file", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/dev/cleaned.eng_Latn.dev")
     args = parser.parse_args()
 
     device = "cuda"

@@ -1,4 +1,4 @@
-import torch, os, configargparse
+import torch, os, argparse
 import numpy as np
 import pandas as pd
 from embed import embed_sentences
@@ -7,18 +7,18 @@ from sklearn.metrics import mean_squared_error
 from pathlib import Path
 
 if __name__ == "__main__":
-	parser = configargparse.ArgParser()
-	parser.add("--teacher-model", dest="teacher_model", help="name of teacher model", type=str, default="laser")
-	parser.add("--teacher-model-path", dest="teacher_model_path", help="path to teacher model", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.pt")
-	parser.add("--teacher-vocab", dest="teacher_vocab", help="path of teacher model vocabulary", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.cvocab")
-	parser.add("--teacher-tok", dest="teacher_tok", help="teacher tokenizer", type=str, default="spm")
-	parser.add("--student-model", dest="student_model", help="name of student model", type=str)
-	parser.add("--student-model-dir", dest="student_model_dir", help="path to student model checkpoints directory", type=str)
-	parser.add("--student-vocab", dest="student_vocab", help="path of student model vocabulary", type=str)
-	parser.add("--student-tok", dest="student_tok", help="student tokenizer", type=str)
-	parser.add("--ugc-file", dest="ugc_file", help="name of UGC data file", type=str)
-	parser.add("--std-file", dest="std_file", help="name of standard data file", type=str)
-	parser.add("--output-dir", dest="output_dir", help="path to directory to save embeddings and results", type=str)
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--teacher-model", help="name of teacher model", type=str, default="laser")
+	parser.add_argument("--teacher-model-path", help="path to teacher model", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.pt")
+	parser.add_argument("--teacher-vocab", help="path of teacher model vocabulary", type=str, default="/home/lnishimw/scratch/LASER/models/laser2.cvocab")
+	parser.add_argument("--teacher-tok", help="teacher tokenizer", type=str, default="spm")
+	parser.add_argument("--student-model", help="name of student model", type=str)
+	parser.add_argument("--student-model-dir", help="path to student model checkpoints directory", type=str)
+	parser.add_argument("--student-vocab", help="path of student model vocabulary", type=str)
+	parser.add_argument("--student-tok", help="student tokenizer", type=str)
+	parser.add_argument("--ugc-file", help="name of UGC data file", type=str)
+	parser.add_argument("--std-file", help="name of standard data file", type=str)
+	parser.add_argument("--output-dir", help="path to directory to save embeddings and results", type=str)
 	args = parser.parse_args()
 	
 	src_embed_dir = os.path.join(args.output_dir, "embeddings", args.student_model)

@@ -1,4 +1,4 @@
-import os, configargparse
+import os, argparse
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
@@ -26,12 +26,12 @@ def model_display_name(model):
     return model.replace("character", "c").replace("-student", "")
 
 if __name__ == "__main__":
-    parser = configargparse.ArgParser()
-    parser.add("-i", "--input-dir", dest="input_dir", help="path to embeddings directory", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/embeddings")
-    parser.add("-o", "--output-dir", dest="output_dir", help="path to directory to save results", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/scores")
-    parser.add("-g", "--gold-file-name", dest="gold_file_name", help="file name of gold embeddings", type=str, default="cleaned.train.uncased.raw.ref.bin")
-    parser.add("-t", "--teacher-model", dest="teacher_model", help="name of teacher model", type=str, default="laser")
-    parser.add("-c", "--checkpoints", help="list of checkpoint names/numbers subdirectories. Leave empty to process all checkpoints.", nargs="+", type=str, default=[])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--input-dir", help="path to embeddings directory", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/embeddings")
+    parser.add_argument("-o", "--output-dir", help="path to directory to save results", type=str, default="/scratch/lnishimw/experiments/robust-embeddings/laser/experiment_025d/scores")
+    parser.add_argument("-g", "--gold-file-name", help="file name of gold embeddings", type=str, default="cleaned.train.uncased.raw.ref.bin")
+    parser.add_argument("-t", "--teacher-model", help="name of teacher model", type=str, default="laser")
+    parser.add_argument("-c", "--checkpoints", help="list of checkpoint names/numbers subdirectories. Leave empty to process all checkpoints.", nargs="+", type=str, default=[])
     args = parser.parse_args()
     
     checkpoints = args.checkpoints if args.checkpoints else [ f.name for f in os.scandir(args.input_dir) if f.is_dir() ]
