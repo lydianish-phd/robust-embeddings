@@ -8,7 +8,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=48:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x%j.log # Standard output and error log
-#SBATCH --array=0,1,3
+#SBATCH --array=2
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -23,7 +23,7 @@ source activate laser_env
 set -e
 
 LASER_EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
-CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_032_jz
+CHECKPOINT_DIR=$LASER_EXPERIMENTS_DIR/experiment_035_jz
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[0]=laser
@@ -51,7 +51,7 @@ MODEL_PATH[4]=$CHECKPOINT_DIR/checkpoints/${MODEL_NAME[4]}/checkpoint_best.pt
 VOCAB_PATH[4]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[4]=char
 
-OUTPUT_DIR=$LASER_EXPERIMENTS_DIR/experiment_032_jz/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}/mteb
+OUTPUT_DIR=$CHECKPOINT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}/mteb
 
 python $LASER/source/mteb_tasks.py \
     --encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
