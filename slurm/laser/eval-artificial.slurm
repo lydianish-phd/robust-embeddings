@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval-artificial      # Job name
-#SBATCH --account=ncm@v100
+#SBATCH --account=rnh@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0
+#SBATCH --array=2
 
 set -e 
 
@@ -83,7 +83,7 @@ TARGET_LANG=eng_Latn
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
-CORPUS_PARTS="dev"
+CORPUS_PARTS="devtest"
 
 for SEED in {100..109}
 do

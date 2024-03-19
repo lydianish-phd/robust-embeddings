@@ -6,9 +6,9 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=1:00:00               # Time limit hrs:min:sec
+#SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-8
+#SBATCH --array=2
 
 set -e 
 
@@ -34,6 +34,8 @@ MODEL_NAME[8]=c-roberta-meanpool-init
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035_eval
 
 INPUT_DIR=$EXPERIMENT_DIR/scores
-CORPUS_PARTS="dev"
+CORPUS_PARTS="devtest"
 
 python $HOME/robust-embeddings/src/laser/aggregate_paired.py -i $INPUT_DIR -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} -p $CORPUS_PARTS
+
+echo "Done..."

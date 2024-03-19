@@ -1,15 +1,15 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval-natural      # Job name
-#SBATCH --account=ncm@v100
+#SBATCH --account=ncm@cpu
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=1:00:00               # Time limit hrs:min:sec
+#SBATCH --time=0:30:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-8
+#SBATCH --array=2
 
 set -e 
 
@@ -80,7 +80,7 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 NOISY_LANGS[0]=en.src
 TARGET_LANG[0]=en.ref
 CORPUS[0]=multilexnorm2021/en
-CORPUS_PARTS[0]="train"
+CORPUS_PARTS[0]="test"
 
 #------------------ ROCSMT ------------------#
 
@@ -89,7 +89,7 @@ TARGET_LANG[1]=norm.en
 CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
 
-for i in {0..0}
+for i in {0..1}
 do
     echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}

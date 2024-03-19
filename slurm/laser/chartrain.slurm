@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0
+#SBATCH --array=1
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,10 +22,12 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="040"
 LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:charobertaugc-laserstd" #,distil:charobertastd-laserstd"
-MAX_EPOCH=15
+MAX_EPOCH=5
+DROPOUT=0.1
+ATTENTION_DROPOUT=0.2
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/character-bert/pytorch_model.bin
@@ -78,9 +80,9 @@ srun fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
-    --dropout 0.1 \
+    --dropout $DROPOUT \
     --activation-dropout 0.1 \
-    --attention-dropout 0.1 \
+    --attention-dropout $ATTENTION_DROPOUT \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
     --student-bpe-symbol _EOW \

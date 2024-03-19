@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logiical
-#SBATCH --time=1:00:00
+#SBATCH --time=0:10:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=110
 
@@ -21,7 +21,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_036
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_040
 INPUT_DIR=${EXPERIMENT_DIR}_valid/$SLURM_ARRAY_TASK_ID/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 

@@ -22,10 +22,11 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="036"
-LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
+EXPERIMENT_BASE_NUM="035"
+LEARNING_RATE="0.0001" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:robertaugc-laserstd" #,distil:robertastd-laserstd"
 MAX_EPOCH=100
+DROPOUT=0.1
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
@@ -78,7 +79,7 @@ srun fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
-    --dropout 0.1 \
+    --dropout $DROPOUT \
     --activation-dropout 0.1 \
     --attention-dropout 0.1 \
     --max-tokens 4000 \

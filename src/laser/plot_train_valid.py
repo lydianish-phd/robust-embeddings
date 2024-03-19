@@ -32,7 +32,7 @@ if __name__ == "__main__":
     
     plt.clf()
     models = all_scores["model"].unique()
-    n_rows = models.size//2
+    n_rows = max(models.size//2, 1)
     n_cols = min(models.size, 2)
     fig, axs = plt.subplots(n_rows, n_cols, squeeze=False, figsize=(4*n_cols, 3*n_rows), sharex=True)
 
