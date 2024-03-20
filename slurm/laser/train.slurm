@@ -1,15 +1,16 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --account=rnh@v100
-#SBATCH --nodes=2		# node count
-#SBATCH --ntasks-per-node=4               # total number of tasks across all nodes
-#SBATCH --gres=gpu:4        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --account=ncm@v100
+#SBATCH --partition=gpu_p2
+#SBATCH --nodes=1		# node count
+#SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
+#SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
+#SBATCH --cpus-per-task=3	# number of cores per task (8x3 = 24 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=1,3,5
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,7 +23,7 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="035"
+EXPERIMENT_BASE_NUM="041"
 LEARNING_RATE="0.0001" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:robertaugc-laserstd" #,distil:robertastd-laserstd"
 MAX_EPOCH=100
@@ -35,22 +36,37 @@ EXPERIMENT_NUM[0]="${EXPERIMENT_BASE_NUM}"
 PORT[0]="12341"
 POOLING[0]="maxpool"
 INIT[0]=""
+PREPEND_BOS[0]=""
 
 EXPERIMENT_NUM[1]="${EXPERIMENT_BASE_NUM}b"
 PORT[1]="12342"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
+PREPEND_BOS[1]=""
 
 EXPERIMENT_NUM[2]="${EXPERIMENT_BASE_NUM}c"
 PORT[2]="12343"
 POOLING[2]="meanpool"
 INIT[2]=""
+PREPEND_BOS[2]=""
 
 EXPERIMENT_NUM[3]="${EXPERIMENT_BASE_NUM}d"
 PORT[3]="12344"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
+PREPEND_BOS[3]=""
 
+EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}i"
+PORT[4]="12345"
+POOLING[4]="cls"
+INIT[4]=""
+PREPEND_BOS[4]="--prepend-bos"
+
+EXPERIMENT_NUM[5]="${EXPERIMENT_BASE_NUM}j"
+PORT[5]="12346"
+POOLING[5]="cls"
+INIT[5]="--student-checkpoint-path $STUDENT_MODEL"
+PREPEND_BOS[5]="--prepend-bos"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
@@ -68,7 +84,6 @@ srun fairseq-train \
     --task laser_distillation \
     --arch laser_transformer \
     --sentemb-criterion ${POOLING[$SLURM_ARRAY_TASK_ID]} \
-    --prepend-bos  \
     --criterion encoder_similarity \
     --mse \
     --save-dir $OUTPUT_DIR \
@@ -85,8 +100,8 @@ srun fairseq-train \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
     --student-bpe-symbol roberta \
-    --left-pad-source False \
-    --left-pad-target True \
+    --left-pad-source True \
+    --left-pad-target False \
     --layernorm-embedding \
     --encoder-embed-dim 768 \
     --encoder-layers 12 \
@@ -109,6 +124,6 @@ srun fairseq-train \
     --student-teacher-config $CONFIG \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    ${INIT[$SLURM_ARRAY_TASK_ID]}
+    ${INIT[$SLURM_ARRAY_TASK_ID]}  ${PREPEND_BOS[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."

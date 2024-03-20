@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=00:30:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=10
+#SBATCH --array=2-12%2
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="041"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -72,15 +72,25 @@ MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
 
-MODEL_NAME[9]=c-roberta-cls
+MODEL_NAME[9]=roberta-cls
 MODEL_PATH[9]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}i/models
-VOCAB_FILE[9]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
-TOKENIZER[9]=$HOME/data-preparation/src/char-tokenizer.py
+VOCAB_FILE[9]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[9]=$HOME/data-preparation/src/roberta-tokenizer.py
 
-MODEL_NAME[10]=c-roberta-cls-init
+MODEL_NAME[10]=roberta-cls-init
 MODEL_PATH[10]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}j/models
-VOCAB_FILE[10]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
-TOKENIZER[10]=$HOME/data-preparation/src/char-tokenizer.py
+VOCAB_FILE[10]=$DATASETS_DIR/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[10]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[11]=c-roberta-cls
+MODEL_PATH[11]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}k/models
+VOCAB_FILE[11]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[11]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[12]=c-roberta-cls-init
+MODEL_PATH[12]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}l/models
+VOCAB_FILE[12]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[12]=$HOME/data-preparation/src/char-tokenizer.py
 
 for VALIDATION_SEED in {110..110}
 do

@@ -38,7 +38,7 @@ fairseq-train \
     --log-format simple \
     --task laser_distillation \
     --arch laser_transformer \
-    --sentemb-criterion maxpool \
+    --sentemb-criterion cls \
     --prepend-bos  \
     --criterion encoder_similarity \
     --mse \
@@ -56,8 +56,8 @@ fairseq-train \
     --max-tokens 4000 \
     --max-epoch 50 \
     --student-bpe-symbol roberta \
-    --left-pad-source False \
-    --left-pad-target True \
+    --left-pad-source True \
+    --left-pad-target False \
     --layernorm-embedding \
     --encoder-embed-dim 768 \
     --encoder-layers 12 \
