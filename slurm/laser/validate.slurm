@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=validate      # Job name
-#SBATCH --account=ncm@cpu
+#SBATCH --account=rnh@cpu
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 ##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=00:30:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=6
+#SBATCH --array=10
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="040"
+EXPERIMENT_BASE_NUM="036"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -71,6 +71,16 @@ MODEL_NAME[8]=c-roberta-meanpool-init
 MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}h/models
 VOCAB_FILE[8]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
 TOKENIZER[8]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[9]=c-roberta-cls
+MODEL_PATH[9]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}i/models
+VOCAB_FILE[9]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[9]=$HOME/data-preparation/src/char-tokenizer.py
+
+MODEL_NAME[10]=c-roberta-cls-init
+MODEL_PATH[10]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}j/models
+VOCAB_FILE[10]=$DATASETS_DIR/charobertaugc-laserstd/dict.charobertaugc.txt
+TOKENIZER[10]=$HOME/data-preparation/src/char-tokenizer.py
 
 for VALIDATION_SEED in {110..110}
 do

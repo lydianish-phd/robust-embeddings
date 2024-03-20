@@ -1,15 +1,16 @@
 #!/bin/bash
 
 #SBATCH --job-name=chartrain      # Job name
-#SBATCH --account=rnh@v100
-#SBATCH --nodes=2		# node count
-#SBATCH --ntasks-per-node=4               # total number of tasks across all nodes
-#SBATCH --gres=gpu:4        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --account=rnh@a100
+#SBATCH -C a100
+#SBATCH --nodes=1		# node count
+#SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
+#SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
+#SBATCH --cpus-per-task=8	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=4
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,12 +23,12 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="040"
+EXPERIMENT_BASE_NUM="036"
 LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:charobertaugc-laserstd" #,distil:charobertastd-laserstd"
-MAX_EPOCH=5
+MAX_EPOCH=50
 DROPOUT=0.1
-ATTENTION_DROPOUT=0.2
+ATTENTION_DROPOUT=0.1
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/character-bert/pytorch_model.bin
@@ -52,6 +53,15 @@ PORT[3]="12348"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
 
+EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}i"
+PORT[4]="12349"
+POOLING[4]="cls"
+INIT[4]=""
+
+EXPERIMENT_NUM[5]="${EXPERIMENT_BASE_NUM}j"
+PORT[5]="12350"
+POOLING[5]="cls"
+INIT[5]="--student-checkpoint-path $STUDENT_MODEL"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
