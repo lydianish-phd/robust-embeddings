@@ -2,6 +2,8 @@
 
 #SBATCH --job-name=chartrain      # Job name
 #SBATCH --account=rnh@a100
+##SBATCH --partition=gpu_p2
+##SBATCH --qos=qos_gpu-t4
 #SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
@@ -10,7 +12,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1,3,5
+#SBATCH --array=12
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -43,7 +45,7 @@ EXPERIMENT_NUM[1]="${EXPERIMENT_BASE_NUM}f"
 PORT[1]="12352"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
-PREPEND_BOS[1]=""
+PREPEND_BOS[1]="--prepend-bos"
 
 EXPERIMENT_NUM[2]="${EXPERIMENT_BASE_NUM}g"
 PORT[2]="12353"
