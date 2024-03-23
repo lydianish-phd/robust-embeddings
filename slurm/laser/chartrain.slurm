@@ -39,37 +39,31 @@ EXPERIMENT_NUM[0]="${EXPERIMENT_BASE_NUM}e"
 PORT[0]="12351"
 POOLING[0]="maxpool"
 INIT[0]=""
-PREPEND_BOS[0]=""
 
 EXPERIMENT_NUM[1]="${EXPERIMENT_BASE_NUM}f"
 PORT[1]="12352"
 POOLING[1]="maxpool"
 INIT[1]="--student-checkpoint-path $STUDENT_MODEL"
-PREPEND_BOS[1]="--prepend-bos"
 
 EXPERIMENT_NUM[2]="${EXPERIMENT_BASE_NUM}g"
 PORT[2]="12353"
 POOLING[2]="meanpool"
 INIT[2]=""
-PREPEND_BOS[2]=""
 
 EXPERIMENT_NUM[3]="${EXPERIMENT_BASE_NUM}h"
 PORT[3]="12354"
 POOLING[3]="meanpool"
 INIT[3]="--student-checkpoint-path $STUDENT_MODEL"
-PREPEND_BOS[3]=""
 
 EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}k"
 PORT[4]="12355"
 POOLING[4]="cls"
 INIT[4]=""
-PREPEND_BOS[4]="--prepend-bos"
 
 EXPERIMENT_NUM[5]="${EXPERIMENT_BASE_NUM}l"
 PORT[5]="12356"
 POOLING[5]="cls"
 INIT[5]="--student-checkpoint-path $STUDENT_MODEL"
-PREPEND_BOS[5]="--prepend-bos"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
@@ -102,6 +96,7 @@ srun fairseq-train \
     --attention-dropout $ATTENTION_DROPOUT \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
+    --prepend-bos \
     --student-bpe-symbol _EOW \
     --left-pad-source True \
     --left-pad-target False \
@@ -127,6 +122,6 @@ srun fairseq-train \
     --student-teacher-config $CONFIG \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
-    ${INIT[$SLURM_ARRAY_TASK_ID]} ${PREPEND_BOS[$SLURM_ARRAY_TASK_ID]}
+    ${INIT[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
