@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=0:30:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=2
+#SBATCH --array=6
 
 set -e 
 
@@ -22,7 +22,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="035"
+EXPERIMENT_BASE_NUM="036"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt

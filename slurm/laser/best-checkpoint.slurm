@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --job-name=best      # Job name
-#SBATCH --account=ncm@v100
-#SBATCH --gres=gpu:1
+#SBATCH --account=ncm@cpu
+##SBATCH --gres=gpu:1
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logiical
@@ -21,7 +21,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_036
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_041
 INPUT_DIR=${EXPERIMENT_DIR}_valid/$SLURM_ARRAY_TASK_ID/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
@@ -29,8 +29,8 @@ echo "Selecting best checkpoint..."
 
 python $SRC_DIR/best.py -i $INPUT_DIR
 
-python $SRC_DIR/plot_train_valid.py -i $INPUT_DIR #-y 0.005
-
 python $SRC_DIR/rename_best.py -d $EXPERIMENT_DIR -s $SLURM_ARRAY_TASK_ID
+
+python $SRC_DIR/plot_train_valid.py -i $INPUT_DIR #-y 0.005
 
 echo "Done..."

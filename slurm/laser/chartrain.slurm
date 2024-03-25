@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=chartrain      # Job name
-#SBATCH --account=rnh@a100
+#SBATCH --account=ncm@a100
 ##SBATCH --partition=gpu_p2
 ##SBATCH --qos=qos_gpu-t4
 #SBATCH -C a100
@@ -10,9 +10,9 @@
 #SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=20:00:00
+#SBATCH --time=10:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=12
+#SBATCH --array=5
 
 echo "### Running $SLURM_JOB_NAME ###"
 

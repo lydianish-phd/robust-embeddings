@@ -1,15 +1,17 @@
 #!/bin/bash
 
 #SBATCH --job-name=validate      # Job name
-#SBATCH --account=rnh@v100
+#SBATCH --account=rnh@cpu
+##SBATCH --partition=gpu_p2
+##SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=00:30:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=6
+#SBATCH --array=12
 
 set -e 
 
@@ -22,7 +24,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="041"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt

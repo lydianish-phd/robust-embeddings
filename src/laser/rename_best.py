@@ -26,7 +26,15 @@ if __name__ == "__main__":
             experiment_dir = f"{args.basedir}g"
         elif row['model'] == "c-roberta-meanpool-init":
             experiment_dir = f"{args.basedir}h"
-        
+        elif row['model'] == "roberta-cls":
+            experiment_dir = f"{args.basedir}i"
+        elif row['model'] == "roberta-cls-init":
+            experiment_dir = f"{args.basedir}j"
+        elif row['model'] == "c-roberta-cls":
+            experiment_dir = f"{args.basedir}k"
+        elif row['model'] == "c-roberta-cls-init":
+            experiment_dir = f"{args.basedir}l"
+
         best_checkpoint = os.path.join(experiment_dir, "models", f"checkpoint_{row['epoch']}_{row['steps']}.pt")
         if not os.path.exists(best_checkpoint):
             best_checkpoint = os.path.join(experiment_dir, "models", f"checkpoint{row['epoch']}.pt")
