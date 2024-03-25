@@ -139,6 +139,7 @@ if __name__ == "__main__":
     for i, example in enumerate(examples):
         subset = data[data["sentence"] == f"sent {example['id']}"]
         subset = subset[subset["model"] != "c-RoLASER"]
+        subset = subset.loc[subset["type"].map({"std": 1, "ugc": 2, "tra": 3}).sort_values().index]
         subset_multi = subset[subset["type"] == "tra"]
         plt.clf()
         fig, ax = plt.subplots(figsize=(6,6))
