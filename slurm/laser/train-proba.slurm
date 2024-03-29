@@ -2,14 +2,15 @@
 
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@v100
-#SBATCH --nodes=2		# node count
-#SBATCH --ntasks-per-node=4               # total number of tasks across all nodes
-#SBATCH --gres=gpu:4        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --partition=gpu_p2
+#SBATCH --nodes=1		# node count
+#SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
+#SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
+#SBATCH --cpus-per-task=3	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0,2
+#SBATCH --array=0-4
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -22,8 +23,8 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="033"
-LEARNING_RATE="0.00005" 
+EXPERIMENT_BASE_NUM="042"
+LEARNING_RATE="0.0001" 
 CONFIG="distil:robertaugc-laserstd" 
 POOLING="maxpool"
 MAX_EPOCH=100
@@ -73,12 +74,15 @@ srun fairseq-train \
     --warmup-updates 1000 \
     --clip-norm 5 \
     --update-freq 1 \
-    --dropout 0.3 \
+    --dropout 0.1 \
+    --activation-dropout 0.1 \
+    --attention-dropout 0.1 \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
     --student-bpe-symbol roberta \
-    --left-pad-source False \
-    --left-pad-target True \
+    --left-pad-source True \
+    --left-pad-target False \
+    --layernorm-embedding \
     --encoder-embed-dim 768 \
     --encoder-layers 12 \
     --encoder-ffn-embed-dim 3072 \
@@ -99,5 +103,6 @@ srun fairseq-train \
     --student-teacher-config $CONFIG \
     --tensorboard-logdir $TENSORBOARD_DIR \
     --distributed-port ${PORT[$SLURM_ARRAY_TASK_ID]} \
+    --student-checkpoint-path $STUDENT_MODEL
 
 echo "Done..."

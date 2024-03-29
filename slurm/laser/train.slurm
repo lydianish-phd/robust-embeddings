@@ -80,6 +80,7 @@ srun fairseq-train \
     --task laser_distillation \
     --arch laser_transformer \
     --sentemb-criterion ${POOLING[$SLURM_ARRAY_TASK_ID]} \
+    --prepend-bos \
     --criterion encoder_similarity \
     --mse \
     --save-dir $OUTPUT_DIR \
@@ -95,7 +96,6 @@ srun fairseq-train \
     --attention-dropout 0.1 \
     --max-tokens 4000 \
     --max-epoch $MAX_EPOCH \
-    --prepend-bos \
     --student-bpe-symbol roberta \
     --left-pad-source True \
     --left-pad-target False \

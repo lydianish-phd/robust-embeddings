@@ -7,7 +7,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=20:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=10,20,30,40,50
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -27,13 +27,15 @@ TEACHER_LANG=laserstd
 STUDENT_LANG[0]=robertastd
 STUDENT_LANG[1]=robertaugc
 
-DATA_DIR=$DATASETS/oscar/mini/4M_40
-TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[$SLURM_ARRAY_TASK_ID]}-$TEACHER_LANG
-BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[$SLURM_ARRAY_TASK_ID]}-$TEACHER_LANG
+DATA_PARTITION=1
+
+DATA_DIR=$DATASETS/oscar/mini/4M_$SLURM_ARRAY_TASK_ID
+TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[$DATA_PARTITION]}-$TEACHER_LANG
+BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[$DATA_PARTITION]}-$TEACHER_LANG
 
 echo "Creating dictionary and binarizing data..."
 
-fairseq-preprocess --source-lang ${STUDENT_LANG[$SLURM_ARRAY_TASK_ID]} --target-lang $TEACHER_LANG \
+fairseq-preprocess --source-lang ${STUDENT_LANG[$DATA_PARTITION]} --target-lang $TEACHER_LANG \
     --trainpref $TOK_DIR/train \
     --destdir $BIN_DIR \
     --tgtdict $TEACHER_VOCAB \
