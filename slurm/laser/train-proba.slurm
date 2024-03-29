@@ -90,6 +90,7 @@ srun fairseq-train \
     --encoder-layers 12 \
     --encoder-ffn-embed-dim 3072 \
     --encoder-attention-heads 12 \
+    --encoder-normalize-before \
     --decoder-embed-dim 1 \
     --decoder-layers 1 \
     --decoder-embed-dim 1 \

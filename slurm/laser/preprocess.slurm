@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40       # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=20:00:00               # Time limit hrs:min:sec
+#SBATCH --time=1:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0,10,20,30,40,50
 
