@@ -34,6 +34,18 @@ if __name__ == "__main__":
             experiment_dir = f"{args.basedir}k"
         elif row['model'] == "c-roberta-cls-init":
             experiment_dir = f"{args.basedir}l"
+        elif row['model'] == "roberta-maxpool-init-0.1":
+            experiment_dir = args.basedir
+        elif row['model'] == "roberta-maxpool-init-0.2":
+            experiment_dir = f"{args.basedir}b"
+        elif row['model'] == "roberta-maxpool-init-0.3":
+            experiment_dir = f"{args.basedir}c"
+        elif row['model'] == "roberta-maxpool-init-0.4":
+            experiment_dir = f"{args.basedir}d"
+        elif row['model'] == "roberta-maxpool-init-0.5":
+            experiment_dir = f"{args.basedir}e"
+        elif row['model'] == "roberta-maxpool-init-0":
+            experiment_dir = f"{args.basedir}f"
 
         best_checkpoint = os.path.join(experiment_dir, "models", f"checkpoint_{row['epoch']}_{row['steps']}.pt")
         if not os.path.exists(best_checkpoint):

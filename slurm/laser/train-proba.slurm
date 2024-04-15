@@ -10,7 +10,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-5
+#SBATCH --array=4
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -47,8 +47,8 @@ PORT[3]="12344"
 EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}e"
 PORT[4]="12345"
 
-EXPERIMENT_NUM[4]="${EXPERIMENT_BASE_NUM}f"
-PORT[6]="12346"
+EXPERIMENT_NUM[5]="${EXPERIMENT_BASE_NUM}f"
+PORT[5]="12346"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json

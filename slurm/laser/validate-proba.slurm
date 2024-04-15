@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-6
+#SBATCH --array=5
 
 set -e 
 
@@ -58,12 +58,12 @@ VOCAB_FILE[5]=$DATASETS_DIR/4M_50/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[5]=$HOME/data-preparation/src/char-tokenizer.py
 
 MODEL_NAME[6]=roberta-maxpool-init-0
-MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}e/models
+MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}f/models
 VOCAB_FILE[6]=$DATASETS_DIR/4M_0/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/char-tokenizer.py
 
 VALIDATION_SEED=110
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}_valid
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}_valid/$VALIDATION_SEED
 PREFIX=$DATASETS/flores200/ugc/$VALIDATION_SEED/dev
 
 python $HOME/robust-embeddings/src/laser/validate.py \

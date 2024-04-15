@@ -13,7 +13,7 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 #source $HOME/.bash_profile
 #source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_036
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_042
 INPUT_DIR=${EXPERIMENT_DIR}_valid/$SLURM_ARRAY_TASK_ID/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
