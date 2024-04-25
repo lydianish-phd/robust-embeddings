@@ -25,5 +25,6 @@ SRC_DIR=$HOME/robust-embeddings/src/laser
 python $SRC_DIR/ttr_flores.py -i $DATASETS/flores200/tok
 python $SRC_DIR/ttr_natural.py -i $DATASETS/multilexnorm2021/en/tok/ -c "multilexnorm2021"
 python $SRC_DIR/ttr_natural.py -i $DATASETS/rocsmt/tok/ -c "rocsmt"
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/oscar/mini/4Mlrec/tok
 
 echo "Done..."

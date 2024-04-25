@@ -8,7 +8,12 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--corpus", help="name of corpus: multilexnorm2021 or rocsmt", type=str)
     args = parser.parse_args()
 
-    corpus_parts = ["train", "dev", "test"] if args.corpus == "multilexnorm2021" else ["test"]
+    if args.corpus == "multilexnorm2021":
+        corpus_parts = ["train", "dev", "test"]
+    elif args.corpus == "rocsmt":
+        corpus_parts = ["test"]
+    else:
+        corpus_parts = [""]
     metric = "ttr"
     
     print("Processing", args.corpus)
