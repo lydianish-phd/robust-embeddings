@@ -1,0 +1,29 @@
+#!/bin/bash
+
+#SBATCH --job-name=ttr      # Job name
+#SBATCH --nodes=1		# node count
+#SBATCH --cpus-per-task=32       # cpu-cores per task (>1 if multi-threaded tasks)
+#SBATCH --hint=multithread       # we get physical cores not logical
+#SBATCH --time=1:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
+
+set -e 
+
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+
+module purge
+module load cuda/10.2
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source $HOME/.bash_python_exports
+source activate laser_env
+
+SRC_DIR=$HOME/robust-embeddings/src/laser
+
+# python $SRC_DIR/ttr_flores.py -i $DATASETS/flores200/tok
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/multilexnorm2021/en/tok/ -c "multilexnorm2021"
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/rocsmt/tok/ -c "rocsmt"
+python $SRC_DIR/ttr_natural.py -i $DATASETS/oscar/mini/4Mlrec/tok/robertaugc-laserstd/
+
+echo "Done..."

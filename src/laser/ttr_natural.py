@@ -8,13 +8,18 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--corpus", help="name of corpus: multilexnorm2021 or rocsmt", type=str)
     args = parser.parse_args()
 
-    corpus_parts = ["train", "dev", "test"] if args.corpus == "multilexnorm2021" else ["test"]
+    if args.corpus == "multilexnorm2021":
+        corpus_parts = ["train", "dev", "test"]
+    elif args.corpus == "rocsmt":
+        corpus_parts = ["test"]
+    else:
+        corpus_parts = ["train"]
     metric = "ttr"
     
     print("Processing", args.corpus)
     for corpus_part in corpus_parts:
         results = []
-        files = [ file for file in os.scandir(os.path.join(args.input_dir, corpus_part)) if file.name.endswith(f"{corpus_part}.tok") ]
+        files = [ file for file in os.scandir(os.path.join(args.input_dir, corpus_part)) if f"{corpus_part}.tok" in file.name ]
         for file in files:
             print(file.name)
             with open(file.path, "r") as f:
