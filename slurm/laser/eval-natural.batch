@@ -10,7 +10,7 @@
 #SBATCH --hint=nomultithread
 #SBATCH --time=24:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0,1,3
+#SBATCH --array=4
 
 set -e 
 
@@ -21,7 +21,7 @@ source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 source activate laser_env
 
-CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035_jz
+CHECKPOINT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_036_jz
 DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
 
 MODEL_NAME[0]=laser
@@ -53,18 +53,27 @@ TOKENIZER[4]=$HOME/data-preparation/src/char-tokenizer.py
 
 # NOISY_LANGS=en.src
 # TARGET_LANG=en.ref
-# EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_025_lrec_$METRIC
+# EXPERIMENT_DIR=$CHECKPOINT_DIR
 # INPUT_DIR=$DATASETS
 # CORPUS=multilexnorm2021/en
 # CORPUS_PARTS="train dev test"
 
 #------------------ ROCSMT ------------------#
 
-NOISY_LANGS=raw.en
-TARGET_LANG=norm.en
+# NOISY_LANGS=raw.en
+# TARGET_LANG=norm.en
+# EXPERIMENT_DIR=$CHECKPOINT_DIR
+# INPUT_DIR=$DATASETS
+# CORPUS=rocsmt
+# CORPUS_PARTS="test"
+
+#------------------ ACCIDENTS ------------------#
+
+NOISY_LANGS=src
+TARGET_LANG=ref
 EXPERIMENT_DIR=$CHECKPOINT_DIR
 INPUT_DIR=$DATASETS
-CORPUS=rocsmt
+CORPUS=accidents
 CORPUS_PARTS="test"
 
 for CORPUS_PART in $CORPUS_PARTS

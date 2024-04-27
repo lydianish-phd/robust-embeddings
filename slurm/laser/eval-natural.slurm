@@ -89,7 +89,14 @@ TARGET_LANG[1]=norm.en
 CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
 
-for i in {0..1}
+#------------------ ACCIDENTS ------------------#
+
+NOISY_LANGS[2]=src
+TARGET_LANG[2]=ref
+CORPUS[2]=accidents
+CORPUS_PARTS[2]="test"
+
+for i in {0..2}
 do
     echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
