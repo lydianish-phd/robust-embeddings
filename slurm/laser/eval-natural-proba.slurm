@@ -85,7 +85,7 @@ CORPUS_PARTS[1]="test"
 NOISY_LANGS[2]=src
 TARGET_LANG[2]=ref
 CORPUS[2]=accidents
-CORPUS_PARTS[2]="test"
+CORPUS_PARTS[2]="train test"
 
 for i in {0..2}
 do
