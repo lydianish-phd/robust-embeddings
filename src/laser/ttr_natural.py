@@ -5,19 +5,13 @@ from aggregate import _file
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to input directory with tokenized files", type=str)
-    parser.add_argument("-c", "--corpus", help="name of corpus: multilexnorm2021 or rocsmt", type=str)
+    parser.add_argument("-c", "--corpus-parts", help="list of corpus parts (train, dev, test)", type=str, nargs='+', default=[])
     args = parser.parse_args()
 
-    if args.corpus == "multilexnorm2021":
-        corpus_parts = ["train", "dev", "test"]
-    elif args.corpus == "rocsmt":
-        corpus_parts = ["test"]
-    else:
-        corpus_parts = ["train"]
     metric = "ttr"
     
-    print("Processing", args.corpus)
-    for corpus_part in corpus_parts:
+    print("Processing", args.corpus_parts)
+    for corpus_part in args.corpus_parts:
         results = []
         files = [ file for file in os.scandir(os.path.join(args.input_dir, corpus_part)) if f"{corpus_part}.tok" in file.name ]
         for file in files:

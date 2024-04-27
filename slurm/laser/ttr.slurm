@@ -11,7 +11,7 @@
 
 set -e 
 
-echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+echo "### Running $SLURM_JOB_NAME ###"
 
 module purge
 module load pytorch-gpu/py3/1.13.0
@@ -22,9 +22,10 @@ source $HOME/.bash_python_exports
 
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
-python $SRC_DIR/ttr_flores.py -i $DATASETS/flores200/tok
-python $SRC_DIR/ttr_natural.py -i $DATASETS/multilexnorm2021/en/tok/ -c "multilexnorm2021"
-python $SRC_DIR/ttr_natural.py -i $DATASETS/rocsmt/tok/ -c "rocsmt"
-# python $SRC_DIR/ttr_natural.py -i $DATASETS/oscar/mini/4Mlrec/tok/robertaugc-laserstd/
+# python $SRC_DIR/ttr_flores.py -i $DATASETS/flores200/tok
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/multilexnorm2021/en/tok/ -c train dev test
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/rocsmt/tok/ -c test
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/oscar/mini/4Mlrec/tok/robertaugc-laserstd/ -c train
+# python $SRC_DIR/ttr_natural.py -i $DATASETS/accidents/tok/ -c train test
 
 echo "Done..."
