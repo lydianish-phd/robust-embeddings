@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=best      # Job name
-#SBATCH --account=ncm@cpu
+#SBATCH --account=rnh@cpu
 ##SBATCH --gres=gpu:1
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
