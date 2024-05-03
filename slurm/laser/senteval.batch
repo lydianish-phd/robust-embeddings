@@ -10,7 +10,7 @@
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/laser/%x/%x%j.log # Standard output and error log
 #SBATCH --array=0-2
 
-echo "### Running $SLURM_JOB_NAME ###"
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 module load cuda/10.2
