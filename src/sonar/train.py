@@ -3,6 +3,12 @@ from sonar.models.sonar_text.loader import load_sonar_text_encoder_model, load_s
 from sonar.models.sonar_text.builder import create_sonar_text_encoder_model, sonar_text_encoder_archs
 from transformers import TrainingArguments, Trainer
 
+from transformers import DefaultDataCollator
+from fairseq2.models.sequence import SequenceBatch
+from fairseq2.data import Collater
+from sonar.inference_pipelines.utils import extract_sequence_batch
+from typing import Any, Callable, Dict, List, NewType, Optional, Tuple, Union
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -46,30 +52,28 @@ def preprocess_function(examples):
     return model_inputs
 
 tokenized_books = formatted_books.map(preprocess_function, batched=True)
-tokenized_books.remove_columns(['id', 'translation', 'source_lang', 'source_sentence', 'target_lang', 'target_sentence'])
+tokenized_books = tokenized_books.remove_columns(['id', 'translation', 'source_lang', 'source_sentence', 'target_lang', 'target_sentence'])
 
-from transformers import DefaultDataCollator
-from fairseq2.models.sequence import SequenceBatch
-from fairseq2.data import Collater
-from sonar.inference_pipelines.utils import extract_sequence_batch
-from typing import Any, Callable, Dict, List, NewType, Optional, Tuple, Union
 
 class DataCollatorForSonarDistillation(DefaultDataCollator):
-  def __init__(self, tokenizer, device="cuda", return_tensors='pt'):
-    super().__init__(return_tensors)
-    self.tokenizer = tokenizer
-    self.device = device
+    def __init__(self, tokenizer, device="cuda", return_tensors='pt'):
+        super().__init__(return_tensors)
+        self.tokenizer = tokenizer
+        self.device = device
+        self.batch_size = 32
 
   def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
-     input_ids = Collater(self.tokenizer.vocab_info.pad_idx)(features["input_ids"])
-     labels = Collater(self.tokenizer.vocab_info.pad_idx)(features["labels"])
-     features["input_ids"] = extract_sequence_batch(input_ids, self.device)
-     features["labels"] = extract_sequence_batch(labels, self.device)
-     return features
+    src_sentence_ids = read_sequence(features["src_sentence_ids"]).bucket(self.batch_size).map(Collater(self.tokenizer.vocab_info.pad_idx)).map(lambda x: extract_sequence_batch(x, self.device)).and_return()
+    tgt_sentence_ids = read_sequence(features["tgt_sentence_ids"]).bucket(self.batch_size).map(Collater(self.tokenizer.vocab_info.pad_idx)).map(lambda x: extract_sequence_batch(x, self.device)).and_return()
+    batch = {
+        "src_sentence_ids": iter(src_sentence_ids),
+        "tgt_sentence_ids": iter(tgt_sentence_ids)
+    }
+    return batch
 
 data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
 
-class SonarEmbeddingDistillationTrainer(Trainer):
+class SonarDistillationTrainer(Trainer):
     def __init__(self, teacher_model=None, student_model=None, *args, **kwargs):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
@@ -110,12 +114,12 @@ training_args = TrainingArguments(
     evaluation_strategy="epoch",
     save_strategy="epoch",
     load_best_model_at_end=True,
-    metric_for_best_model="accuracy",
+    greater_is_better=False,
     report_to="tensorboard",
     push_to_hub=False
 )
 
-trainer = SonarEmbeddingDistillationTrainer(
+trainer = SonarDistillationTrainer(
     student_model=student_model,
     teacher_model=teacher_model,
     args=training_args,
