@@ -1,17 +1,19 @@
+from transformers import TrainingArguments, Trainer, DefaultDataCollator
 from datasets import load_dataset
-from sonar.models.sonar_text.loader import load_sonar_text_encoder_model, load_sonar_tokenizer
-from sonar.models.sonar_text.builder import create_sonar_text_encoder_model, sonar_text_encoder_archs
-from transformers import TrainingArguments, Trainer
 
-from transformers import DefaultDataCollator
-from fairseq2.models.sequence import SequenceBatch
+from fairseq2.models.nllb.tokenizer import NllbTokenizer
+from fairseq2.models.sequence import SequenceBatch, PaddingMask
 from fairseq2.data import Collater
 from sonar.inference_pipelines.utils import extract_sequence_batch
-from typing import Any, Callable, Dict, List, NewType, Optional, Tuple, Union
+from sonar.models.sonar_text.loader import load_sonar_text_encoder_model, load_sonar_tokenizer
+from sonar.models.sonar_text.builder import create_sonar_text_encoder_model, sonar_text_encoder_archs
+
+from typing import Any, Dict, List
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch.nn import MSELoss
+from torch.nn.utils.rnn import pad_sequence
+
 
 books = load_dataset("opus_books", "en-fr")
 books = books["train"].train_test_split(test_size=0.2)
@@ -56,18 +58,27 @@ tokenized_books = tokenized_books.remove_columns(['id', 'translation', 'source_l
 
 
 class DataCollatorForSonarDistillation(DefaultDataCollator):
-    def __init__(self, tokenizer, device="cuda", return_tensors='pt'):
-        super().__init__(return_tensors)
-        self.tokenizer = tokenizer
-        self.device = device
-        self.batch_size = 32
+  def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = 'pt'):
+    super().__init__(return_tensors)
+    self.padding_value = tokenizer.vocab_info.pad_idx
 
   def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
-    src_sentence_ids = read_sequence(features["src_sentence_ids"]).bucket(self.batch_size).map(Collater(self.tokenizer.vocab_info.pad_idx)).map(lambda x: extract_sequence_batch(x, self.device)).and_return()
-    tgt_sentence_ids = read_sequence(features["tgt_sentence_ids"]).bucket(self.batch_size).map(Collater(self.tokenizer.vocab_info.pad_idx)).map(lambda x: extract_sequence_batch(x, self.device)).and_return()
+    src_sentence_ids = [ torch.tensor(row["src_sentence_ids"], dtype=torch.int) for row in features ]
+    src_sentence_ids = pad_sequence(src_sentence_ids, batch_first=True, padding_value=self.padding_value)
+    tgt_sentence_ids = [ torch.tensor(row["tgt_sentence_ids"], dtype=torch.int) for row in features ]
+    tgt_sentence_ids = pad_sequence(tgt_sentence_ids, batch_first=True, padding_value=self.padding_value)
+
     batch = {
-        "src_sentence_ids": iter(src_sentence_ids),
-        "tgt_sentence_ids": iter(tgt_sentence_ids)
+        "src_sentence_ids": src_sentence_ids,
+        "src_mask": PaddingMask(
+            (src_sentence_ids != self.padding_value).all(-1).sum(-1),
+            batch_seq_len=src_sentence_ids.shape[1]
+        ),
+        "tgt_sentence_ids": tgt_sentence_ids,
+        "tgt_mask": PaddingMask(
+            (tgt_sentence_ids != self.padding_value).all(-1).sum(-1),
+            batch_seq_len=tgt_sentence_ids.shape[1]
+        )
     }
     return batch
 
@@ -78,23 +89,33 @@ class SonarDistillationTrainer(Trainer):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
         self.student = student_model
-        self.loss_function = nn.MSELoss(reduction="batchmean")
+        self.loss_function = MSELoss(reduction="batchmean")
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.teacher.to(self.device)
         self.teacher.eval()
 
     def compute_loss(self, student, inputs, return_outputs=False):
         print(inputs)
-        student_source_output = self.student(inputs["src_sentence_ids"])
-        student_source_embeddings = student_source_output.map(lambda x: x.sentence_embeddings.to(self.device))
-        student_target_output = self.student(inputs["tgt_sentence_ids"])
-        student_target_embeddings = student_source_output.map(lambda x: x.sentence_embeddings.to(self.device))
-
+        student_source_output = self.student(
+            SequenceBatch(
+                seqs=inputs["src_sentence_ids"].to(self.device),
+                padding_mask=inputs["src_mask"].to(self.device)
+              )
+        )
+        student_target_output = self.student(
+            SequenceBatch(
+                seqs=inputs["tgt_sentence_ids"].to(self.device),
+                padding_mask=inputs["tgt_mask"].to(self.device)
+              )
+        )
         with torch.no_grad():
-          teacher_source_output = self.teacher(inputs["src_sentence_ids"])
-          teacher_source_embeddings = teacher_source_output.map(lambda x: x.sentence_embeddings.to(self.device))
-
-        distillation_loss = self.loss_function(teacher_source_embeddings, student_source_embeddings) + self.loss_function(teacher_source_embeddings, student_target_embeddings)
+            teacher_source_output = self.teacher(
+                SequenceBatch(
+                    seqs=inputs["src_sentence_ids"].to(self.device),
+                    padding_mask=inputs["src_mask"].to(self.device)
+                  )
+            )
+        distillation_loss = self.loss_function(teacher_source_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_source_output.sentence_embeddings, student_target_output.sentence_embeddings)
 
         return (distillation_loss, student_source_output, student_target_output) if return_outputs else distillation_loss
 
