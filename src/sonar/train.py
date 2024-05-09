@@ -54,11 +54,11 @@ def preprocess_function(examples):
     return model_inputs
 
 tokenized_books = formatted_books.map(preprocess_function, batched=True)
-tokenized_books = tokenized_books.remove_columns(['id', 'translation', 'source_lang', 'source_sentence', 'target_lang', 'target_sentence'])
+tokenized_books = tokenized_books.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
 
 
 class DataCollatorForSonarDistillation(DefaultDataCollator):
-  def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = 'pt'):
+  def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = "pt"):
     super().__init__(return_tensors)
     self.padding_value = tokenizer.vocab_info.pad_idx
 
@@ -90,7 +90,7 @@ class SonarDistillationTrainer(Trainer):
         self.teacher = teacher_model
         self.student = student_model
         self.loss_function = MSELoss(reduction="batchmean")
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.teacher.to(self.device)
         self.teacher.eval()
 
