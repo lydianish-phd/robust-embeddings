@@ -23,10 +23,10 @@ en_tokenizer = tokenizer.create_encoder(lang="eng_Latn")
 fr_tokenizer = tokenizer.create_encoder(lang="fra_Latn")
 
 def normalize_format_en_fr(examples):
-    source_langs = ["eng_Latn"] * len(examples["translation"])
-    target_langs = ["fra_Latn"] * len(examples["translation"])
-    inputs = [example["en"] for example in examples["translation"]]
-    targets = [example["fr"] for example in examples["translation"]]
+    source_langs = ["fra_Latn"] * len(examples["translation"])
+    target_langs = ["eng_Latn"] * len(examples["translation"])
+    inputs = [example["fr"] for example in examples["translation"]]
+    targets = [example["en"] for example in examples["translation"]]
     outputs = {
         "source_lang": source_langs,
         "source_sentence": inputs,
@@ -70,15 +70,11 @@ class DataCollatorForSonarDistillation(DefaultDataCollator):
 
     batch = {
         "src_sentence_ids": src_sentence_ids,
-        "src_mask": PaddingMask(
-            (src_sentence_ids != self.padding_value).sum(-1),
-            batch_seq_len=src_sentence_ids.shape[1]
-        ),
+        "src_seq_lens": (src_sentence_ids != self.padding_value).sum(-1).unsqueeze(0),
+        "src_batch_seq_len": torch.tensor([src_sentence_ids.shape[1]], dtype=torch.int),
         "tgt_sentence_ids": tgt_sentence_ids,
-        "tgt_mask": PaddingMask(
-            (tgt_sentence_ids != self.padding_value).sum(-1),
-            batch_seq_len=tgt_sentence_ids.shape[1]
-        )
+        "tgt_seq_lens": (tgt_sentence_ids != self.padding_value).sum(-1).unsqueeze(0),
+        "tgt_batch_seq_len": torch.tensor([tgt_sentence_ids.shape[1]], dtype=torch.int)
     }
     return batch
 
@@ -95,29 +91,28 @@ class SonarDistillationTrainer(Trainer):
         self.teacher.eval()
 
     def compute_loss(self, student, inputs, return_outputs=False):
-        print(inputs)
         student_source_output = self.student(
             SequenceBatch(
                 seqs=inputs["src_sentence_ids"].to(self.device),
-                padding_mask=inputs["src_mask"].to(self.device)
+                padding_mask=PaddingMask(inputs["src_seq_lens"][0], inputs["src_batch_seq_len"][0]).to(self.device)
               )
         )
         student_target_output = self.student(
             SequenceBatch(
                 seqs=inputs["tgt_sentence_ids"].to(self.device),
-                padding_mask=inputs["tgt_mask"].to(self.device)
+                padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0]).to(self.device)
               )
         )
         with torch.no_grad():
-            teacher_source_output = self.teacher(
+            teacher_target_output = self.teacher(
                 SequenceBatch(
-                    seqs=inputs["src_sentence_ids"].to(self.device),
-                    padding_mask=inputs["src_mask"].to(self.device)
+                    seqs=inputs["tgt_sentence_ids"].to(self.device),
+                    padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0]).to(self.device)
                   )
             )
-        distillation_loss = self.loss_function(teacher_source_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_source_output.sentence_embeddings, student_target_output.sentence_embeddings)
+        distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
 
-        return (distillation_loss, student_source_output, student_target_output) if return_outputs else distillation_loss
+        return (distillation_loss, dict(student_source_output)) if return_outputs else distillation_loss
 
 teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
 
@@ -131,13 +126,19 @@ training_args = TrainingArguments(
     num_train_epochs=3,
     fp16=True,
     logging_dir=f"logs",
-    logging_strategy="epoch",
-    evaluation_strategy="epoch",
-    save_strategy="epoch",
+    logging_strategy="steps",
+    evaluation_strategy="steps",
+    save_strategy="steps",
     load_best_model_at_end=True,
     greater_is_better=False,
     report_to="tensorboard",
-    push_to_hub=False
+    push_to_hub=False,
+    per_device_train_batch_size=2,
+    remove_unused_columns=False,
+    max_steps=1000,
+    save_steps=100,
+    logging_steps=100,
+    label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len']
 )
 
 trainer = SonarDistillationTrainer(
