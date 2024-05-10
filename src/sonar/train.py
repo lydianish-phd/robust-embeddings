@@ -71,12 +71,12 @@ class DataCollatorForSonarDistillation(DefaultDataCollator):
     batch = {
         "src_sentence_ids": src_sentence_ids,
         "src_mask": PaddingMask(
-            (src_sentence_ids != self.padding_value).all(-1).sum(-1),
+            (src_sentence_ids != self.padding_value).sum(-1),
             batch_seq_len=src_sentence_ids.shape[1]
         ),
         "tgt_sentence_ids": tgt_sentence_ids,
         "tgt_mask": PaddingMask(
-            (tgt_sentence_ids != self.padding_value).all(-1).sum(-1),
+            (tgt_sentence_ids != self.padding_value).sum(-1),
             batch_seq_len=tgt_sentence_ids.shape[1]
         )
     }
