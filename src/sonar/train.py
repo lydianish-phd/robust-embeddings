@@ -136,7 +136,6 @@ training_args = TrainingArguments(
     evaluation_strategy="steps",
     save_strategy="steps",
     load_best_model_at_end=True,
-    greater_is_better=False,
     report_to="tensorboard",
     push_to_hub=False,
     per_device_train_batch_size=2,
