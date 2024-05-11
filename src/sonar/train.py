@@ -112,7 +112,13 @@ class SonarDistillationTrainer(Trainer):
             )
         distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
 
-        return (distillation_loss, dict(student_source_output)) if return_outputs else distillation_loss
+        student_source_output_dict = {
+            "encoded_seqs": student_source_output.encoded_seqs,
+            "sentence_embeddings": student_source_output.sentence_embeddings,
+            "padding_mask": student_source_output.padding_mask
+        }
+
+        return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
 
 teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
 
@@ -138,7 +144,8 @@ training_args = TrainingArguments(
     max_steps=1000,
     save_steps=100,
     logging_steps=100,
-    label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len']
+    label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
+    prediction_loss_only=True
 )
 
 trainer = SonarDistillationTrainer(
