@@ -51,30 +51,27 @@ class SonarDistillationTrainer(Trainer):
     def __init__(self, teacher_model=None, student_model=None, *args, **kwargs):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
-        #self.student = student_model
-        self.loss_function = MSELoss(reduction="sum")
-        #self.device = accelerator.device
-        #self.teacher.to(self.device)
         self.teacher.eval()
+        self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, student, inputs, return_outputs=False):
         student_source_output = student(
             SequenceBatch(
-                seqs=inputs["src_sentence_ids"], #.to(self.device),
-                padding_mask=PaddingMask(inputs["src_seq_lens"][0], inputs["src_batch_seq_len"][0])#.to(self.device)
+                seqs=inputs["src_sentence_ids"],
+                padding_mask=PaddingMask(inputs["src_seq_lens"][0], inputs["src_batch_seq_len"][0])
               )
         )
         student_target_output = student(
             SequenceBatch(
-                seqs=inputs["tgt_sentence_ids"], #.to(self.device),
-                padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0]) #.to(self.device)
+                seqs=inputs["tgt_sentence_ids"],
+                padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0]) 
               )
         )
         with torch.no_grad():
             teacher_target_output = self.teacher(
                 SequenceBatch(
-                    seqs=inputs["tgt_sentence_ids"], #.to(self.device),
-                    padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0])#.to(self.device)
+                    seqs=inputs["tgt_sentence_ids"],
+                    padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0])
                   )
             )
         distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
@@ -160,7 +157,7 @@ if __name__=="__main__":
 
     print("Loading teacher model...")
 
-    teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder")) #, device=accelerator.device)
+    teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder"))
 
     print("Instantiating student model...")
 
