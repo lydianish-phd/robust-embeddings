@@ -1,3 +1,5 @@
+import os
+
 from transformers import TrainingArguments, Trainer, DefaultDataCollator
 from datasets import load_dataset
 
@@ -5,18 +7,25 @@ from fairseq2.models.nllb.tokenizer import NllbTokenizer
 from fairseq2.models.sequence import SequenceBatch, PaddingMask
 from fairseq2.data import Collater
 from sonar.inference_pipelines.utils import extract_sequence_batch
-from sonar.models.sonar_text.loader import load_sonar_text_encoder_model, load_sonar_tokenizer
-from sonar.models.sonar_text.builder import create_sonar_text_encoder_model, sonar_text_encoder_archs
+from sonar.models.sonar_text.loader import (
+    load_sonar_text_encoder_model,
+    load_sonar_tokenizer,
+    convert_sonar_text_encoder_checkpoint
+)
+from sonar.models.sonar_text.builder import (
+    create_sonar_text_encoder_model, 
+    sonar_text_encoder_archs
+)
 
 from typing import Any, Dict, List
 
 import torch
-from torch.nn import MSELoss
+from torch.nn import MSELoss, Embedding
 from torch.nn.utils.rnn import pad_sequence
 
 
 books = load_dataset("opus_books", "en-fr")
-books = books["train"].train_test_split(test_size=0.1)
+books = books["train"].train_test_split(test_size=0.001)
 
 tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
 en_tokenizer = tokenizer.create_encoder(lang="eng_Latn")
@@ -120,6 +129,8 @@ class SonarDistillationTrainer(Trainer):
 
         return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
 
+# Models
+
 teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
 
 cfg = sonar_text_encoder_archs.get_config("basic")
@@ -127,15 +138,36 @@ cfg.num_encoder_layers = cfg.num_decoder_layers = 12
 cfg.ffn_inner_dim = 4096
 student_model = create_sonar_text_encoder_model(cfg)
 
+# Initializing student
+
+student_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
+student_checkpoint = torch.load(student_checkpoint_path)
+student_encoder_checkpoint = {
+    "state_dict": {},
+    "embed_tokens": Embedding.from_pretrained(student_checkpoint["model"]["encoder.embed_tokens.weight"])
+}
+
+prefix = "encoder."
+for key, value in student_checkpoint['model'].items():
+    if key.startswith(prefix):
+        student_encoder_checkpoint["state_dict"][key[len(prefix):]] = value
+
+student_encoder_checkpoint_init = convert_sonar_text_encoder_checkpoint(student_encoder_checkpoint, cfg)
+student_model.load_state_dict(student_encoder_checkpoint_init["model"])
+
+# Training
+
+experiment_dir = os.path.join(os.environ["EXPERIMENTS", "robust-embeddings/sonar/draft_experiment"])
+
 training_args = TrainingArguments(
-    output_dir="my-awesome-model",
+    output_dir=experiment_dir,
     fp16=True,
     logging_dir=f"logs",
     logging_strategy="steps",
     evaluation_strategy="steps",
     save_strategy="steps",
     load_best_model_at_end=True,
-    report_to="tensorboard",
+    report_to=f"{experiment_dir}/tensorboard",
     push_to_hub=False,
     per_device_train_batch_size=2,
     remove_unused_columns=False,
