@@ -129,7 +129,6 @@ student_model = create_sonar_text_encoder_model(cfg)
 
 training_args = TrainingArguments(
     output_dir="my-awesome-model",
-    num_train_epochs=3,
     fp16=True,
     logging_dir=f"logs",
     logging_strategy="steps",
