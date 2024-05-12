@@ -44,7 +44,7 @@ tokenizers = {
 
 max_seq_len = 512
 
-def preprocess_function(examples):
+def tokenize_inputs(examples):
     src_sentence_ids = [ tokenizers[source_lang](sentence)[:max_seq_len] for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
     tgt_sentence_ids = [ tokenizers[target_lang](sentence)[:max_seq_len] for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
     model_inputs = {
@@ -53,7 +53,7 @@ def preprocess_function(examples):
     }
     return model_inputs
 
-tokenized_books = formatted_books.map(preprocess_function, batched=True)
+tokenized_books = formatted_books.map(tokenize_inputs, batched=True)
 tokenized_books = tokenized_books.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
 
 
