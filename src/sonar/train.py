@@ -49,7 +49,7 @@ class SonarDistillationTrainer(Trainer):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
         self.student = student_model
-        self.loss_function = MSELoss(reduction="batchmean")
+        self.loss_function = MSELoss(reduction="sum")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.teacher.to(self.device)
         self.teacher.eval()
@@ -173,19 +173,19 @@ if __name__=="__main__":
 
     print("Training teacher model...")
 
-    experiment_dir = os.path.join(os.environ["EXPERIMENTS", "robust-embeddings/sonar/draft_experiment"])
+    experiment_dir = os.path.join(os.environ["EXPERIMENTS"], "robust-embeddings/sonar/draft_experiment")
 
     training_args = TrainingArguments(
         output_dir=experiment_dir,
-        fp16=True,
+        fp16=False,
         logging_dir=f"{experiment_dir}/logs",
         logging_strategy="steps",
         evaluation_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
-        report_to=f"{experiment_dir}/tensorboard",
+        report_to="tensorboard",
         push_to_hub=False,
-        per_device_train_batch_size=2,
+        per_device_train_batch_size=8,
         remove_unused_columns=False,
         max_steps=1000,
         save_steps=100,
