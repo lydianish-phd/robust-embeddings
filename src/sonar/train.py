@@ -16,7 +16,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 
 books = load_dataset("opus_books", "en-fr")
-books = books["train"].train_test_split(test_size=0.2)
+books = books["train"].train_test_split(test_size=0.1)
 
 tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
 en_tokenizer = tokenizer.create_encoder(lang="eng_Latn")
