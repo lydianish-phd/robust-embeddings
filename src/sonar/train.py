@@ -153,7 +153,6 @@ trainer = SonarDistillationTrainer(
     train_dataset=tokenized_books["train"],
     eval_dataset=tokenized_books["test"],
     data_collator=data_collator,
-    tokenizer=tokenizer
 )
 
 trainer.train()
