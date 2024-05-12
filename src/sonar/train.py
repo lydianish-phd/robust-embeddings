@@ -23,49 +23,6 @@ import torch
 from torch.nn import MSELoss, Embedding
 from torch.nn.utils.rnn import pad_sequence
 
-
-books = load_dataset("opus_books", "en-fr")
-books = books["train"].train_test_split(test_size=0.001)
-
-tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
-en_tokenizer = tokenizer.create_encoder(lang="eng_Latn")
-fr_tokenizer = tokenizer.create_encoder(lang="fra_Latn")
-
-def normalize_format_en_fr(examples):
-    source_langs = ["fra_Latn"] * len(examples["translation"])
-    target_langs = ["eng_Latn"] * len(examples["translation"])
-    inputs = [example["fr"] for example in examples["translation"]]
-    targets = [example["en"] for example in examples["translation"]]
-    outputs = {
-        "source_lang": source_langs,
-        "source_sentence": inputs,
-        "target_lang": target_langs,
-        "target_sentence": targets
-    }
-    return outputs
-
-formatted_books = books.map(normalize_format_en_fr, batched=True)
-
-tokenizers = {
-    "eng_Latn": en_tokenizer,
-    "fra_Latn": fr_tokenizer
-}
-
-max_seq_len = 512
-
-def tokenize_inputs(examples):
-    src_sentence_ids = [ tokenizers[source_lang](sentence)[:max_seq_len] for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
-    tgt_sentence_ids = [ tokenizers[target_lang](sentence)[:max_seq_len] for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
-    model_inputs = {
-        "src_sentence_ids": src_sentence_ids,
-        "tgt_sentence_ids": tgt_sentence_ids
-    }
-    return model_inputs
-
-tokenized_books = formatted_books.map(tokenize_inputs, batched=True)
-tokenized_books = tokenized_books.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
-
-
 class DataCollatorForSonarDistillation(DefaultDataCollator):
   def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = "pt"):
     super().__init__(return_tensors)
@@ -86,8 +43,6 @@ class DataCollatorForSonarDistillation(DefaultDataCollator):
         "tgt_batch_seq_len": torch.tensor([tgt_sentence_ids.shape[1]], dtype=torch.int)
     }
     return batch
-
-data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
 
 class SonarDistillationTrainer(Trainer):
     def __init__(self, teacher_model=None, student_model=None, *args, **kwargs):
@@ -129,63 +84,124 @@ class SonarDistillationTrainer(Trainer):
 
         return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
 
-# Models
+def normalize_format_en_fr(examples):
+    source_langs = ["fra_Latn"] * len(examples["translation"])
+    target_langs = ["eng_Latn"] * len(examples["translation"])
+    inputs = [example["fr"] for example in examples["translation"]]
+    targets = [example["en"] for example in examples["translation"]]
+    outputs = {
+        "source_lang": source_langs,
+        "source_sentence": inputs,
+        "target_lang": target_langs,
+        "target_sentence": targets
+    }
+    return outputs
 
-teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
+def tokenize_inputs(examples, tokenizers, max_seq_len):
+    src_sentence_ids = [ tokenizers[source_lang](sentence)[:max_seq_len] for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
+    tgt_sentence_ids = [ tokenizers[target_lang](sentence)[:max_seq_len] for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
+    model_inputs = {
+        "src_sentence_ids": src_sentence_ids,
+        "tgt_sentence_ids": tgt_sentence_ids
+    }
+    return model_inputs
 
-cfg = sonar_text_encoder_archs.get_config("basic")
-cfg.num_encoder_layers = cfg.num_decoder_layers = 12
-cfg.ffn_inner_dim = 4096
-student_model = create_sonar_text_encoder_model(cfg)
+def get_student_model_config():
+    cfg = sonar_text_encoder_archs.get_config("basic")
+    cfg.num_encoder_layers = cfg.num_decoder_layers = 12
+    cfg.ffn_inner_dim = 4096
+    return cfg
 
-# Initializing student
+def get_nllb_checkpoint_encoder(nllb_checkpoint, student_config):
+    nllb_checkpoint_encoder = {
+        "state_dict": {},
+        "embed_tokens": Embedding.from_pretrained(nllb_checkpoint["model"]["encoder.embed_tokens.weight"])
+    }
 
-student_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
-student_checkpoint = torch.load(student_checkpoint_path)
-student_encoder_checkpoint = {
-    "state_dict": {},
-    "embed_tokens": Embedding.from_pretrained(student_checkpoint["model"]["encoder.embed_tokens.weight"])
-}
+    prefix = "encoder."
+    for key, value in nllb_checkpoint['model'].items():
+        if key.startswith(prefix):
+            nllb_checkpoint_encoder["state_dict"][key[len(prefix):]] = value
 
-prefix = "encoder."
-for key, value in student_checkpoint['model'].items():
-    if key.startswith(prefix):
-        student_encoder_checkpoint["state_dict"][key[len(prefix):]] = value
+    return convert_sonar_text_encoder_checkpoint(nllb_checkpoint_encoder, student_config)
 
-student_encoder_checkpoint_init = convert_sonar_text_encoder_checkpoint(student_encoder_checkpoint, cfg)
-student_model.load_state_dict(student_encoder_checkpoint_init["model"])
+if __name__=="__main__":
+    
+    print("Loading dataset...")
 
-# Training
+    books = load_dataset("opus_books", "en-fr")
+    books = books["train"].train_test_split(test_size=0.001)
 
-experiment_dir = os.path.join(os.environ["EXPERIMENTS", "robust-embeddings/sonar/draft_experiment"])
+    print("Formatting dataset...")
 
-training_args = TrainingArguments(
-    output_dir=experiment_dir,
-    fp16=True,
-    logging_dir=f"logs",
-    logging_strategy="steps",
-    evaluation_strategy="steps",
-    save_strategy="steps",
-    load_best_model_at_end=True,
-    report_to=f"{experiment_dir}/tensorboard",
-    push_to_hub=False,
-    per_device_train_batch_size=2,
-    remove_unused_columns=False,
-    max_steps=1000,
-    save_steps=100,
-    logging_steps=100,
-    label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
-    prediction_loss_only=True
-)
+    formatted_books = books.map(normalize_format_en_fr, batched=True)
 
-trainer = SonarDistillationTrainer(
-    student_model=student_model,
-    teacher_model=teacher_model,
-    args=training_args,
-    train_dataset=tokenized_books["train"],
-    eval_dataset=tokenized_books["test"],
-    data_collator=data_collator,
-)
+    print("Loading tokenizers...")
 
-trainer.train()
+    tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
+    tokenizers = {
+        "eng_Latn": tokenizer.create_encoder(lang="eng_Latn"),
+        "fra_Latn": tokenizer.create_encoder(lang="fra_Latn")
+    }
+
+    print("Tokenizing dataset...")
+
+    max_seq_len = 512
+
+    tokenized_books = formatted_books.map(tokenize_inputs, batched=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len})
+    tokenized_books = tokenized_books.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
+
+    print("Instantiating data collator...")
+
+    data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
+
+    print("Loading teacher model...")
+
+    teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
+
+    print("Instantiating student model...")
+
+    student_config = get_student_model_config()
+    student_model = create_sonar_text_encoder_model(student_config)
+
+    print("Initializing student model...")
+
+    nllb_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
+    nllb_checkpoint = torch.load(nllb_checkpoint_path)
+    student_model_init = get_nllb_checkpoint_encoder(nllb_checkpoint, student_config)
+    student_model.load_state_dict(student_model_init["model"])
+
+    print("Training teacher model...")
+
+    experiment_dir = os.path.join(os.environ["EXPERIMENTS", "robust-embeddings/sonar/draft_experiment"])
+
+    training_args = TrainingArguments(
+        output_dir=experiment_dir,
+        fp16=True,
+        logging_dir=f"{experiment_dir}/logs",
+        logging_strategy="steps",
+        evaluation_strategy="steps",
+        save_strategy="steps",
+        load_best_model_at_end=True,
+        report_to=f"{experiment_dir}/tensorboard",
+        push_to_hub=False,
+        per_device_train_batch_size=2,
+        remove_unused_columns=False,
+        max_steps=1000,
+        save_steps=100,
+        logging_steps=100,
+        label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
+        prediction_loss_only=True
+    )
+
+    trainer = SonarDistillationTrainer(
+        student_model=student_model,
+        teacher_model=teacher_model,
+        args=training_args,
+        train_dataset=tokenized_books["train"],
+        eval_dataset=tokenized_books["test"],
+        data_collator=data_collator,
+    )
+
+    trainer.train()
 
