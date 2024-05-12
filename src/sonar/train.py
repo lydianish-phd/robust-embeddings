@@ -24,7 +24,6 @@ from torch.nn import MSELoss, Embedding
 from torch.nn.utils.rnn import pad_sequence
 
 from accelerate import Accelerator
-accelerator = Accelerator()
 
 class DataCollatorForSonarDistillation(DefaultDataCollator):
   def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = "pt"):
@@ -157,6 +156,7 @@ if __name__=="__main__":
 
     print("Loading teacher model...")
 
+    accelerator = Accelerator()
     teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder"))
 
     print("Instantiating student model...")
