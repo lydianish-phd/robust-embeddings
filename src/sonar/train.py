@@ -23,6 +23,9 @@ import torch
 from torch.nn import MSELoss, Embedding
 from torch.nn.utils.rnn import pad_sequence
 
+from accelerate import Accelerator
+accelerator = Accelerator()
+
 class DataCollatorForSonarDistillation(DefaultDataCollator):
   def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = "pt"):
     super().__init__(return_tensors)
@@ -50,7 +53,7 @@ class SonarDistillationTrainer(Trainer):
         self.teacher = teacher_model
         self.student = student_model
         self.loss_function = MSELoss(reduction="sum")
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = accelerator.device
         self.teacher.to(self.device)
         self.teacher.eval()
 
@@ -157,7 +160,7 @@ if __name__=="__main__":
 
     print("Loading teacher model...")
 
-    teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device="cuda")
+    teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder", device=accelerator.device)
 
     print("Instantiating student model...")
 
