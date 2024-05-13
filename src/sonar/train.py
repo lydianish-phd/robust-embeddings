@@ -171,13 +171,13 @@ if __name__=="__main__":
     student_model_init = get_nllb_checkpoint_encoder(nllb_checkpoint, student_config)
     student_model.load_state_dict(student_model_init["model"])
 
-    print("Training teacher model...")
+    print("Training student model...")
 
     experiment_dir = os.path.join(os.environ["EXPERIMENTS"], "robust-embeddings/sonar/draft_experiment")
 
     training_args = TrainingArguments(
         output_dir=experiment_dir,
-        fp16=False,
+        fp16=True,
         logging_dir=f"{experiment_dir}/logs",
         logging_strategy="steps",
         evaluation_strategy="steps",
