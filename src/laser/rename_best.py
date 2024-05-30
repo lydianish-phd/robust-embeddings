@@ -46,6 +46,14 @@ if __name__ == "__main__":
             experiment_dir = f"{args.basedir}e"
         elif row['model'] == "roberta-maxpool-init-0":
             experiment_dir = f"{args.basedir}f"
+        elif row['model'] == "roberta-maxpool-init-0.35":
+            experiment_dir = f"{args.basedir}g"
+        elif row['model'] == "roberta-maxpool-init-0.45":
+            experiment_dir = f"{args.basedir}h"
+        elif row['model'] == "roberta-maxpool-init-0.6":
+            experiment_dir = f"{args.basedir}i"
+        else:
+            raise ValueError("Invalid input: Model name unknown")
 
         best_checkpoint = os.path.join(experiment_dir, "models", f"checkpoint_{row['epoch']}_{row['steps']}.pt")
         if not os.path.exists(best_checkpoint):

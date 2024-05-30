@@ -41,7 +41,7 @@ fairseq-train \
     --sentemb-criterion cls \
     --prepend-bos  \
     --criterion encoder_similarity \
-    --mse \
+    --distil-loss mse \
     --save-dir $OUTPUT_DIR \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \

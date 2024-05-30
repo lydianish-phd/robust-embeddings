@@ -10,12 +10,12 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=4
+#SBATCH --array=8
 
 echo "### Running $SLURM_JOB_NAME ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd anaconda-py3/2022.10
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -50,6 +50,15 @@ PORT[4]="12345"
 EXPERIMENT_NUM[5]="${EXPERIMENT_BASE_NUM}f"
 PORT[5]="12346"
 
+EXPERIMENT_NUM[6]="${EXPERIMENT_BASE_NUM}g"
+PORT[6]="12347"
+
+EXPERIMENT_NUM[7]="${EXPERIMENT_BASE_NUM}h"
+PORT[7]="12348"
+
+EXPERIMENT_NUM[8]="${EXPERIMENT_BASE_NUM}i"
+PORT[8]="12349"
+
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
 
@@ -68,7 +77,7 @@ srun fairseq-train \
     --sentemb-criterion $POOLING \
     --prepend-bos  \
     --criterion encoder_similarity \
-    --mse \
+    --distil-loss mse \
     --save-dir $OUTPUT_DIR \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \

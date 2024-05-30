@@ -15,7 +15,7 @@ set -e
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD #anaconda-py3/2022.10
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
@@ -31,7 +31,7 @@ MODEL_NAME[6]=c-roberta-maxpool-init
 MODEL_NAME[7]=c-roberta-meanpool
 MODEL_NAME[8]=c-roberta-meanpool-init
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_036_eval
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_043_eval
 
 INPUT_DIR=$EXPERIMENT_DIR/scores
 CORPUS_PARTS="devtest"

@@ -1,15 +1,15 @@
 #!/bin/bash
 
 #SBATCH --job-name=validate      # Job name
-#SBATCH --account=rnh@cpu
+#SBATCH --account=rnh@v100
 ##SBATCH --partition=gpu_p2
 ##SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=00:30:00
+#SBATCH --time=6:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=6
 
@@ -18,13 +18,13 @@ set -e
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd anaconda-py3/2022.10
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="043"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -32,7 +32,7 @@ VOCAB_FILE[0]=$LASER/models/laser2.cvocab
 TOKENIZER[0]=$HOME/data-preparation/src/spm-tokenizer.py
 
 EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
-DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
+DATASETS_DIR=$DATASETS/oscar/mini/5Msent/bin
 
 MODEL_NAME[1]=roberta-maxpool
 MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models

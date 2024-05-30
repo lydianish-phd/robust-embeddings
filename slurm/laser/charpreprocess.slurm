@@ -25,34 +25,35 @@ TEACHER_LANG=laserstd
 STUDENT_LANG[0]=charobertastd
 STUDENT_LANG[1]=charobertaugc
 
-DATA_DIR=$DATASETS/oscar/mini/4Mlrec
+DATA_DIR=$DATASETS/oscar/mini/5Msent
 
-echo "Creating joint dictionary from standard and UGC data..."
+#echo "Creating joint dictionary from standard and UGC data..."
 
 TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[1]}-${STUDENT_LANG[0]}
 BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[1]}-${STUDENT_LANG[0]}
-STUDENT_PRETOK_VOCAB=$BIN_DIR/dict.${STUDENT_LANG[0]}.txt # joint std and ugc vocab
+STUDENT_PRETOK_VOCAB=$BIN_DIR/dict.${STUDENT_LANG[1]}.txt # joint std and ugc vocab
 
-fairseq-preprocess --source-lang ${STUDENT_LANG[1]} --target-lang ${STUDENT_LANG[0]} \
+fairseq-preprocess --source-lang ${STUDENT_LANG[1]} \
     --trainpref $TOK_DIR/train \
     --destdir $BIN_DIR \
     --dataset-impl cached \
     --workers 16 \
-    --joined-dictionary \
     --dict-only \
+    --joined-dictionary \
+    --target-lang ${STUDENT_LANG[1]} \
 
-echo "Binarizing standard data..."
+#echo "Binarizing standard data..."
 
-TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[0]}-$TEACHER_LANG
-BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[0]}-$TEACHER_LANG
+#TOK_DIR=$DATA_DIR/tok/${STUDENT_LANG[0]}-$TEACHER_LANG
+#BIN_DIR=$DATA_DIR/bin/${STUDENT_LANG[0]}-$TEACHER_LANG
 
-fairseq-preprocess --source-lang ${STUDENT_LANG[0]} --target-lang $TEACHER_LANG \
-    --trainpref $TOK_DIR/train \
-    --destdir $BIN_DIR \
-    --srcdict $STUDENT_PRETOK_VOCAB \
-    --tgtdict $TEACHER_VOCAB \
-    --dataset-impl cached \
-    --workers 16 \
+#fairseq-preprocess --source-lang ${STUDENT_LANG[0]} --target-lang $TEACHER_LANG \
+#    --trainpref $TOK_DIR/train \
+#    --destdir $BIN_DIR \
+#    --srcdict $STUDENT_PRETOK_VOCAB \
+#    --tgtdict $TEACHER_VOCAB \
+#    --dataset-impl cached \
+#    --workers 16 \
 
 echo "Binarizing UGC data..."
 

@@ -15,19 +15,21 @@ set -e
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD #anaconda-py3/2022.10
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_042
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_043
 INPUT_DIR=${EXPERIMENT_DIR}_valid/$SLURM_ARRAY_TASK_ID/scores
 SRC_DIR=$HOME/robust-embeddings/src/laser
 
 echo "Selecting best checkpoint..."
 
 python $SRC_DIR/best.py -i $INPUT_DIR
+
+echo "Renaming best checkpoint..."
 
 python $SRC_DIR/rename_best.py -d $EXPERIMENT_DIR -s $SLURM_ARRAY_TASK_ID
 

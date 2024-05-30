@@ -3,21 +3,21 @@
 #SBATCH --job-name=chartrain      # Job name
 #SBATCH --account=rnh@v100
 #SBATCH --partition=gpu_p2
-#SBATCH --qos=qos_gpu-t4
+##SBATCH --qos=qos_gpu-t4
 ##SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
 #SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=3	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=100:00:00
+#SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=1
 
 echo "### Running $SLURM_JOB_NAME ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd anaconda-py3/2022.10
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -25,7 +25,7 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="044"
 LEARNING_RATE="0.00005" #--lr-scheduler inverse_sqrt"
 CONFIG="distil:charobertaugc-laserstd" #,distil:charobertastd-laserstd"
 MAX_EPOCH=100
@@ -83,7 +83,7 @@ srun fairseq-train \
     --sentemb-criterion ${POOLING[$SLURM_ARRAY_TASK_ID]} \
     --prepend-bos \
     --criterion encoder_similarity \
-    --mse \
+    --distil-loss snr \
     --save-dir $OUTPUT_DIR \
     --optimizer adam  \
     --adam-betas '(0.9,0.98)'  \

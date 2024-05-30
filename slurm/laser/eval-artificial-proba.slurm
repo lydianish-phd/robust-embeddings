@@ -10,14 +10,14 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=6
+#SBATCH --array=9
 
 set -e 
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD #naconda-py3/2022.10
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
@@ -62,6 +62,21 @@ MODEL_NAME[6]=roberta-maxpool-init-0
 MODEL_PATH[6]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}f/models/checkpoint_best.pt
 VOCAB_FILE[6]=$DATASETS_DIR/4M_0/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[6]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[7]=roberta-maxpool-init-0.35
+MODEL_PATH[7]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}g/models/checkpoint_best.pt
+VOCAB_FILE[7]=$DATASETS_DIR/4M_35/bin/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[7]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[8]=roberta-maxpool-init-0.45
+MODEL_PATH[8]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}h/models/checkpoint_best.pt
+VOCAB_FILE[8]=$DATASETS_DIR/4M_45/bin/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[8]=$HOME/data-preparation/src/roberta-tokenizer.py
+
+MODEL_NAME[9]=roberta-maxpool-init-0.6
+MODEL_PATH[9]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}i/models/checkpoint_best.pt
+VOCAB_FILE[9]=$DATASETS_DIR/4M_60/bin/robertaugc-laserstd/dict.robertaugc.txt
+TOKENIZER[9]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 #------------------ FLORES ------------------#
 

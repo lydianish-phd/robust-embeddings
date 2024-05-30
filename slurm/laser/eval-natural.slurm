@@ -16,13 +16,13 @@ set -e
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD #anaconda-py3/2022.10
 
 source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_BASE_NUM="036"
+EXPERIMENT_BASE_NUM="043"
 
 MODEL_NAME[0]=laser
 MODEL_PATH[0]=$LASER/models/laser2.pt
@@ -30,7 +30,7 @@ VOCAB_FILE[0]=$LASER/models/laser2.cvocab
 TOKENIZER[0]=$HOME/data-preparation/src/spm-tokenizer.py
 
 EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
-DATASETS_DIR=$DATASETS/oscar/mini/4Mlrec/bin
+DATASETS_DIR=$DATASETS/oscar/mini/5Msent/bin
 
 MODEL_NAME[1]=roberta-maxpool
 MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_best.pt
