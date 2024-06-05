@@ -83,18 +83,18 @@ class SonarDistillationTrainer(Trainer):
 
         return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
 
-def normalize_format_en_fr(examples):
-    source_langs = ["fra_Latn"] * len(examples["translation"])
-    target_langs = ["eng_Latn"] * len(examples["translation"])
-    inputs = [example["fr"] for example in examples["translation"]]
-    targets = [example["en"] for example in examples["translation"]]
-    outputs = {
-        "source_lang": source_langs,
-        "source_sentence": inputs,
-        "target_lang": target_langs,
-        "target_sentence": targets
-    }
-    return outputs
+# def normalize_format_en_fr(examples):
+#     source_langs = ["fra_Latn"] * len(examples["translation"])
+#     target_langs = ["eng_Latn"] * len(examples["translation"])
+#     inputs = [example["fr"] for example in examples["translation"]]
+#     targets = [example["en"] for example in examples["translation"]]
+#     outputs = {
+#         "source_lang": source_langs,
+#         "source_sentence": inputs,
+#         "target_lang": target_langs,
+#         "target_sentence": targets
+#     }
+#     return outputs
 
 def tokenize_inputs(examples, tokenizers, max_seq_len):
     src_sentence_ids = [ tokenizers[source_lang](sentence)[:max_seq_len] for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
