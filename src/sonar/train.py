@@ -128,12 +128,15 @@ if __name__=="__main__":
     
     print("Loading dataset...")
 
-    books = load_dataset("opus_books", "en-fr")
-    books = books["train"].train_test_split(test_size=0.001)
+    data_fr_files = {
+        "train": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/train.fra_Latn-fra_Latn.jsonl",
+        "valid": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/valid.fra_Latn-fra_Latn.jsonl"
+    }
+    data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
 
-    print("Formatting dataset...")
+    # print("Formatting dataset...")
 
-    formatted_books = books.map(normalize_format_en_fr, batched=True)
+    # formatted_data_en_fr = data_en_fr.map(normalize_format_en_fr, batched=True)
 
     print("Loading tokenizers...")
 
@@ -147,8 +150,8 @@ if __name__=="__main__":
 
     max_seq_len = 512
 
-    tokenized_books = formatted_books.map(tokenize_inputs, batched=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len})
-    tokenized_books = tokenized_books.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
+    tokenized_data = data_fr.map(tokenize_inputs, batched=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len})
+    tokenized_data = tokenized_data.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     print("Instantiating data collator...")
 
@@ -187,9 +190,9 @@ if __name__=="__main__":
         push_to_hub=False,
         per_device_train_batch_size=8,
         remove_unused_columns=False,
-        max_steps=1000,
-        save_steps=100,
-        logging_steps=100,
+        max_steps=2000,
+        save_steps=1000,
+        logging_steps=1000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         prediction_loss_only=True
     )
@@ -198,8 +201,8 @@ if __name__=="__main__":
         student_model=student_model,
         teacher_model=teacher_model,
         args=training_args,
-        train_dataset=tokenized_books["train"],
-        eval_dataset=tokenized_books["test"],
+        train_dataset=tokenized_data["train"],
+        eval_dataset=tokenized_data["valid"],
         data_collator=data_collator,
     )
 
