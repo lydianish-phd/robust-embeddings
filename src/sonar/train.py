@@ -31,18 +31,18 @@ class DataCollatorForSonarDistillation(DefaultDataCollator):
     self.padding_value = tokenizer.vocab_info.pad_idx
 
   def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
-    src_sentence_ids = [ torch.tensor(row["src_sentence_ids"], dtype=torch.int) for row in features ]
+    src_sentence_ids = [ row["src_sentence_ids"].clone().detach() for row in features ]
     src_sentence_ids = pad_sequence(src_sentence_ids, batch_first=True, padding_value=self.padding_value)
-    tgt_sentence_ids = [ torch.tensor(row["tgt_sentence_ids"], dtype=torch.int) for row in features ]
+    tgt_sentence_ids = [ row["tgt_sentence_ids"].clone().detach() for row in features ]
     tgt_sentence_ids = pad_sequence(tgt_sentence_ids, batch_first=True, padding_value=self.padding_value)
 
     batch = {
         "src_sentence_ids": src_sentence_ids,
-        "src_seq_lens": (src_sentence_ids != self.padding_value).sum(-1).unsqueeze(0),
-        "src_batch_seq_len": torch.tensor([src_sentence_ids.shape[1]], dtype=torch.int),
+        "src_seq_lens": (src_sentence_ids != self.padding_value).sum(-1).unsqueeze(-1),
+        "src_batch_seq_len": torch.tensor([src_sentence_ids.shape[1]], dtype=torch.int).unsqueeze(0).repeat((src_sentence_ids.shape[0], 1)),
         "tgt_sentence_ids": tgt_sentence_ids,
-        "tgt_seq_lens": (tgt_sentence_ids != self.padding_value).sum(-1).unsqueeze(0),
-        "tgt_batch_seq_len": torch.tensor([tgt_sentence_ids.shape[1]], dtype=torch.int)
+        "tgt_seq_lens": (tgt_sentence_ids != self.padding_value).sum(-1).unsqueeze(-1),
+        "tgt_batch_seq_len": torch.tensor([tgt_sentence_ids.shape[1]], dtype=torch.int).unsqueeze(0).repeat((tgt_sentence_ids.shape[0], 1))
     }
     return batch
 
@@ -57,20 +57,20 @@ class SonarDistillationTrainer(Trainer):
         student_source_output = student(
             SequenceBatch(
                 seqs=inputs["src_sentence_ids"],
-                padding_mask=PaddingMask(inputs["src_seq_lens"][0], inputs["src_batch_seq_len"][0])
+                padding_mask=PaddingMask(inputs["src_seq_lens"].flatten(), inputs["src_batch_seq_len"].flatten()[0])
               )
         )
         student_target_output = student(
             SequenceBatch(
                 seqs=inputs["tgt_sentence_ids"],
-                padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0]) 
+                padding_mask=PaddingMask(inputs["tgt_seq_lens"].flatten(), inputs["tgt_batch_seq_len"].flatten()[0]) 
               )
         )
         with torch.no_grad():
             teacher_target_output = self.teacher(
                 SequenceBatch(
                     seqs=inputs["tgt_sentence_ids"],
-                    padding_mask=PaddingMask(inputs["tgt_seq_lens"][0], inputs["tgt_batch_seq_len"][0])
+                    padding_mask=PaddingMask(inputs["tgt_seq_lens"].flatten(), inputs["tgt_batch_seq_len"].flatten()[0])
                   )
             )
         distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
@@ -95,10 +95,20 @@ class SonarDistillationTrainer(Trainer):
 #         "target_sentence": targets
 #     }
 #     return outputs
+    
+def tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
+    tensor = tokenizer(sentence)
+    padding_length = max_length - tensor.size(0)
+    if padding_length <= 0:
+        return tensor[:max_length]
+    padding = torch.full(torch.Size([padding_length]), fill_value=pad_idx)
+    padded_tensor = torch.cat((tensor, padding), dim=0)
+    return padded_tensor[:max_length]
 
-def tokenize_inputs(examples, tokenizers, max_seq_len):
-    src_sentence_ids = [ tokenizers[source_lang](sentence)[:max_seq_len] for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
-    tgt_sentence_ids = [ tokenizers[target_lang](sentence)[:max_seq_len] for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
+
+def tokenize_inputs(examples, tokenizers, max_seq_len, pad_idx):
+    src_sentence_ids = [ tokenize_and_pad(tokenizers[source_lang],sentence,max_seq_len,pad_idx) for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
+    tgt_sentence_ids = [ tokenize_and_pad(tokenizers[target_lang],sentence,max_seq_len,pad_idx) for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
     model_inputs = {
         "src_sentence_ids": src_sentence_ids,
         "tgt_sentence_ids": tgt_sentence_ids
@@ -124,15 +134,20 @@ def get_nllb_checkpoint_encoder(nllb_checkpoint, student_config):
 
     return convert_sonar_text_encoder_checkpoint(nllb_checkpoint_encoder, student_config)
 
+SEED = 42
+
 if __name__=="__main__":
-    
+
+    accelerator = Accelerator()
+
     print("Loading dataset...")
 
     data_fr_files = {
-        "train": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/train.fra_Latn-fra_Latn.jsonl",
-        "valid": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/valid.fra_Latn-fra_Latn.jsonl"
+        "train": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/train/train.fra_Latn-fra_Latn-*.jsonl",
+        "valid": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/valid/valid.fra_Latn-fra_Latn-*.jsonl"
     }
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
+    data_fr = data_fr.shuffle(seed=SEED, buffer_size=10_000)
 
     # print("Formatting dataset...")
 
@@ -150,16 +165,16 @@ if __name__=="__main__":
 
     max_seq_len = 512
 
-    tokenized_data = data_fr.map(tokenize_inputs, batched=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len})
-    tokenized_data = tokenized_data.remove_columns(["id", "translation", "source_lang", "source_sentence", "target_lang", "target_sentence"])
+    tokenized_data = data_fr.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
+    tokenized_data = tokenized_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     print("Instantiating data collator...")
 
     data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
+    dadata_collatorta_fr = accelerator.prepare(data_collator)
 
     print("Loading teacher model...")
 
-    accelerator = Accelerator()
     teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder"))
 
     print("Instantiating student model...")
@@ -180,7 +195,7 @@ if __name__=="__main__":
 
     training_args = TrainingArguments(
         output_dir=experiment_dir,
-        fp16=True,
+        fp16=False,
         logging_dir=f"{experiment_dir}/logs",
         logging_strategy="steps",
         evaluation_strategy="steps",
@@ -188,13 +203,14 @@ if __name__=="__main__":
         load_best_model_at_end=True,
         report_to="tensorboard",
         push_to_hub=False,
-        per_device_train_batch_size=8,
+        per_device_train_batch_size=16,
         remove_unused_columns=False,
         max_steps=2000,
         save_steps=1000,
         logging_steps=1000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
-        prediction_loss_only=True
+        prediction_loss_only=True, 
+        seed=SEED
     )
 
     trainer = SonarDistillationTrainer(
