@@ -212,15 +212,15 @@ if __name__=="__main__":
         save_total_limit=5,
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
-        gradient_accumulation_steps=64,
+        #gradient_accumulation_steps=64,
         remove_unused_columns=False,
-        max_steps=100_000,
-        warmup_steps=8000,
+        max_steps=2000, #100_000,
+        #warmup_steps=8000,
         learning_rate=1e-4,
         lr_scheduler_type="linear",
-        save_steps=400,
-        logging_steps=400,
-        eval_steps=400,
+        save_steps=100,
+        logging_steps=100,
+        eval_steps=100,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         prediction_loss_only=True, 
         seed=SEED
@@ -233,7 +233,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        #callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
     trainer.train()
