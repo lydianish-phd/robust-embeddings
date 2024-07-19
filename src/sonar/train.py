@@ -1,7 +1,7 @@
 import os
 
-from transformers import TrainingArguments, Trainer, DefaultDataCollator
-from datasets import load_dataset
+from transformers import TrainingArguments, Trainer, DefaultDataCollator, EarlyStoppingCallback
+from datasets import load_dataset, interleave_datasets
 
 from fairseq2.models.nllb.tokenizer import NllbTokenizer
 from fairseq2.models.sequence import SequenceBatch, PaddingMask
@@ -83,19 +83,6 @@ class SonarDistillationTrainer(Trainer):
 
         return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
 
-# def normalize_format_en_fr(examples):
-#     source_langs = ["fra_Latn"] * len(examples["translation"])
-#     target_langs = ["eng_Latn"] * len(examples["translation"])
-#     inputs = [example["fr"] for example in examples["translation"]]
-#     targets = [example["en"] for example in examples["translation"]]
-#     outputs = {
-#         "source_lang": source_langs,
-#         "source_sentence": inputs,
-#         "target_lang": target_langs,
-#         "target_sentence": targets
-#     }
-#     return outputs
-    
 def tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     tensor = tokenizer(sentence)
     padding_length = max_length - tensor.size(0)
@@ -140,18 +127,34 @@ if __name__=="__main__":
 
     accelerator = Accelerator()
 
-    print("Loading dataset...")
+    print("Loading datasets...")
+
+    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
+    monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
+
+    data_en_fr_files = {
+        "train": f"{bilingual_data_dir}/eng-fra/train/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl",
+        "valid": f"{bilingual_data_dir}/eng-fra/valid/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
+    }
+    data_en_fr = load_dataset("json", data_files=data_en_fr_files, streaming=True)
+    data_en_fr = data_en_fr.shuffle(seed=SEED, buffer_size=10_000)
 
     data_fr_files = {
-        "train": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/train/train.fra_Latn-fra_Latn-*.jsonl",
-        "valid": "/home/lnishimw/scratch/datasets/rosonar/monolingual/concatenated/fra/valid/valid.fra_Latn-fra_Latn-*.jsonl"
+        "train": f"{monolingual_data_dir}/fra/train/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/fra/valid/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
     }
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
     data_fr = data_fr.shuffle(seed=SEED, buffer_size=10_000)
 
-    # print("Formatting dataset...")
+    data_en_files = {
+        "train": f"{monolingual_data_dir}/eng/train/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/eng/valid/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+    }
+    data_en = load_dataset("json", data_files=data_en_files, streaming=True)
+    data_en = data_en.shuffle(seed=SEED, buffer_size=10_000)
 
-    # formatted_data_en_fr = data_en_fr.map(normalize_format_en_fr, batched=True)
+    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
+    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
 
     print("Loading tokenizers...")
 
@@ -165,8 +168,11 @@ if __name__=="__main__":
 
     max_seq_len = 512
 
-    tokenized_data = data_fr.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
-    tokenized_data = tokenized_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
+    tokenized_train_data = all_train_data.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
+    tokenized_train_data = tokenized_train_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
+
+    tokenized_valid_data = all_valid_data.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
+    tokenized_valid_data = tokenized_valid_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     print("Instantiating data collator...")
 
@@ -202,12 +208,13 @@ if __name__=="__main__":
         save_strategy="steps",
         load_best_model_at_end=True,
         report_to="tensorboard",
+        save_total_limit=5,
         push_to_hub=False,
         per_device_train_batch_size=16,
         remove_unused_columns=False,
         max_steps=2000,
-        save_steps=1000,
-        logging_steps=1000,
+        save_steps=100,
+        logging_steps=100,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         prediction_loss_only=True, 
         seed=SEED
@@ -217,9 +224,10 @@ if __name__=="__main__":
         student_model=student_model,
         teacher_model=teacher_model,
         args=training_args,
-        train_dataset=tokenized_data["train"],
-        eval_dataset=tokenized_data["valid"],
+        train_dataset=tokenized_train_data,
+        eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=10)],
     )
 
     trainer.train()
