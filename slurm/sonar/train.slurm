@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=0:10:00                # Time limit hrs:min:sec
+#SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 
 echo "### Running $SLURM_JOB_NAME ###"
@@ -18,24 +18,19 @@ module purge
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
-#source $HOME/.bash_python_exports
 
 #module load anaconda-py3/2023.09 pytorch-gpu/py3/2.3.0
 module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
-
-#export PATH=$PATH:/usr/lib64
 
 set -e
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$MODELS/roberta-base/pytorch_model.bin
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035
-OUTPUT_DIR=$EXPERIMENT_DIR/models
-TENSORBOARD_DIR=$EXPERIMENT_DIR/tensorboard
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
+SEED=42
 
-
-accelerate launch $HOME/robust-embeddings/src/sonar/train.py
+accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED 
 
 echo "Done..."
 

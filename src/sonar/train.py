@@ -1,4 +1,4 @@
-import os
+import os, argparse
 
 from transformers import TrainingArguments, Trainer, DefaultDataCollator, EarlyStoppingCallback
 from datasets import load_dataset, interleave_datasets
@@ -53,14 +53,14 @@ class SonarDistillationTrainer(Trainer):
         self.teacher.eval()
         self.loss_function = MSELoss(reduction="sum")
 
-    def compute_loss(self, student, inputs, return_outputs=False):
-        student_source_output = student(
+    def compute_loss(self, model, inputs, return_outputs=False):
+        student_source_output = model(
             SequenceBatch(
                 seqs=inputs["src_sentence_ids"],
                 padding_mask=PaddingMask(inputs["src_seq_lens"].flatten(), inputs["src_batch_seq_len"].flatten()[0])
               )
         )
-        student_target_output = student(
+        student_target_output = model(
             SequenceBatch(
                 seqs=inputs["tgt_sentence_ids"],
                 padding_mask=PaddingMask(inputs["tgt_seq_lens"].flatten(), inputs["tgt_batch_seq_len"].flatten()[0]) 
@@ -75,13 +75,32 @@ class SonarDistillationTrainer(Trainer):
             )
         distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
 
-        student_source_output_dict = {
-            "encoded_seqs": student_source_output.encoded_seqs,
-            "sentence_embeddings": student_source_output.sentence_embeddings,
-            "padding_mask": student_source_output.padding_mask
+        outputs = {
+            "student_source_embeddings": student_source_output.sentence_embeddings,
+            "teacher_target_embeddings": teacher_target_output.sentence_embeddings
         }
 
-        return (distillation_loss, student_source_output_dict) if return_outputs else distillation_loss
+        return (distillation_loss, outputs) if return_outputs else distillation_loss
+    
+    def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys=None):
+        inputs = self._prepare_inputs(inputs)
+
+        with torch.no_grad():
+            with self.compute_loss_context_manager():
+                loss, outputs = self.compute_loss(model, inputs, return_outputs=True)
+            loss = loss.mean().detach()
+            logits = outputs["student_source_embeddings"]
+            labels = outputs["teacher_target_embeddings"]
+           
+        if prediction_loss_only:
+            return (loss, None, None)
+
+        return (loss, logits, labels)
+    
+def compute_metrics(eval_pred):
+    predictions, labels = eval_pred
+    loss = MSELoss(reduction="sum")(predictions, labels)
+    return { "loss": loss }
 
 def tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     tensor = tokenizer(sentence)
@@ -121,9 +140,13 @@ def get_nllb_checkpoint_encoder(nllb_checkpoint, student_config):
 
     return convert_sonar_text_encoder_checkpoint(nllb_checkpoint_encoder, student_config)
 
-SEED = 42
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
+    parser.add_argument("--last-checkpoint", help="path to last saved checkpoint", type=str)
+    parser.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
 
     accelerator = Accelerator()
 
@@ -137,24 +160,24 @@ if __name__=="__main__":
         "valid": f"{bilingual_data_dir}/eng-fra/valid/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
     }
     data_en_fr = load_dataset("json", data_files=data_en_fr_files, streaming=True)
-    data_en_fr = data_en_fr.shuffle(seed=SEED, buffer_size=10_000)
+    data_en_fr = data_en_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
     data_fr_files = {
         "train": f"{monolingual_data_dir}/fra/train/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
         "valid": f"{monolingual_data_dir}/fra/valid/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
     }
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
-    data_fr = data_fr.shuffle(seed=SEED, buffer_size=10_000)
+    data_fr = data_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
     data_en_files = {
         "train": f"{monolingual_data_dir}/eng/train/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
         "valid": f"{monolingual_data_dir}/eng/valid/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
     }
     data_en = load_dataset("json", data_files=data_en_files, streaming=True)
-    data_en = data_en.shuffle(seed=SEED, buffer_size=10_000)
+    data_en = data_en.shuffle(seed=args.seed, buffer_size=10_000)
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
+    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
+    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
 
     print("Loading tokenizers...")
 
@@ -177,7 +200,7 @@ if __name__=="__main__":
     print("Instantiating data collator...")
 
     data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
-    dadata_collatorta_fr = accelerator.prepare(data_collator)
+    data_collator = accelerator.prepare(data_collator)
 
     print("Loading teacher model...")
 
@@ -197,34 +220,32 @@ if __name__=="__main__":
 
     print("Training student model...")
 
-    experiment_dir = os.path.join(os.environ["EXPERIMENTS"], "robust-embeddings/sonar/draft_experiment")
-
     training_args = TrainingArguments(
-        output_dir=experiment_dir,
+        output_dir=f"{args.output_dir}/checkpoints",
         log_level="info",
         fp16=False,
-        logging_dir=f"{experiment_dir}/logs",
+        logging_dir=f"{args.output_dir}/tensorboard",
         logging_strategy="steps",
         eval_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
         metric_for_best_model="loss",
         report_to="tensorboard",
-        save_total_limit=5,
+        #save_total_limit=5,
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         #gradient_accumulation_steps=64,
         remove_unused_columns=False,
-        max_steps=2000, #100_000,
-        #warmup_steps=8000,
+        max_steps=100_000,
+        warmup_steps=8000,
         learning_rate=1e-4,
         lr_scheduler_type="linear",
-        save_steps=100,
-        logging_steps=100,
-        eval_steps=100,
+        save_steps=1000,
+        logging_steps=1000,
+        eval_steps=1000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
-        prediction_loss_only=True, 
-        seed=SEED
+        #prediction_loss_only=True, 
+        seed=args.seed
     )
 
     trainer = SonarDistillationTrainer(
@@ -234,7 +255,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        #callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
     trainer.train()
