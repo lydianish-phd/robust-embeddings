@@ -141,20 +141,23 @@ if __name__=="__main__":
 
     data_fr_files = {
         "train": f"{monolingual_data_dir}/fra/train/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/fra/valid/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
+        "valid": f"{monolingual_data_dir}/fra/valid/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-0.jsonl"
     }
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
     data_fr = data_fr.shuffle(seed=SEED, buffer_size=10_000)
 
     data_en_files = {
         "train": f"{monolingual_data_dir}/eng/train/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/eng/valid/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        "valid": f"{monolingual_data_dir}/eng/valid/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-0.jsonl"
     }
     data_en = load_dataset("json", data_files=data_en_files, streaming=True)
     data_en = data_en.shuffle(seed=SEED, buffer_size=10_000)
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
+    all_train_data = interleave_datasets([data_fr["train"], data_en["train"]], probabilities=[0.5, 0.5], seed=SEED)
+    all_valid_data = interleave_datasets([data_fr["valid"], data_en["valid"]], probabilities=[0.5, 0.5], seed=SEED)
+
+#    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
+#    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=SEED)
 
     print("Loading tokenizers...")
 
@@ -212,7 +215,7 @@ if __name__=="__main__":
         save_total_limit=5,
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
-        #gradient_accumulation_steps=64,
+        gradient_accumulation_steps=1,
         remove_unused_columns=False,
         max_steps=2000, #100_000,
         #warmup_steps=8000,
