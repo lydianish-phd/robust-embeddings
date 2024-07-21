@@ -208,9 +208,10 @@ if __name__=="__main__":
         fp16=False,
         logging_dir=f"{experiment_dir}/logs",
         logging_strategy="steps",
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
+        metric_for_best_model="loss",
         report_to="tensorboard",
         save_total_limit=5,
         push_to_hub=False,
@@ -236,7 +237,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        #callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
     trainer.train()

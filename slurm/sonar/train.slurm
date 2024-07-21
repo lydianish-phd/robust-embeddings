@@ -18,9 +18,12 @@ module purge
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
-source $HOME/.bash_python_exports
+#source $HOME/.bash_python_exports
 
-module load cpuarch/amd pytorch-gpu/py3/2.0.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+#module load anaconda-py3/2023.09 pytorch-gpu/py3/2.3.0
+module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+
+#export PATH=$PATH:/usr/lib64
 
 set -e
 
