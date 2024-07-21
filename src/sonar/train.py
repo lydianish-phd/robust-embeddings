@@ -234,7 +234,7 @@ if __name__=="__main__":
         #save_total_limit=5,
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
-        #gradient_accumulation_steps=64,
+        gradient_accumulation_steps=1,
         remove_unused_columns=False,
         max_steps=100_000,
         warmup_steps=8000,
