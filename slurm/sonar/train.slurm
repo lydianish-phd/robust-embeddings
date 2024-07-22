@@ -24,10 +24,7 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 
 set -e
 
-TEACHER_MODEL=$LASER/models/laser2.pt
-STUDENT_MODEL=$MODELS/roberta-base/pytorch_model.bin
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
 SEED=42
 
 accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED 
