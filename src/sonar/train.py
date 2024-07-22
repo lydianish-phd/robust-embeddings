@@ -221,7 +221,7 @@ if __name__=="__main__":
     print("Training student model...")
 
     training_args = TrainingArguments(
-        output_dir=f"{args.output_dir}/checkpoints",
+        output_dir=f"{args.output_dir}/models",
         log_level="info",
         fp16=False,
         logging_dir=f"{args.output_dir}/tensorboard",
