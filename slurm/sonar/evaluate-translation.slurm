@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=1:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=2-4
+#SBATCH --array=1
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -27,6 +27,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 MODEL=sonar
 OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
 
+
 DATA_DIR[0]=$DATASETS/rocsmt/test
 SRC_FILE[0]=${DATA_DIR[0]}/raw.en.test
 REF_FILE[0]=${DATA_DIR[0]}/ref.fr.test
@@ -37,32 +38,18 @@ SRC_FILE[1]=${DATA_DIR[1]}/norm.en.test
 REF_FILE[1]=${DATA_DIR[1]}/ref.fr.test
 SYS_FILE[1]=$OUTPUT_DIR/rocsmt/eng_Latn-fra_Latn/norm.en.test.out
 
+DATA_DIR[2]=$DATASETS/flores200/devtest
+SRC_FILE[2]=${DATA_DIR[2]}/eng_Latn.devtest
+REF_FILE[2]=${DATA_DIR[2]}/fra_Latn.devtest
+SYS_FILE[2]=$OUTPUT_DIR/flores200/eng_Latn-fra_Latn/eng_Latn.devtest.out
 
-CORPUS[1]=rocsmt
-DATA_DIR[1]=$DATASETS/rocsmt/test
-INPUT_FILES[1]="${DATA_DIR[1]}/raw.en.test ${DATA_DIR[1]}/norm.en.test"
-SRC_LANG[1]=eng_Latn
-TGT_LANG[1]=deu_Latn
-
-CORPUS[2]=rocsmt
-DATA_DIR[2]=$DATASETS/rocsmt/test
-INPUT_FILES[2]="${DATA_DIR[2]}/raw.en.test ${DATA_DIR[2]}/norm.en.test"
-SRC_LANG[2]=eng_Latn
-TGT_LANG[2]=ces_Latn
-
-CORPUS[3]=rocsmt
-DATA_DIR[3]=$DATASETS/rocsmt/test
-INPUT_FILES[3]="${DATA_DIR[3]}/raw.en.test ${DATA_DIR[3]}/norm.en.test"
-SRC_LANG[3]=eng_Latn
-TGT_LANG[3]=ukr_Cyrl
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
-        -i $INPUT_FILE \
-        -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -o $OUTPUT_DIR
+    python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
+        --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+        --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
+        --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
 done
 
 echo "Done..."
