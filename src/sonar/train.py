@@ -156,22 +156,22 @@ if __name__=="__main__":
     monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
 
     data_en_fr_files = {
-        "train": f"{bilingual_data_dir}/eng-fra/train/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl",
-        "valid": f"{bilingual_data_dir}/eng-fra/valid/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
+        "train": f"{bilingual_data_dir}/eng-fra/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl",
+        "valid": f"{bilingual_data_dir}/eng-fra/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
     }
     data_en_fr = load_dataset("json", data_files=data_en_fr_files, streaming=True)
     data_en_fr = data_en_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
     data_fr_files = {
-        "train": f"{monolingual_data_dir}/fra/train/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/fra/valid/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
+        "train": f"{monolingual_data_dir}/fra/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/fra/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
     }
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
     data_fr = data_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
     data_en_files = {
-        "train": f"{monolingual_data_dir}/eng/train/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/eng/valid/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        "train": f"{monolingual_data_dir}/eng/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/eng/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
     }
     data_en = load_dataset("json", data_files=data_en_files, streaming=True)
     data_en = data_en.shuffle(seed=args.seed, buffer_size=10_000)
@@ -236,16 +236,17 @@ if __name__=="__main__":
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         gradient_accumulation_steps=1,
         remove_unused_columns=False,
-        max_steps=100_000,
+        max_steps=300_000,
         warmup_steps=8000,
         learning_rate=1e-4,
         lr_scheduler_type="linear",
-        save_steps=1000,
+        save_steps=5000,
         logging_steps=1000,
-        eval_steps=1000,
+        eval_steps=5000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         #prediction_loss_only=True, 
-        seed=args.seed
+        seed=args.seed,
+        resume_from_checkpoint=args.last_checkpoint
     )
 
     trainer = SonarDistillationTrainer(
