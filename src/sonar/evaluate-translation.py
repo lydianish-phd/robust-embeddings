@@ -7,7 +7,7 @@ if __name__ == "__main__":
     parser.add_argument("--src-file", type=str)
     parser.add_argument("--sys-file", type=str)
     parser.add_argument("--ref-file", type=str)
-
+    args = parser.parse_args()
     with open (args.src_file) as f:
         src_data = [ line.strip() for line in f.readlines() ]
 
