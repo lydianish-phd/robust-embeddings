@@ -104,6 +104,79 @@ SRC_FILE[14]=${DATA_DIR[14]}/eng_Latn.devtest
 REF_FILE[14]=${DATA_DIR[14]}/rus_Cyrl.devtest
 SYS_FILE[14]=$OUTPUT_DIR/flores200/eng_Latn-rus_Cyrl/eng_Latn.devtest.out
 
+# Standard bilingual
+
+DATA_DIR[15]=$DATASETS/flores200/devtest
+SRC_FILE[15]=${DATA_DIR[15]}/fra_Latn.devtest
+REF_FILE[15]=${DATA_DIR[15]}/eng_Latn.devtest
+SYS_FILE[15]=$OUTPUT_DIR/flores200/fra_Latn-eng_Latn/fra_Latn.devtest.out
+
+DATA_DIR[16]=$DATASETS/wmt2015
+SRC_FILE[16]=${DATA_DIR[16]}/newsdiscusstest2015-enfr-src.en
+REF_FILE[16]=${DATA_DIR[16]}/newsdiscusstest2015-enfr-ref.fr
+SYS_FILE[16]=$OUTPUT_DIR/wmt2015/eng_Latn-fra_Latn/newsdiscusstest2015-enfr-src.en.out
+
+DATA_DIR[17]=$DATASETS/wmt2015
+SRC_FILE[17]=${DATA_DIR[17]}/newsdiscusstest2015-enfr-ref.fr
+REF_FILE[17]=${DATA_DIR[17]}/newsdiscusstest2015-enfr-src.en
+SYS_FILE[17]=$OUTPUT_DIR/wmt2015/fra_Latn_eng_Latn/newsdiscusstest2015-enfr-ref.fr.out
+
+# Non-standard English
+
+DATA_DIR[18]=$DATASETS/footweets
+SRC_FILE[18]=${DATA_DIR[18]}/twitter.sent.en.txt
+REF_FILE[18]=${DATA_DIR[18]}/twitter.sent.de.txt
+SYS_FILE[18]=$OUTPUT_DIR/footweets/eng_Latn-deu_Latn/twitter.sent.en.txt.out
+
+DATA_DIR[19]=$DATASETS/mtnt/MTNT2019
+SRC_FILE[19]=${DATA_DIR[19]}/en-fr.en
+REF_FILE[19]=${DATA_DIR[19]}/en-fr.fr
+SYS_FILE[19]=$OUTPUT_DIR/mtnt/eng_Latn-fra_Latn/en-fr.en.out
+
+DATA_DIR[20]=$DATASETS/mtnt/MTNT2019
+SRC_FILE[20]=${DATA_DIR[20]}/en-ja.en
+REF_FILE[20]=${DATA_DIR[20]}/en-ja.ja
+SYS_FILE[20]=$OUTPUT_DIR/mtnt/eng_Latn-jpn_Jpan/en-ja.en.out
+
+# Non-standard French
+
+DATA_DIR[21]=$DATASETS/mmtc
+SRC_FILE[21]=${DATA_DIR[21]}/test.fr-en.fr
+REF_FILE[21]=${DATA_DIR[21]}/test.fr-en.en
+SYS_FILE[21]=$OUTPUT_DIR/mmtc/fra_Latn-eng_Latn/test.fr-en.fr.out
+
+DATA_DIR[22]=$DATASETS/mtnt/MTNT2019
+SRC_FILE[22]=${DATA_DIR[22]}/fr-en.fr
+REF_FILE[22]=${DATA_DIR[22]}/fr-en.en
+SYS_FILE[22]=$OUTPUT_DIR/mtnt/fra_Latn-eng_Latn/fr-en.fr.out
+
+DATA_DIR[23]=$DATASETS/pfsmb/tmp
+SRC_FILE[23]=${DATA_DIR[23]}/test.fr
+REF_FILE[23]=${DATA_DIR[23]}/test.en
+SYS_FILE[23]=$OUTPUT_DIR/pfsmb/fra_Latn-eng_Latn/test.fr.out
+
+# Autoencode
+
+DATA_DIR[24]=$DATASETS/rocsmt/test
+SRC_FILE[24]=${DATA_DIR[24]}/ref.fr.test
+REF_FILE[24]=${DATA_DIR[24]}/ref.fr.test
+SYS_FILE[24]=$OUTPUT_DIR/rocsmt/fra_Latn/ref.fr.test.out
+
+DATA_DIR[25]=$DATASETS/rocsmt/test
+SRC_FILE[25]=${DATA_DIR[25]}/norm.en.test
+REF_FILE[25]=${DATA_DIR[25]}/norm.en.test
+SYS_FILE[25]=$OUTPUT_DIR/rocsmt/eng_Latn/norm.en.test.out
+
+DATA_DIR[26]=$DATASETS/rocsmt/test
+SRC_FILE[26]=${DATA_DIR[26]}/raw.en.test
+REF_FILE[26]=${DATA_DIR[26]}/raw.en.test
+SYS_FILE[26]=$OUTPUT_DIR/rocsmt/eng_Latn/raw.en.test.out
+
+DATA_DIR[27]=$DATASETS/rocsmt/test
+SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
+REF_FILE[27]=${DATA_DIR[27]}/norm.en.test
+SYS_FILE[27]=$OUTPUT_DIR/rocsmt/eng_Latn-eng_Latn/raw.en.test.out
+
 python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
         --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
         --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
