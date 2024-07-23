@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=generate      # Job name
+#SBATCH --job-name=evaluate      # Job name
 #SBATCH --account=rnh@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
