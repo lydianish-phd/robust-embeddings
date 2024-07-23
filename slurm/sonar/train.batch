@@ -22,16 +22,12 @@ source activate sonar_env
 
 set -e
 
-TEACHER_MODEL=$LASER/models/laser2.pt
-STUDENT_MODEL=$MODELS/roberta-base/pytorch_model.bin
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_035
-OUTPUT_DIR=$EXPERIMENT_DIR/models
-TENSORBOARD_DIR=$EXPERIMENT_DIR/tensorboard
-CONFIG_PATH=$EXPERIMENT_DIR/train-config.json
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/draft_experiment
+SEED=42
 
 echo "Training student model $SLURM_ARRAY_TASK_ID..."
 
-accelerate launch $HOME/robust-embeddings/src/sonar/train.py
+accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED
 
 echo "Done..."
 

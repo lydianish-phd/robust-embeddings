@@ -111,7 +111,6 @@ def tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     padded_tensor = torch.cat((tensor, padding), dim=0)
     return padded_tensor[:max_length]
 
-
 def tokenize_inputs(examples, tokenizers, max_seq_len, pad_idx):
     src_sentence_ids = [ tokenize_and_pad(tokenizers[source_lang],sentence,max_seq_len,pad_idx) for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
     tgt_sentence_ids = [ tokenize_and_pad(tokenizers[target_lang],sentence,max_seq_len,pad_idx) for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
@@ -176,8 +175,11 @@ if __name__=="__main__":
     data_en = load_dataset("json", data_files=data_en_files, streaming=True)
     data_en = data_en.shuffle(seed=args.seed, buffer_size=10_000)
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
+    all_train_data = interleave_datasets([data_fr["train"], data_en["train"]], probabilities=[0.5, 0.5], seed=args.seed)
+    all_valid_data = interleave_datasets([data_fr["valid"], data_en["valid"]], probabilities=[0.5, 0.5], seed=args.seed)
+
+    # all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
+    # all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
 
     print("Loading tokenizers...")
 
