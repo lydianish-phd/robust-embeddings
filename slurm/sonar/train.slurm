@@ -28,7 +28,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 SEED=42
 LAST_CHECKPOINT=$EXPERIMENT_DIR/models/checkpoint-75000
 
-accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED --last-chekpoint $LAST_CHECKPOINT 
+accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED --last-checkpoint $LAST_CHECKPOINT 
 
 echo "Done..."
 
