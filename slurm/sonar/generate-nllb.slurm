@@ -206,7 +206,7 @@ do
             --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
     fi
 
-    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin #/$LANG_PAIR
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin/$LANG_PAIR
     
     if [ ! -e "$BIN_DIR/test.$LANG_PAIR.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}.bin" ]
     then
