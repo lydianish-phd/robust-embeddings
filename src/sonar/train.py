@@ -261,5 +261,5 @@ if __name__=="__main__":
         callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
-    trainer.train()
+    trainer.train(resume_from_checkpoint=True)
 
