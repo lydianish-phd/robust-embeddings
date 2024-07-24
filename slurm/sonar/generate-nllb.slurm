@@ -11,12 +11,12 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=3:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0
+#SBATCH --array=5
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-module load cpuarch/amd anaconda-py3/2022.10 pytorch-gpu/py3/1.10.0-AMD
+module load cpuarch/amd anaconda-py3/2022.10 #pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -28,6 +28,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 MODEL=nllb600m
 MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
 SPM_MODEL_PATH=$MODELS/nllb600m/flores200sacrebleuspm
+SPM_MODEL_DICT=$MODELS/nllb600m/nllb200dictionary
 
 # Multilingual
 
@@ -186,24 +187,40 @@ fi
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    srun fairseq-generate \
-        $INPUT_FILE \
-        --path $MODEL_PATH \
-        --task translation_multi_simple_epoch \
-        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
-        --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+    echo "Tokenizing input data..."
+    python $FAIRSEQ_PATH/scripts/spm_encode.py \
+        --model $SPM_MODEL_PATH \
+        --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+    
+    echo "Binarizing input data..."
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
+    fairseq-preprocess \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --encoder-langtok src \
-        --decoder-langtok \
-        --gen-subset test \
-        --beam 5 \
-        --bpe sentencepiece \
-        --sentencepiece-model $SPM_MODEL_PATH \
-        --add-data-source-prefix-tags \
-        --fp16 \
-        --max-sentences 1 \
-        --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/gen.tok.out
+        --testpref $INPUT_FILE.tok \
+        --destdir $BIN_DIR \
+        --srcdict $SPM_MODEL_DICT \
+        --only-source
+    
+    #echo "Generating outputs..."
+    #fairseq-generate \
+    #    $BIN_DIR \
+    #    --path $MODEL_PATH \
+        # --task translation_multi_simple_epoch \
+        # --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+        # --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+        # --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+        # --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        # --encoder-langtok src \
+        # --decoder-langtok \
+        # --gen-subset test \
+        # --batch-size 32 \
+        # --beam 5 \
+        # --nbest 1 \
+        # --bpe sentencepiece \
+        # --sentencepiece-model $SPM_MODEL_PATH \
+        # --add-data-source-prefix-tags \
+        # --fp16 \
+        # --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/gen.tok.out
 
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
