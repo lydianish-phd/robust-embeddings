@@ -235,6 +235,7 @@ do
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --gen-subset test \
         --batch-size 32 \
+        --bpe sentencepiece \
         --beam 5 \
         --nbest 1 \
         --fp16 \
