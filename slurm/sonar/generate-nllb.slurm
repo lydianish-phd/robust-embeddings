@@ -235,6 +235,8 @@ do
         --lang-pairs $LANG_PAIR \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --encoder-langtok src \
+        --decoder-langtok \
         --lang-tok-replacing-bos-eos \
         --keep-inference-langtok \
         --gen-subset test \
@@ -244,8 +246,7 @@ do
         --fp16 \
         --remove-bpe \
         --results-path $OUTPUT_DIR
-        # --encoder-langtok src \
-        # --decoder-langtok \
+
         # --bpe sentencepiece \
         # --sentencepiece-model $SPM_MODEL_PATH \
 
