@@ -242,11 +242,11 @@ do
         --batch-size 32 \
         --beam 5 \
         --nbest 1 \
-        --bpe sentencepiece \
-        --sentencepiece-model $SPM_MODEL_PATH \
         --fp16 \
         --results-path $OUTPUT_DIR
- 
+#        --bpe sentencepiece \
+#        --sentencepiece-model $SPM_MODEL_PATH \
+
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
         NEW_OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
