@@ -193,6 +193,7 @@ do
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
         NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        mkdir -p $NEW_OUTPUT_DIR
         cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
     fi
 done
