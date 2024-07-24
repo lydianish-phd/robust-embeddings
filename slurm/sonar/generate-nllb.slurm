@@ -237,7 +237,6 @@ do
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --encoder-langtok src \
         --decoder-langtok \
-        --lang-tok-replacing-bos-eos \
         --keep-inference-langtok \
         --gen-subset test \
         --batch-size 32 \
