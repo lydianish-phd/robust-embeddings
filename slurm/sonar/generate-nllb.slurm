@@ -210,7 +210,6 @@ do
     fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
         --task multilingual_translation \
-        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
         --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
@@ -225,7 +224,7 @@ do
         --add-data-source-prefix-tags \
         --fp16 \
         --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
-
+#        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
