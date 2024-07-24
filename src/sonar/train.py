@@ -238,7 +238,7 @@ if __name__=="__main__":
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         gradient_accumulation_steps=1,
         remove_unused_columns=False,
-        max_steps=300_000,
+        max_steps=100_000,
         warmup_steps=8000,
         learning_rate=1e-4,
         lr_scheduler_type="linear",
