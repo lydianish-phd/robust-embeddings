@@ -203,9 +203,8 @@ do
     #     --only-source
     
     echo "Generating outputs..."
-    fairseq-generate \
-       $BIN_DIR \
-       --path $MODEL_PATH \
+    fairseq-generate $BIN_DIR/test \
+        --path $MODEL_PATH \
         --task translation_multi_simple_epoch \
         --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
         --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
