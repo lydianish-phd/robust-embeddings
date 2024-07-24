@@ -25,8 +25,13 @@ source $HOME/.bash_python_exports
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODEL=nllb600m
-MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
+
+#MODEL=nllb600m
+#MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
+
+MODEL=nllb1b
+MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
+
 SPM_MODEL_PATH=$MODELS/nllb600m/flores200sacrebleuspm
 SPM_MODEL_DICT=$MODELS/nllb600m/nllb200dictionary
 
@@ -222,8 +227,6 @@ do
         --batch-size 32 \
         --beam 5 \
         --nbest 1 \
-        --bpe sentencepiece \
-        --sentencepiece-model $SPM_MODEL_PATH \
         --remove-bpe=sentencepiece \
         --fp16 \
         --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
