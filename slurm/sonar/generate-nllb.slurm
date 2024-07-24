@@ -244,6 +244,7 @@ do
         --nbest 1 \
         --fp16 \
         --bpe sentencepiece \
+        --sentencepiece-model $SPM_MODEL_PATH \
         --remove-bpe \
         --results-path $OUTPUT_DIR
 
