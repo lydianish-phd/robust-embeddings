@@ -183,9 +183,11 @@ OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
 if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
 then 
-    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
+    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
 else
     OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
 fi
 
 # Languages ($FLORES200_LANGS and $LANG_PAIR)
@@ -197,16 +199,15 @@ LANG_PAIR=${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    
-    if [ ! -e "$INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}" ]
+    INPUT_FILE_TOK=$INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+
+    if [ ! -e "$INPUT_FILE_TOK" ]
     then
         echo "Tokenizing input data..."
         python $FAIRSEQ_PATH/scripts/spm_encode.py \
             --model $SPM_MODEL_PATH \
-            --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+            --output_format piece < $INPUT_FILE > $INPUT_FILE_TOK
     fi
-
-    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin/$LANG_PAIR
     
     if [ ! -e "$BIN_DIR/test.$LANG_PAIR.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}.bin" ]
     then
@@ -221,6 +222,8 @@ do
             --only-source \
             --dataset-impl cached \
             --workers 16
+        
+        cp $BIN_DIR/dict.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}.txt $BIN_DIR/dict.${TGT_LANG[$SLURM_ARRAY_TASK_ID]}.txt
     fi
     
     echo "Generating outputs..."
@@ -241,7 +244,6 @@ do
         --nbest 1 \
         --bpe sentencepiece \
         --sentencepiece-model $SPM_MODEL_PATH \
-        --remove-bpe=sentencepiece \
         --fp16 \
         --results-path $OUTPUT_DIR
  
