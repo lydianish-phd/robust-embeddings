@@ -23,7 +23,13 @@ if __name__ == "__main__":
     sentences = data.strip().split("\n")
 
     print("Generating outputs...")
-    outputs = t2t_model.predict(sentences, source_lang=args.src_lang, target_lang=args.tgt_lang, progress_bar=True, batch_size=32)
+    outputs = t2t_model.predict(sentences, 
+        source_lang=args.src_lang,
+        target_lang=args.tgt_lang,
+        progress_bar=True,
+        batch_size=32,
+        max_seq_len=512
+    )
 
     with open(output_file, "w") as f:
         for output in outputs:
