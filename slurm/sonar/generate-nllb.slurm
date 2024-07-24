@@ -185,7 +185,7 @@ fi
 
 # Launch the generation of outputs
 
-source ./lang_pairs.txt
+source $HOME/robust-embeddings/src/sonar/lang_pairs.txt
 
 LANG_PAIRS=$LANG_PAIRS,eng_Latn-eng_Latn,fra_Latn-fra_Latn
 
