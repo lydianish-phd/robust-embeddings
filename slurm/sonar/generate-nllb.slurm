@@ -193,7 +193,7 @@ do
     #     --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
     
     # echo "Binarizing input data..."
-    # BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
     # fairseq-preprocess \
     #     --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
     #     --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
