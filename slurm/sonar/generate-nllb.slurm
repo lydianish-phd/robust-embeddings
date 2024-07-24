@@ -26,14 +26,14 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-#MODEL=nllb600m
-#MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
+MODEL=nllb600m
+MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
 
-MODEL=nllb1b
-MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
+#MODEL=nllb1b
+#MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
 
-SPM_MODEL_PATH=$MODELS/nllb600m/flores200sacrebleuspm
-SPM_MODEL_DICT=$MODELS/nllb600m/nllb200dictionary
+SPM_MODEL_PATH=$MODELS/nllb200-spm/flores200sacrebleuspm
+SPM_MODEL_DICT=$MODELS/nllb200-spm/nllb200dictionary
 
 # Multilingual
 
@@ -188,29 +188,40 @@ else
     OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
 fi
 
-# Launch the generation of outputs
+# Languages ($FLORES200_LANGS and $LANG_PAIR)
 
-source $HOME/robust-embeddings/src/sonar/flores200.langs.txt
+source $HOME/robust-embeddings/src/sonar/flores200.langs.txt 
+LANG_PAIR=${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+
+# Launch the generation of outputs
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    # echo "Tokenizing input data..."
-    # python $FAIRSEQ_PATH/scripts/spm_encode.py \
-    #     --model $SPM_MODEL_PATH \
-    #     --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
     
-    # echo "Binarizing input data..."
-    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
-    # fairseq-preprocess \
-    #     --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-    #     --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-    #     --testpref $INPUT_FILE.tok \
-    #     --destdir $BIN_DIR \
-    #     --srcdict $SPM_MODEL_DICT \
-    #     --tgtdict $SPM_MODEL_DICT \
-    #     --only-source \
-    #     --dataset-impl cached \
-    #     --workers 16
+    if [ ! -e "$INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}" ]
+    then
+        echo "Tokenizing input data..."
+        python $FAIRSEQ_PATH/scripts/spm_encode.py \
+            --model $SPM_MODEL_PATH \
+            --output_format piece < $INPUT_FILE > $INPUT_FILE.tok.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+    fi
+
+    BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin/$LANG_PAIR
+    
+    if [ ! -e "$BIN_DIR/test.$LANG_PAIR.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}.bin" ]
+    then
+        echo "Binarizing input data..."
+        fairseq-preprocess \
+            --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+            --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+            --testpref $INPUT_FILE.tok \
+            --destdir $BIN_DIR \
+            --srcdict $SPM_MODEL_DICT \
+            --tgtdict $SPM_MODEL_DICT \
+            --only-source \
+            --dataset-impl cached \
+            --workers 16
+    fi
     
     echo "Generating outputs..."
     INPUT_FILE_NAME=$(basename "$INPUT_FILE")
@@ -218,21 +229,21 @@ do
         --path $MODEL_PATH \
         --task translation_multi_simple_epoch \
         --langs $FLORES200_LANGS \
-        --lang-pairs ${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --lang-pairs $LANG_PAIR \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --encoder-langtok src \
         --decoder-langtok \
+        --keep-inference-langtok \
         --gen-subset test \
         --batch-size 32 \
         --beam 5 \
         --nbest 1 \
+        --bpe sentencepiece \
+        --sentencepiece-model $SPM_MODEL_PATH \
         --remove-bpe=sentencepiece \
         --fp16 \
-        --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
-#        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
-#        --bpe sentencepiece \
-#        --sentencepiece-model $SPM_MODEL_PATH \
+        --results-path $OUTPUT_DIR
  
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
