@@ -200,8 +200,7 @@ do
         --testpref $INPUT_FILE.tok \
         --destdir $BIN_DIR \
         --srcdict $SPM_MODEL_DICT \
-        --tgtdict $SPM_MODEL_DICT \
-        --joined-dictionary
+        --tgtdict $SPM_MODEL_DICT 
     
     echo "Generating outputs..."
     fairseq-generate $BIN_DIR \
