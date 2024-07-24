@@ -200,7 +200,6 @@ do
         --beam 5 \
         --bpe sentencepiece \
         --sentencepiece-model $SPM_MODEL_PATH \
-        --remove-bpe \
         --add-data-source-prefix-tags \
         --fp16 \
         --max-sentences 1 \
