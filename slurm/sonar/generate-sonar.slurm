@@ -9,9 +9,9 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=20:00:00                # Time limit hrs:min:sec
+#SBATCH --time=3:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-4
+#SBATCH --array=1-21
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -30,11 +30,11 @@ MODEL=sonar
 
 # Multilingual
 
-CORPUS[9]=flores200
-DATA_DIR[9]=$DATASETS/flores200/devtest
-INPUT_FILES[9]="${DATA_DIR[9]}/eng_Latn.devtest"
-SRC_LANG[9]=eng_Latn
-TGT_LANG[9]=rus_Cyrl
+CORPUS[0]=rocsmt
+DATA_DIR[0]=$DATASETS/rocsmt/test
+INPUT_FILES[0]="${DATA_DIR[0]}/raw.en.test ${DATA_DIR[0]}/norm.en.test"
+SRC_LANG[0]=eng_Latn
+TGT_LANG[0]=fra_Latn
 
 CORPUS[1]=rocsmt
 DATA_DIR[1]=$DATASETS/rocsmt/test
@@ -126,7 +126,7 @@ TGT_LANG[14]=fra_Latn
 
 CORPUS[15]=mtnt
 DATA_DIR[15]=$DATASETS/mtnt/MTNT2019
-INPUT_FILES[15]="${DATA_DIR[15]}/en-fr.en"
+INPUT_FILES[15]="${DATA_DIR[15]}/en-ja.en"
 SRC_LANG[15]=eng_Latn
 TGT_LANG[15]=jpn_Jpan
 
@@ -170,7 +170,14 @@ INPUT_FILES[21]="${DATA_DIR[21]}/raw.en.test"
 SRC_LANG[21]=eng_Latn
 TGT_LANG[21]=eng_Latn
 
-LANG_PAIR=${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+
+if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
+then 
+    LANG_PAIR=${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
+else
+    LANG_PAIR=${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+fi
+
 OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/$LANG_PAIR
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
@@ -180,6 +187,12 @@ do
         -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         -o $OUTPUT_DIR
+
+    if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
+    then
+        NEW_OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
+    fi
 done
 
 echo "Done..."

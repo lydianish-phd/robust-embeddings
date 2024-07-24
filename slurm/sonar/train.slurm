@@ -8,7 +8,7 @@
 #SBATCH --ntasks-per-node=8               # number of tasks per node
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
-#SBATCH --hint=nomultithread       # we get physical cores not logical
+#SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 
