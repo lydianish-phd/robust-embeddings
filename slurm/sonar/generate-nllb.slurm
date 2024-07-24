@@ -26,11 +26,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-#MODEL=nllb600m
-#MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
+MODEL=nllb600m
+MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
 
-MODEL=nllb1b
-MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
+#MODEL=nllb1b
+#MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
 
 SPM_MODEL_PATH=$MODELS/nllb200-spm/flores200sacrebleuspm
 SPM_MODEL_DICT=$MODELS/nllb200-spm/nllb200dictionary
@@ -235,8 +235,7 @@ do
         --lang-pairs $LANG_PAIR \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --encoder-langtok src \
-        --decoder-langtok \
+        --lang-tok-replacing-bos-eos \
         --keep-inference-langtok \
         --gen-subset test \
         --batch-size 32 \
@@ -245,7 +244,8 @@ do
         --fp16 \
         --remove-bpe \
         --results-path $OUTPUT_DIR
-
+        # --encoder-langtok src \
+        # --decoder-langtok \
         # --bpe sentencepiece \
         # --sentencepiece-model $SPM_MODEL_PATH \
 
