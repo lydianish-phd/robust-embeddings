@@ -200,9 +200,13 @@ do
         --testpref $INPUT_FILE.tok \
         --destdir $BIN_DIR \
         --srcdict $SPM_MODEL_DICT \
-        --tgtdict $SPM_MODEL_DICT 
+        --tgtdict $SPM_MODEL_DICT \
+        --only-source \
+        --dataset-impl cached \
+        --workers 16
     
     echo "Generating outputs..."
+    INPUT_FILE_NAME=$(basename "$INPUT_FILE")
     fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
         --task translation_multi_simple_epoch \
@@ -220,12 +224,13 @@ do
         --sentencepiece-model $SPM_MODEL_PATH \
         --add-data-source-prefix-tags \
         --fp16 \
-        --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/gen.tok.out
+        --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
 
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
         NEW_OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        mkdir -p $NEW_OUTPUT_DIR
         cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
     fi
 done
