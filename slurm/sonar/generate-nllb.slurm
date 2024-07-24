@@ -194,22 +194,22 @@ do
     
     # echo "Binarizing input data..."
     BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
-    fairseq-preprocess \
-        --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --testpref $INPUT_FILE.tok \
-        --destdir $BIN_DIR \
-        --srcdict $SPM_MODEL_DICT \
-        --tgtdict $SPM_MODEL_DICT \
-        --only-source \
-        --dataset-impl cached \
-        --workers 16
+    # fairseq-preprocess \
+    #     --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+    #     --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+    #     --testpref $INPUT_FILE.tok \
+    #     --destdir $BIN_DIR \
+    #     --srcdict $SPM_MODEL_DICT \
+    #     --tgtdict $SPM_MODEL_DICT \
+    #     --only-source \
+    #     --dataset-impl cached \
+    #     --workers 16
     
     echo "Generating outputs..."
     INPUT_FILE_NAME=$(basename "$INPUT_FILE")
     fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
-        --task translation_multi_simple_epoch \
+        --task multilingual_translation \
         --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
         --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
