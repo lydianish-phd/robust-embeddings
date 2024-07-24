@@ -200,11 +200,11 @@ do
         --beam 5 \
         --bpe sentencepiece \
         --sentencepiece-model $SPM_MODEL_PATH \
-        --sacrebleu \
+        --remove-bpe \
         --add-data-source-prefix-tags \
         --fp16 \
         --max-sentences 1 \
-        --results-path $OUTPUT_DIR >> $OUTPUT_DIR/eval.out 2>&1
+        --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/gen.tok.out
 
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
