@@ -235,7 +235,7 @@ do
         --lang-pairs $LANG_PAIR \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --encoder-langtok src \
+        --encoder-langtok tgt \
         --decoder-langtok \
         --keep-inference-langtok \
         --gen-subset test \
@@ -243,9 +243,9 @@ do
         --beam 5 \
         --nbest 1 \
         --fp16 \
+        --bpe sentencepiece \
+        --remove-bpe \
         --results-path $OUTPUT_DIR
-       --bpe sentencepiece \
-#        --sentencepiece-model $SPM_MODEL_PATH \
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
