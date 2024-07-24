@@ -8,6 +8,8 @@ if __name__ == "__main__":
     parser.add_argument("--sys-file", type=str)
     parser.add_argument("--ref-file", type=str)
     args = parser.parse_args()
+
+    print("Loading data...")
     with open (args.src_file) as f:
         src_data = [ line.strip() for line in f.readlines() ]
 
@@ -19,6 +21,7 @@ if __name__ == "__main__":
 
     data = [{"src": src, "mt": mt, "ref": ref} for src, mt, ref in zip(src_data, sys_data, ref_data)]
 
+    print("Loading metric models...")
     bleu_model = BLEU()
     comet_model_path = download_model("Unbabel/wmt22-comet-da")
     comet_model = load_from_checkpoint(comet_model_path)

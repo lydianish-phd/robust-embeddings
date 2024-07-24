@@ -11,21 +11,23 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=3:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-21
+#SBATCH --array=0
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-#module load anaconda-py3/2023.09 pytorch-gpu/py3/2.3.0
-module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load cpuarch/amd anaconda-py3/2022.10 pytorch-gpu/py3/1.10.0-AMD
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
+source $HOME/.bash_python_exports
 
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODEL=sonar
+MODEL=nllb600m
+MODEL_PATH=$MODELS/nllb600m/nllb200densedst600mcheckpoint
+SPM_MODEL_PATH=$MODELS/nllb600m/flores200sacrebleuspm
 
 # Multilingual
 
@@ -184,15 +186,30 @@ fi
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
-        -i $INPUT_FILE \
-        -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -o $OUTPUT_DIR
+    srun fairseq-generate \
+        $INPUT_FILE \
+        --path $MODEL_PATH \
+        --task translation_multi_simple_epoch \
+        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+        --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+        --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --encoder-langtok src \
+        --decoder-langtok \
+        --gen-subset test \
+        --beam 5 \
+        --bpe sentencepiece \
+        --sentencepiece-model $SPM_MODEL_PATH \
+        --sacrebleu \
+        --add-data-source-prefix-tags \
+        --fp16 \
+        --max-sentences 1 \
+        --results-path $OUTPUT_DIR >> $OUTPUT_DIR/eval.out 2>&1
+
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
-        NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        NEW_OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
         cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
     fi
 done
