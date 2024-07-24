@@ -220,7 +220,6 @@ do
             --srcdict $SPM_MODEL_DICT \
             --tgtdict $SPM_MODEL_DICT \
             --only-source \
-            --dataset-impl cached \
             --workers 16
         
         cp $BIN_DIR/dict.${SRC_LANG[$SLURM_ARRAY_TASK_ID]}.txt $BIN_DIR/dict.${TGT_LANG[$SLURM_ARRAY_TASK_ID]}.txt
