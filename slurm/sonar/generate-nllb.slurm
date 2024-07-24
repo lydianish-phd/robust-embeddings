@@ -185,6 +185,10 @@ fi
 
 # Launch the generation of outputs
 
+source ./lang_pairs.txt
+
+LANG_PAIRS=$LANG_PAIRS,eng_Latn-eng_Latn,fra_Latn-fra_Latn
+
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
     # echo "Tokenizing input data..."
@@ -210,7 +214,7 @@ do
     fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
         --task multilingual_translation \
-        --lang-pairs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
+        --lang-pairs $LANG_PAIRS \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --encoder-langtok src \
