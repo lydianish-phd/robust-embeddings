@@ -227,22 +227,35 @@ do
     
     echo "Generating outputs..."
     INPUT_FILE_NAME=$(basename "$INPUT_FILE")
-    fairseq-generate $BIN_DIR \
+
+        fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
-        --task translation_multi_simple_epoch \
-        --langs $FLORES200_LANGS \
-        --lang-pairs $LANG_PAIR \
+        --task translation \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        --encoder-langtok src \
-        --decoder-langtok \
-        --keep-inference-langtok \
         --gen-subset test \
         --batch-size 32 \
         --beam 5 \
         --nbest 1 \
         --fp16 \
         --results-path $OUTPUT_DIR
+
+    # fairseq-generate $BIN_DIR \
+    #     --path $MODEL_PATH \
+    #     --task translation_multi_simple_epoch \
+    #     --langs $FLORES200_LANGS \
+    #     --lang-pairs $LANG_PAIR \
+    #     --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+    #     --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+    #     --encoder-langtok src \
+    #     --decoder-langtok \
+    #     --keep-inference-langtok \
+    #     --gen-subset test \
+    #     --batch-size 32 \
+    #     --beam 5 \
+    #     --nbest 1 \
+    #     --fp16 \
+    #     --results-path $OUTPUT_DIR
 #        --bpe sentencepiece \
 #        --sentencepiece-model $SPM_MODEL_PATH \
 
