@@ -214,7 +214,7 @@ do
     fairseq-generate $BIN_DIR \
         --path $MODEL_PATH \
         --task multilingual_translation \
-        --lang-pairs $LANG_PAIRS \
+        --lang-pairs ${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
         --encoder-langtok src \
@@ -223,12 +223,13 @@ do
         --batch-size 32 \
         --beam 5 \
         --nbest 1 \
-        --bpe sentencepiece \
-        --sentencepiece-model $SPM_MODEL_PATH \
+        --remove-bpe=sentencepiece \
         --fp16 \
         --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
 #        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
-
+#        --bpe sentencepiece \
+#        --sentencepiece-model $SPM_MODEL_PATH \
+ 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
         NEW_OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
