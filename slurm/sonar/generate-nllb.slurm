@@ -194,13 +194,14 @@ do
     
     # echo "Binarizing input data..."
     BIN_DIR=${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/bin
-    # fairseq-preprocess \
-    #     --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-    #     --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-    #     --testpref $INPUT_FILE.tok \
-    #     --destdir $BIN_DIR \
-    #     --srcdict $SPM_MODEL_DICT \
-    #     --only-source
+    fairseq-preprocess \
+        --source-lang ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --target-lang ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        --testpref $INPUT_FILE.tok \
+        --destdir $BIN_DIR \
+        --srcdict $SPM_MODEL_DICT \
+        --tgtdict $SPM_MODEL_DICT \
+        --joined-dictionary
     
     echo "Generating outputs..."
     fairseq-generate $BIN_DIR \
