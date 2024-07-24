@@ -221,7 +221,6 @@ do
         --nbest 1 \
         --bpe sentencepiece \
         --sentencepiece-model $SPM_MODEL_PATH \
-        --add-data-source-prefix-tags \
         --fp16 \
         --results-path $OUTPUT_DIR | tee $OUTPUT_DIR/$INPUT_FILE_NAME.tok.out
 #        --langs "${SRC_LANG[$SLURM_ARRAY_TASK_ID]},${TGT_LANG[$SLURM_ARRAY_TASK_ID]}" \
