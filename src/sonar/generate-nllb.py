@@ -28,6 +28,7 @@ class NLLBTranslationPipeline(TextToTextModelPipeline):
             decoder (Union[str, NllbTokenizer]): either card name or model object
             device (device, optional): . Defaults to GPU.
         """
+        super().__init__()
         if isinstance(model, str):
             config = load_nllb_config(model)
             model = create_nllb_model(config, dtype=torch.float32)
