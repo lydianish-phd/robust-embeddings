@@ -12,7 +12,7 @@ from typing import Union
 from fairseq2.typing import Device
 import torch
 
-NLLBTranslationPipeline(TextToTextModelPipeline):
+class NLLBTranslationPipeline(TextToTextModelPipeline):
     model: TransformerModel
     tokenizer: NllbTokenizer
 
