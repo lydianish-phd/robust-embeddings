@@ -22,7 +22,7 @@ if __name__ == "__main__":
     )
     model = AutoModelForSeq2SeqLM.from_pretrained(
         args.model_name,
-        device_map="cuda"
+        device_map="auto"
     )
     
     print("Reading input sentences...")
