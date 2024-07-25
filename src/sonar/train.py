@@ -20,7 +20,6 @@ from datasets import (
 )
 from transformers import (
     TrainingArguments,
-    Trainer,
     EarlyStoppingCallback
 )
 from accelerate import Accelerator

@@ -1,14 +1,10 @@
-from transformers import DefaultDataCollator
+from transformers import DefaultDataCollator, Trainer
 
 from fairseq2.models.nllb.tokenizer import NllbTokenizer
 from fairseq2.models.sequence import SequenceBatch, PaddingMask
 
-from sonar.models.sonar_text.builder import ( 
-    sonar_text_encoder_archs
-)
-from sonar.models.sonar_text.loader import (
-    convert_sonar_text_encoder_checkpoint
-)
+from sonar.models.sonar_text.builder import sonar_text_encoder_archs
+from sonar.models.sonar_text.loader import convert_sonar_text_encoder_checkpoint
 
 from typing import Any, Dict, List
 
