@@ -21,11 +21,12 @@ if __name__ == "__main__":
     else:
         encoder = "text_sonar_basic_encoder"
     translator = TextToTextModelPipeline(encoder=encoder,
-                                        decoder="text_sonar_basic_decoder",
-                                        tokenizer="text_sonar_basic_encoder",
-                                        device=torch.device("cuda")
+        decoder="text_sonar_basic_decoder",
+        tokenizer="text_sonar_basic_encoder",
+        device=torch.device("cuda")
     )
 
+    print("Reading input sentences...")
     with open(args.input_file) as f:
         data = f.readlines()
     sentences = [line.strip() for line in data]
@@ -39,6 +40,7 @@ if __name__ == "__main__":
         max_seq_len=512
     )
 
+    print("Writing output sentences...")
     with open(output_file, "w") as f:
         for output in outputs:
             f.write(output + "\n")

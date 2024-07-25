@@ -25,12 +25,13 @@ if __name__ == "__main__":
         device_map="cuda"
     )
     
+    print("Reading input sentences...")
     with open(args.input_file) as f:
         data = f.readlines()
     sentences = [line.strip() for line in data]
+    inputs = tokenizer(sentences, return_tensors="pt", padding=True).to(model.device)
 
     print("Generating outputs...")
-    inputs = tokenizer(sentences, return_tensors="pt", padding=True).to(model.device)
     output_tokens = model.generate(
         **inputs,
         forced_bos_token_id=tokenizer.convert_tokens_to_ids(tokenizer.tgt_lang),
@@ -38,6 +39,7 @@ if __name__ == "__main__":
     )
     outputs = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)
 
+    print("Writing output sentences...")
     with open(output_file, "w") as f:
         for output in outputs:
             f.write(output + "\n")
