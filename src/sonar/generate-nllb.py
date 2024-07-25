@@ -7,9 +7,12 @@ from fairseq2.models.nllb import (
 )
 from fairseq2.generation import BeamSearchSeq2SeqGenerator, TextTranslator
 from fairseq2.models.transformer import TransformerModel
-from typing import Union
+from typing import Iterable, List, Optional, Sequence, Union
 from fairseq2.typing import Device
 import torch
+from pathlib import Path
+from fairseq2.data import StringLike
+from fairseq2.data.cstring import CString
 
 class NLLBTranslationPipeline(torch.nn.Module):
     model: TransformerModel
