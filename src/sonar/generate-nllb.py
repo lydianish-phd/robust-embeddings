@@ -30,13 +30,13 @@ NLLBTranslationPipeline(TextToTextModelPipeline):
         """
         if isinstance(model, str):
             config = load_nllb_config(model)
-            self.model = create_nllb_model(config, dtype=torch.float32, progress=False)
+            model = create_nllb_model(config, dtype=torch.float32)
 
         if isinstance(tokenizer, str):
-            self.tokenizer = load_nllb_tokenizer(tokenizer, progress=False)
+            tokenizer = load_nllb_tokenizer(tokenizer, progress=False)
 
         self.model = model.to(device).eval()   
-        self.tokenizer = tokenizer.to(device)
+        self.tokenizer = tokenizer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -66,8 +66,7 @@ if __name__ == "__main__":
         source_lang=args.src_lang,
         target_lang=args.tgt_lang,
         progress_bar=True,
-        batch_size=32,
-        max_seq_len=512
+        batch_size=32
     )
 
     with open(output_file, "w") as f:

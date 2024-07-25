@@ -33,7 +33,7 @@ MODEL_NAME=nllb-200_dense_distill_600m
 
 #MODEL=nllb1b
 #MODEL_PATH=$MODELS/nllb1b/nllb200dense1bcheckpoint
-#MODEL_NAME=nllb-200_dense_distill_600m
+#MODEL_NAME=nllb-200_dense_distill_1b
 
 SPM_MODEL_PATH=$MODELS/nllb200-spm/flores200sacrebleuspm
 SPM_MODEL_DICT=$MODELS/nllb200-spm/nllb200dictionary
