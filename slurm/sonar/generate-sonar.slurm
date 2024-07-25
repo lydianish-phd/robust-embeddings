@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=3:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=18
+#SBATCH --array=5
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -25,7 +25,11 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODEL=sonar
+#MODEL=sonar
+#MODEL_DIR=""
+
+MODEL=rosonar
+MODEL_DIR=$EXPERIMENT_DIR/models/checkpoint-100000
 
 # Multilingual
 
@@ -188,7 +192,7 @@ do
         -i $INPUT_FILE \
         -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -o $OUTPUT_DIR
+        -o $OUTPUT_DIR -m $MODEL_DIR
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then

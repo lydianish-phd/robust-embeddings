@@ -1,5 +1,6 @@
 import os, argparse
 from sonar.inference_pipelines.text import TextToTextModelPipeline
+from sonar_distillation import load_student_encoder_from_checkpoint
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -7,14 +8,19 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--src-lang", type=str)
     parser.add_argument("-t", "--tgt-lang", type=str)
     parser.add_argument("-o", "--output-dir", type=str)
+    parser.add_argument("-m", "--model-dir", type=str)
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
     file_name = os.path.basename(args.input_file)
     output_file = os.path.join(args.output_dir, f"{file_name}.out")
 
+    if args.model_dir:
+        encoder = load_student_encoder_from_checkpoint(args.model_dir)
+    else:
+        encoder = "text_sonar_basic_encoder"
     print("Loading translation pipeline...")
-    t2t_model = TextToTextModelPipeline(encoder="text_sonar_basic_encoder",
+    t2t_model = TextToTextModelPipeline(encoder=encoder,
                                         decoder="text_sonar_basic_decoder",
                                         tokenizer="text_sonar_basic_encoder")
 

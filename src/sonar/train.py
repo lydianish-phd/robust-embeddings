@@ -3,7 +3,6 @@ import os, argparse
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
     load_sonar_tokenizer,
-    convert_sonar_text_encoder_checkpoint
 )
 from sonar.models.sonar_text.builder import (
     create_sonar_text_encoder_model
@@ -13,8 +12,7 @@ from sonar_distillation import (
     SonarDistillationTrainer,
     compute_metrics,
     tokenize_inputs,
-    get_student_model_config,
-    get_nllb_checkpoint_encoder,
+    load_student_encoder_from_checkpoint
 )
 from datasets import (
     load_dataset,
@@ -103,9 +101,7 @@ if __name__=="__main__":
     print("Initializing student model...")
 
     nllb_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
-    nllb_checkpoint = torch.load(nllb_checkpoint_path)
-    student_model_init = get_nllb_checkpoint_encoder(nllb_checkpoint, student_config)
-    student_model.load_state_dict(student_model_init["model"])
+    student_model = load_student_encoder_from_checkpoint(nllb_checkpoint_path)
 
     print("Training student model...")
 
