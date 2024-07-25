@@ -1,5 +1,4 @@
 import os, argparse
-from sonar.inference_pipelines.text import TextToTextModelPipeline
 from fairseq2.models.nllb import (
     create_nllb_model, 
     load_nllb_config, 
@@ -12,7 +11,7 @@ from typing import Union
 from fairseq2.typing import Device
 import torch
 
-class NLLBTranslationPipeline(TextToTextModelPipeline):
+class NLLBTranslationPipeline(torch.nn.Module):
     model: TransformerModel
     tokenizer: NllbTokenizer
 
@@ -38,6 +37,45 @@ class NLLBTranslationPipeline(TextToTextModelPipeline):
 
         self.model = model.to(device).eval()   
         self.tokenizer = tokenizer
+    
+    @torch.inference_mode()
+    def predict(
+        self,
+        input: Union[Path, Sequence[str]],
+        source_lang: str,
+        target_lang: str,
+        batch_size: int = 5,
+        progress_bar: bool = False,
+        **generator_kwargs,
+    ) -> List[str]:
+        generator = BeamSearchSeq2SeqGenerator(self.model, **generator_kwargs)
+        translator = TextTranslator(
+            generator,
+            tokenizer=self.tokenizer,
+            source_lang=source_lang,
+            target_lang=target_lang,
+        )
+
+        def _do_translate(src_texts: List[StringLike]) -> List[StringLike]:
+            texts, _ = translator.batch_translate(src_texts)
+            return texts
+
+        pipeline: Iterable = (
+            (
+                read_text(input)
+                if isinstance(input, (str, Path))
+                else read_sequence(input)
+            )
+            .bucket(batch_size)
+            .map(_do_translate)
+            .and_return()
+        )
+        if progress_bar:
+            pipeline = add_progress_bar(pipeline, inputs=input, batch_size=batch_size)
+
+        results: List[List[CString]] = list(iter(pipeline))
+        return [str(x) for y in results for x in y]
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
