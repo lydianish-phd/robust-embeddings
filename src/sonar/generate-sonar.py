@@ -15,11 +15,11 @@ if __name__ == "__main__":
     file_name = os.path.basename(args.input_file)
     output_file = os.path.join(args.output_dir, f"{file_name}.out")
 
+    print("Loading translation pipeline...")
     if args.model_dir:
         encoder = load_student_encoder_from_checkpoint(args.model_dir)
     else:
         encoder = "text_sonar_basic_encoder"
-    print("Loading translation pipeline...")
     t2t_model = TextToTextModelPipeline(encoder=encoder,
                                         decoder="text_sonar_basic_decoder",
                                         tokenizer="text_sonar_basic_encoder")
