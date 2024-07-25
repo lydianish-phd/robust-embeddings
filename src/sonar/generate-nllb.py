@@ -5,7 +5,8 @@ from fairseq2.generation import (
     BeamSearchSeq2SeqGenerator,
     TextTranslator    
 )
-from fairseq2.models.nllb.loader import load_nllb_tokenizer
+from fairseq2.models.nllb import create_nllb_model, load_nllb_config, load_nllb_tokenizer
+from fairseq2.generation import BeamSearchSeq2SeqGenerator, TextTranslator
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -22,7 +23,12 @@ if __name__ == "__main__":
 
     print("Loading translation pipeline...")
     
-    
+    tokenizer = load_nllb_tokenizer("nllb-200")
+    config = load_nllb_config("nllb-200_dense_distill_600m")
+    model = create_nllb_model(config)
+    generator = BeamSearchSeq2SeqGenerator(model)
+
+    translator = TextTranslator(generator, tokenizer, source_lang=src_lang, target_lang=tgt_lang)
     
     if args.model_dir:
         encoder = load_student_encoder_from_checkpoint(args.model_dir)
