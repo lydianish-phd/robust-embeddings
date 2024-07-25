@@ -24,9 +24,10 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047b
 SEED=42
 LAST_CHECKPOINT=$EXPERIMENT_DIR/models
+mkdir -p $LAST_CHECKPOINT
 
 accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED --last-checkpoint $LAST_CHECKPOINT 
 

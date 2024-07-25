@@ -179,7 +179,7 @@ if __name__=="__main__":
     # all_valid_data = interleave_datasets([data_fr["valid"], data_en["valid"]], probabilities=[0.5, 0.5], seed=args.seed)
 
     all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
+    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], seed=args.seed)
 
     print("Loading tokenizers...")
 
