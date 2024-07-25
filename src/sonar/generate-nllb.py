@@ -13,6 +13,9 @@ import torch
 from pathlib import Path
 from fairseq2.data import StringLike
 from fairseq2.data.cstring import CString
+from fairseq2.data.data_pipeline import read_sequence
+from fairseq2.data.text import TextTokenizer, read_text
+from sonar.inference_pipelines.utils import add_progress_bar
 
 class NLLBTranslationPipeline(torch.nn.Module):
     model: TransformerModel
