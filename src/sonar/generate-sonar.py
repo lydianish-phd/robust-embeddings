@@ -20,16 +20,18 @@ if __name__ == "__main__":
         encoder = load_student_encoder_from_checkpoint(args.model_dir)
     else:
         encoder = "text_sonar_basic_encoder"
-    t2t_model = TextToTextModelPipeline(encoder=encoder,
+    translator = TextToTextModelPipeline(encoder=encoder,
                                         decoder="text_sonar_basic_decoder",
-                                        tokenizer="text_sonar_basic_encoder")
+                                        tokenizer="text_sonar_basic_encoder",
+                                        device=torch.device("cuda")
+    )
 
     with open(args.input_file) as f:
-        data = f.read()
-    sentences = data.strip().split("\n")
+        data = f.readlines()
+    sentences = [line.strip() for line in data]
 
     print("Generating outputs...")
-    outputs = t2t_model.predict(sentences, 
+    outputs = translator.predict(sentences, 
         source_lang=args.src_lang,
         target_lang=args.tgt_lang,
         progress_bar=True,
