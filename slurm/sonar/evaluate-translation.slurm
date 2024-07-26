@@ -15,7 +15,7 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 # Using anaconda-py3/2023.09 which has pytorch 2.2.2 but no accelerate (otherwise fails to load NLLB pretrained model from HF)
-module load cpuarch/amd anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load anaconda-py3/2023.09
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -23,7 +23,7 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODEL=nllb600m
+MODEL=nllb1b
 OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
 
 # Multilingual
