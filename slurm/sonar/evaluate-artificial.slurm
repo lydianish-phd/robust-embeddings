@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=40	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=00:30:00                # Time limit hrs:min:sec
+#SBATCH --time=01:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-4
 
@@ -45,7 +45,7 @@ LANG_PAIR[3]=eng_Latn-ukr_Cyrl
 REF_FILE[4]=$REF_DIR/ref.ru.test
 LANG_PAIR[4]=eng_Latn-rus_Cyrl
 
-SEEDS="1000 1001 1002 1003 1004"
+SEEDS="1003 1004"
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Launch the evaluation of outputs
