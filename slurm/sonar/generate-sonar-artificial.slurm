@@ -30,7 +30,7 @@ MODEL=sonar
 MODEL_DIR=""
 
 #MODEL=rosonar
-#MODEL_DIR=$EXPERIMENT_DIR/models/checkpoint-100000
+#MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-100000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
@@ -72,7 +72,8 @@ do
             -i $INPUT_FILE \
             -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
             -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -o $OUTPUT_DIR -m $MODEL_DIR
+            -o $OUTPUT_DIR \
+            $MODEL_DIR
 
     done
 done
