@@ -28,10 +28,12 @@ if __name__ == "__main__":
 
     print("Computing BLEU and COMET scores...")
     for seed in args.seeds:
+        print("- seed:", seed)
         for proba in args.probas:
-            print("\t - seed:", seed, "proba:", proba)
+            print("\t - proba:", proba)
             src_file = os.path.join(args.src_dir, str(seed), str(proba), "ugc", args.src_file_name)
             for model in args.models:
+                print("\t\t - model:", model)
                 model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, args.lang_pair, str(seed), str(proba))
                 sys_file = os.path.join(model_output_dir, args.sys_file_name)
 
