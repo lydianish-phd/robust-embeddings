@@ -27,11 +27,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-MODEL[0]=nllb600m
-MODEL_NAME[0]=facebook/nllb-200-distilled-600m
+MODEL=nllb600m
+MODEL_NAME=facebook/nllb-200-distilled-600m
 
-MODEL[1]=nllb1b
-MODEL_NAME[1]=facebook/nllb-200-distilled-1.3B
+#MODEL=nllb1b
+#MODEL_NAME=facebook/nllb-200-distilled-1.3B
 
 # Multilingual
 
@@ -175,40 +175,34 @@ INPUT_FILES[21]="${DATA_DIR[21]}/raw.en.test"
 SRC_LANG[21]=eng_Latn
 TGT_LANG[21]=eng_Latn
 
+# Output dir
 
-# Loop through models
+OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
-for i in {0..1}
+if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
+then 
+    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+else
+    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+fi
+
+# Launch the generation of outputs
+for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-    # Output dir
 
-    OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/${CORPUS[$SLURM_ARRAY_TASK_ID]}
+    python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
+        -i $INPUT_FILE \
+        -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+        -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+        -o $OUTPUT_DIR -m $MODEL_NAME
 
-    if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
-    then 
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
-    else
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+    if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
+    then
+        NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        mkdir -p $NEW_OUTPUT_DIR
+        cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
     fi
-
-    # Launch the generation of outputs
-
-    for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
-    do
-
-        python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
-            -i $INPUT_FILE \
-            -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -o $OUTPUT_DIR -m ${MODEL_NAME[$i]}
-
-        if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
-        then
-            NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
-            mkdir -p $NEW_OUTPUT_DIR
-            cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
-        fi
-    done
 done
+
 echo "Done..."
 
