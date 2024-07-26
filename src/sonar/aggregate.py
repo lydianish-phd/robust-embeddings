@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--input-dir", help="path to experiment directory", type=str)
     parser.add_argument("-t", "--table-name", type=str)
     parser.add_argument("-c", "--corpora", type=str, nargs="+")
-    parser.add_argument("-l", "--lang-pais", type=str, nargs="+")
+    parser.add_argument("-l", "--lang-pairs", type=str, nargs="+")
     parser.add_argument("-m", "--models", type=str, nargs="+")
     args = parser.parse_args()
 
