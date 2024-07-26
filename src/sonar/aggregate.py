@@ -31,8 +31,14 @@ if __name__ == "__main__":
                         column_name = "__".join([corpus, lang_pair, file_name])
                         with open(score_file) as f:
                             scores = json.load(f)
-                        bleu_scores[column_name].append(round(scores["bleu"], 2))
-                        comet_scores[column_name].append(round(scores["comet"], 3))
+                        if column_name in bleu_scores:
+                            bleu_scores[column_name].append(round(scores["bleu"], 2))
+                        else:
+                            bleu_scores[column_name] = [round(scores["bleu"], 2)]
+                        if column_name in comet_scores:
+                            comet_scores[column_name].append(round(scores["comet"], 3))
+                        else:
+                            comet_scores[column_name] = [round(scores["comet"], 3)]
     
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
