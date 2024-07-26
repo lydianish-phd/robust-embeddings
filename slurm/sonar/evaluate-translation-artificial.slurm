@@ -57,7 +57,7 @@ do
     
     for SEED in {1000..1004}
     do
-        echo "\t - seed $SEED"
+        echo -e "\t - seed $SEED"
 
         for PROBA in $PROBAS
         do
