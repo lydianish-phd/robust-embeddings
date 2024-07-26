@@ -28,22 +28,26 @@ if __name__ == "__main__":
     with open(args.input_file) as f:
         data = f.readlines()
     sentences = [line.strip() for line in data]
-    inputs = tokenizer(sentences, return_tensors="pt", padding=True).to(model.device)
 
     print("Generating outputs...")
-    output_tokens = model.generate(
-        **inputs,
-        forced_bos_token_id=tokenizer.convert_tokens_to_ids(tokenizer.tgt_lang),
-        max_length=512
-    )
-    outputs = tokenizer.batch_decode(output_tokens, skip_special_tokens=True)
+    batch_size = 32
+    outputs = []
+    for i in range(0, len(sentences), batch_size):
+        batch = sentences[i:i + batch_size]
+        inputs = tokenizer(batch, return_tensors="pt", padding=True).to(model.device)
+        output_tokens = model.generate(
+            **inputs,
+            forced_bos_token_id=tokenizer.convert_tokens_to_ids(tokenizer.tgt_lang),
+            max_length=512
+        )
+        outputs += tokenizer.batch_decode(output_tokens, skip_special_tokens=True)
 
     print("Writing output sentences...")
     with open(output_file, "w") as f:
         for output in outputs:
             f.write(output + "\n")
     
-    del model
+
 
 
 
