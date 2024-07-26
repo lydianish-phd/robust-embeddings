@@ -42,7 +42,7 @@ if __name__ == "__main__":
     
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
-    os.makedirs(args.scores_dir, exist_ok=True)
+    os.makedirs(scores_dir, exist_ok=True)
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
