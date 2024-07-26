@@ -19,7 +19,7 @@ if __name__ == "__main__":
         "model": args.models
     }
 
-    print(f"Aggregating scores for {args.table_name}...")
+    print(f"Aggregating {args.table_name} scores...")
     for model in args.models:
         for corpus in args.corpora:
             for lang_pair in args.lang_pairs:
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
-    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
-    comet_scores_df = pd.DataFrame.from_dict(comet_scores)
+    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model")
+    comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
 
     bleu_scores_df.to_csv(bleu_score_file)
     comet_scores_df.to_csv(comet_score_file)
