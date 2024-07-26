@@ -33,8 +33,8 @@ if __name__ == "__main__":
             for model in args.models:
                 model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, args.lang_pair, str(seed), str(proba))
                 sys_file = os.path.join(model_output_dir, args.sys_file_name)
-                
-                with open (args.src_file) as f:
+
+                with open (src_file) as f:
                     src_data = [ line.strip() for line in f.readlines() ]
                 with open (sys_file) as f:
                     sys_data = [ line.strip() for line in f.readlines() ]
