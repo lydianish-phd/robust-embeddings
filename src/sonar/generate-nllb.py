@@ -36,7 +36,7 @@ if __name__ == "__main__":
         forced_bos_token_id=tokenizer.convert_tokens_to_ids(tokenizer.tgt_lang),
         max_length=512
     )
-    outputs = tokenizer.batch_decode(translated_tokens, skip_special_tokens=True)
+    outputs = tokenizer.batch_decode(output_tokens, skip_special_tokens=True)
 
     print("Writing output sentences...")
     with open(output_file, "w") as f:
