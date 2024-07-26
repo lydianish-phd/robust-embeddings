@@ -45,36 +45,22 @@ LANG_PAIR[3]=eng_Latn-ukr_Cyrl
 REF_FILE[4]=$REF_DIR/ref.ru.test
 LANG_PAIR[4]=eng_Latn-rus_Cyrl
 
+SEEDS="1000 1001 1002 1003 1004"
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Launch the evaluation of outputs
     
-for SEED in {1000..1004}
-do
-    echo -e "Seed: $SEED"
-
-    for PROBA in $PROBAS
-    do
-        echo -e "\t - Proba: $PROBA"
-
-        SRC_FILE=$SRC_DIR/$SEED/$PROBA/ugc/norm.en_mix_all.test
-        SYS_FILES=()
-
-        for MODEL in $MODELS
-        do
-            echo -e "\t\t - Model: $MODEL"
-
-            OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/$CORPUS/${LANG_PAIR[$SLURM_ARRAY_TASK_ID]}
-            SYS_FILES+=("$OUTPUT_DIR/$SEED/$PROBA/norm.en_mix_all.test.out")
-        done
-    
-        python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
-            --src-file $SRC_FILE \
-            --sys-files "${SYS_FILES[@]}" \
-            --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
-    done
-done 
-done
+python $HOME/robust-embeddings/src/sonar/evaluate-artificial.py \
+    -i $EXPERIMENT_DIR \
+    -c $CORPUS \
+    -l ${LANG_PAIR[$SLURM_ARRAY_TASK_ID]} \
+    --src-dir $SRC_DIR \
+    --src-file-name norm.en_mix_all.test \
+    --sys-file-name norm.en_mix_all.test.out \
+    --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} \
+    -m $MODELS \
+    -s $SEEDS \
+    -p $PROBAS
 
 echo "Done..."
 

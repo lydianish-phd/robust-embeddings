@@ -185,7 +185,7 @@ do
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
 done
 
-python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
+python $HOME/robust-embeddings/src/sonar/evaluate.py \
     --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
     --sys-files "${SYS_FILES[@]}" \
     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
