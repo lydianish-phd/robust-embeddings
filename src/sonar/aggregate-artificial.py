@@ -25,6 +25,8 @@ if __name__ == "__main__":
         "proba": []
     }
 
+    total_files = len(args.seeds) * len(args.probas) * len(args.lang_pairs) * len(args.models)
+    print("Total files:", total_files)
     print(f"Aggregating {args.table_name} scores...")
     for seed in args.seeds:
         print("- seed:", seed)
@@ -57,7 +59,7 @@ if __name__ == "__main__":
                             comet_scores["seed"].append(seed)
                             comet_scores["proba"].append(proba)
                             n_files += 1
-                            print("\t\t\t file no.:", n_files)
+                            #print("\t\t\t file no.:", n_files)
 
     
     print(f"Writing aggregated score files...")
