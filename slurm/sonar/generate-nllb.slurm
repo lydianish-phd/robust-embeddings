@@ -7,7 +7,7 @@
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
-#SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
+#SBATCH --cpus-per-task=64	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
@@ -27,11 +27,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-#MODEL=nllb600m
-#MODEL_NAME=facebook/nllb-200-distilled-600m
+MODEL=nllb600m
+MODEL_NAME=facebook/nllb-200-distilled-600m
 
-MODEL=nllb1b
-MODEL_NAME=facebook/nllb-200-distilled-1.3B
+#MODEL=nllb1b
+#MODEL_NAME=facebook/nllb-200-distilled-1.3B
 
 # Multilingual
 
