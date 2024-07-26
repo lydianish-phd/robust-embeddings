@@ -13,10 +13,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     bleu_scores = {
-        "model": arg.models
+        "model": args.models
     }
     comet_scores = {
-        "model": arg.models
+        "model": args.models
     }
 
     print(f"Aggregating scores for {args.table_name}...")
