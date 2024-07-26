@@ -32,6 +32,7 @@ if __name__ == "__main__":
             print("\t - proba:", proba)
             for lang_pair in args.lang_pairs:
                 print("\t\t - lang_pair:", lang_pair)
+                n_files = 0
                 for model in args.models:
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
                     if os.path.isdir(model_output_dir):
@@ -55,6 +56,9 @@ if __name__ == "__main__":
                             comet_scores["model"].append(model)
                             comet_scores["seed"].append(seed)
                             comet_scores["proba"].append(proba)
+                            n_files += 1
+                            print("\t\t\t file no.:", n_files)
+
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
