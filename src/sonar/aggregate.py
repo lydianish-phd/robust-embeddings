@@ -20,9 +20,10 @@ if __name__ == "__main__":
     }
 
     print(f"Aggregating {args.table_name} scores...")
-    for model in args.models:
-        for corpus in args.corpora:
-            for lang_pair in args.lang_pairs:
+    
+    for corpus in args.corpora:
+        for lang_pair in args.lang_pairs:
+            for model in args.models:
                 model_output_dir = os.path.join(args.input_dir, "outputs", model, corpus, lang_pair)
                 if os.path.isdir(model_output_dir):
                     scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
