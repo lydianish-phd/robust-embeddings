@@ -45,7 +45,7 @@ LANG_PAIR[3]=eng_Latn-ukr_Cyrl
 REF_FILE[4]=$REF_DIR/ref.ru.test
 LANG_PAIR[4]=eng_Latn-rus_Cyrl
 
-SEEDS="1003 1004"
+SEEDS="1000 1001 1002 1003 1004"
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Launch the evaluation of outputs

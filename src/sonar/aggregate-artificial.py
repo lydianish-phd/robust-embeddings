@@ -20,7 +20,7 @@ if __name__ == "__main__":
         "proba": []
     }
     comet_scores = {
-        "model": args.models,
+        "model": [],
         "seed": [],
         "proba": []
     }
@@ -46,9 +46,11 @@ if __name__ == "__main__":
                                 comet_scores[column_name].append(scores["comet"])
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
+                            bleu_scores["model"].append(model)
                             bleu_scores["seed"].append(seed)
-                            comet_scores["seed"].append(seed)
                             bleu_scores["proba"].append(proba)
+                            comet_scores["model"].append(model)
+                            comet_scores["seed"].append(seed)
                             comet_scores["proba"].append(proba)
     
     print(f"Writing aggregated score files...")
@@ -56,7 +58,7 @@ if __name__ == "__main__":
     os.makedirs(scores_dir, exist_ok=True)
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
-
+    
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores)
 
