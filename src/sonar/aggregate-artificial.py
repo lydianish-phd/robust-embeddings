@@ -40,6 +40,7 @@ if __name__ == "__main__":
                     if os.path.isdir(model_output_dir):
                         scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
                         for score_file in scores_files:
+                            print(score_file)
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                             column_name = "__".join([args.corpus, lang_pair, file_name])
                             with open(score_file) as f:
