@@ -58,7 +58,7 @@ if __name__ == "__main__":
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
-    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model").
+    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model")
     comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
 
     bleu_scores_df.round(2).to_csv(bleu_score_file)
