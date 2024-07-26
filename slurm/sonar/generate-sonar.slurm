@@ -185,10 +185,11 @@ else
 fi
 
 # Launch the generation of outputs
+echo "Model: $MODEL"
 
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do 
-    echo "Model: $MODEL"
+    echo -e "\t - input file: $INPUT_FILE"
 
     python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
         -i $INPUT_FILE \

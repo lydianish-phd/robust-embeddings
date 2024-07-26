@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-21
+#SBATCH --array=0
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -21,7 +21,6 @@ module load cpuarch/amd anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
-source $HOME/.bash_python_exports
 
 set -e
 
@@ -177,7 +176,7 @@ TGT_LANG[21]=eng_Latn
 
 for i in {0..1}
 do
-    # Output dir
+    echo "Model: ${MODEL[$i]}"
 
     OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
@@ -191,7 +190,7 @@ do
     # Launch the generation of outputs
     for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
     do
-        echo "Model: ${MODEL[$i]}"
+        echo -e "\t - input file: $INPUT_FILE"
 
         python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
             -i $INPUT_FILE \
