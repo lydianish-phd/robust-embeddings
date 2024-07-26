@@ -23,7 +23,7 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODELS="sonar nllb600m nllb1b"
+MODELS="nllb1b sonar nllb600m"
 
 CORPUS=rocsmt_artificial
 DATA_DIR=$DATASETS/rocsmt
