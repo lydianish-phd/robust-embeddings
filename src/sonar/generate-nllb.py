@@ -1,5 +1,6 @@
 import os, argparse
 from transformers import AutoModelForSeq2SeqLM, NllbTokenizer
+import torch
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -20,10 +21,8 @@ if __name__ == "__main__":
         src_lang=args.src_lang,
         tgt_lang=args.tgt_lang
     )
-    model = AutoModelForSeq2SeqLM.from_pretrained(
-        args.model_name,
-        device_map="auto"
-    )
+    model = AutoModelForSeq2SeqLM.from_pretrained(args.model_name)
+    model.to(torch.device("cuda"))
     
     print("Reading input sentences...")
     with open(args.input_file) as f:
