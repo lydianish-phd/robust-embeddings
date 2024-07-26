@@ -3,6 +3,12 @@ import pandas as pd
 
 SCORE_FILE_SUFFIX = ".out.json"
 
+def multilingual_average(data):
+
+
+def multilingual_delta(data, lang_pairs, corpus="rocsmt", ugc_file_name="raw.en.test", std_file_name="norm.en.test"):
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to experiment directory", type=str)
