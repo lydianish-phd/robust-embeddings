@@ -61,6 +61,6 @@ if __name__ == "__main__":
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model")
     comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
 
-    bleu_scores_df.round(2).to_csv(bleu_score_file)
-    comet_scores_df.round(3).to_csv(comet_score_file)
+    bleu_scores_df.to_csv(bleu_score_file)
+    comet_scores_df.to_csv(comet_score_file)
         

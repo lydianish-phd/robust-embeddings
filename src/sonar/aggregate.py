@@ -75,6 +75,6 @@ if __name__ == "__main__":
         bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df), args.lang_pairs)
         comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df), args.lang_pairs)
 
-    bleu_scores_df.round(2).to_csv(bleu_score_file)
-    comet_scores_df.round(3).to_csv(comet_score_file)
+    bleu_scores_df.to_csv(bleu_score_file)
+    comet_scores_df.to_csv(comet_score_file)
 
