@@ -50,6 +50,8 @@ TABLE_NAME[4]=autoencode
 CORPORA[4]="rocsmt"
 LANG_PAIRS[4]="fra_Latn eng_Latn eng_Latn-eng_Latn"
 
+# Aggregate scores
+
 python $HOME/robust-embeddings/src/sonar/aggregate.py \
     -i $EXPERIMENT_DIR \
     -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
@@ -57,4 +59,4 @@ python $HOME/robust-embeddings/src/sonar/aggregate.py \
     -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
     -m $MODELS
 
-
+echo "Done..."

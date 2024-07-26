@@ -19,6 +19,7 @@ if __name__ == "__main__":
         "model": arg.models
     }
 
+    print(f"Aggregating scores for {args.table_name}...")
     for model in args.models:
         for corpus in args.corpora:
             for lang_pair in args.lang_pairs:
