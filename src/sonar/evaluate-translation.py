@@ -32,7 +32,7 @@ if __name__ == "__main__":
             "comet": comet_model.predict(data, batch_size=32, gpus=1)[1]
         }
 
-        output_file = f"{args.sys_file}.json"
+        output_file = f"{sys_file}.json"
         with open(output_file, 'w') as f:
             json.dump(scores, f)
 

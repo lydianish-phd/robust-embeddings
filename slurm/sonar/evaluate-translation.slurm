@@ -183,7 +183,6 @@ do
         
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
-    
 done
 
 python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
