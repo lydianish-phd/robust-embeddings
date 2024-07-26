@@ -177,14 +177,14 @@ SYS_FILE[27]=$OUTPUT_DIR/rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
 for MODEL in $MODELS
 do
-        echo "Model: $MODEL"
+    echo "Model: $MODEL"
         
-        OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
+    OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
         
-        python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
-                --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
-                --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
-                --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
+    python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
+        --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+        --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
+        --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
 done
 
 echo "Done..."

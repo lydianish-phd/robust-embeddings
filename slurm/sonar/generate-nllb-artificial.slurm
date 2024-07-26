@@ -50,14 +50,15 @@ TGT_LANG[3]=ukr_Cyrl
 SRC_LANG[4]=eng_Latn
 TGT_LANG[4]=rus_Cyrl
 
+PROBAS="0.1 0.2 0.3 0.4 0.5"
+
+# Launch the generation of outputs
+
 for i in {0..1}
 do
     echo "Model: ${MODEL[$i]}"
 
     OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/$CORPUS/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
-
-    # Launch the generation of outputs
-    PROBAS="0.1 0.2 0.3 0.4 0.5"
 
     for SEED in {1000..1004}
     do
