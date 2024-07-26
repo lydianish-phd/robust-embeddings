@@ -176,6 +176,8 @@ SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
 REF_FILE[27]=${DATA_DIR[27]}/norm.en.test
 SYS_FILE[27]=$OUTPUT_DIR/rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
+echo "Model: $MODEL"
+
 python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
         --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
         --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
