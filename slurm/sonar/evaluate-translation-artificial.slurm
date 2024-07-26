@@ -31,10 +31,19 @@ SRC_DIR=$DATA_DIR/artificial
 REF_DIR=$DATA_DIR/test
 
 REF_FILE[0]=$REF_DIR/ref.fr.test
+LANG_PAIR[0]=eng_Latn-fra_Latn
+
 REF_FILE[1]=$REF_DIR/ref.de.test
+LANG_PAIR[1]=eng_Latn-deu_Latn
+
 REF_FILE[2]=$REF_DIR/ref.cs.test
+LANG_PAIR[2]=eng_Latn-ces_Latn
+
 REF_FILE[3]=$REF_DIR/ref.uk.test
+LANG_PAIR[3]=eng_Latn-ukr_Cyrl
+
 REF_FILE[4]=$REF_DIR/ref.ru.test
+LANG_PAIR[4]=eng_Latn-rus_Cyrl
 
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
@@ -44,7 +53,7 @@ for MODEL in $MODELS
 do
     echo "Model: $MODEL"
 
-    OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/$CORPUS/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+    OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/$CORPUS/${LANG_PAIR[$SLURM_ARRAY_TASK_ID]}
     
     for SEED in {1000..1004}
     do
