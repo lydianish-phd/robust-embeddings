@@ -15,10 +15,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     bleu_scores = {
-        "model": args.models
+        "model": args.models,
+        "seed": [],
+        "proba": []
     }
     comet_scores = {
-        "model": args.models
+        "model": args.models,
+        "seed": [],
+        "proba": []
     }
 
     print(f"Aggregating {args.table_name} scores...")
@@ -36,38 +40,27 @@ if __name__ == "__main__":
                                 with open(score_file) as f:
                                     scores = json.load(f)
                                 if column_name in bleu_scores:
-                                    bleu_scores[column_name].append(round(scores["bleu"], 2))
+                                    bleu_scores[column_name].append(scores["bleu"])
                                 else:
-                                    bleu_scores[column_name] = [round(scores["bleu"], 2)]
+                                    bleu_scores[column_name] = [scores["bleu"]]
                                 if column_name in comet_scores:
-                                    comet_scores[column_name].append(round(scores["comet"], 3))
+                                    comet_scores[column_name].append(scores["comet"])
                                 else:
-                                    comet_scores[column_name] = [round(scores["comet"], 3)]
+                                    comet_scores[column_name] = [scores["comet"]]
+                                bleu_scores["seed"].append(seed)
+                                comet_scores["seed"].append(seed)
+                                bleu_scores["proba"].append(proba)
+                                comet_scores["proba"].append(proba)
     
-            print(f"Writing aggregated score files for seed {seed} and proba {proba}...")
-            scores_dir = os.path.join(args.input_dir, "scores", "artificial", str(seed), str(proba))
-            os.makedirs(scores_dir, exist_ok=True)
-            bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
-            comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
+    print(f"Writing aggregated score files...")
+    scores_dir = os.path.join(args.input_dir, "scores")
+    os.makedirs(scores_dir, exist_ok=True)
+    bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
+    comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
-            bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model")
-            comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
+    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model").
+    comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
 
-            bleu_scores_df.to_csv(bleu_score_file)
-            comet_scores_df.to_csv(comet_score_file)
+    bleu_scores_df.round(2).to_csv(bleu_score_file)
+    comet_scores_df.round(3).to_csv(comet_score_file)
         
-    # print("Averaging scores for all seeds...")
-    # for metric in ["bleu", "comet"]:
-    #     for proba in args.probas:
-    #         all_data = pd.DataFrame()
-    #         for seed in args.seeds:
-    #             scores_file = scores_dir = os.path.join(args.input_dir, "scores", "artificial", str(seed), str(proba), f"{metric}_{args.table_name}.csv")
-    #             data = pd.read_csv(input_file)
-    #             all_data = pd.concat([all_data, data[all_data.columns]], ignore_index=True)
-            
-            
-
-
-    
-
-

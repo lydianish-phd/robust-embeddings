@@ -8,7 +8,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0
+#SBATCH --array=5
 
 set -e 
 
@@ -50,13 +50,32 @@ TABLE_NAME[4]=autoencode
 CORPORA[4]="rocsmt"
 LANG_PAIRS[4]="fra_Latn eng_Latn eng_Latn-eng_Latn"
 
+# Artificial
+TABLE_NAME[5]=artificial
+CORPORA[5]="rocsmt_artificial"
+LANG_PAIRS[5]="eng_Latn-ces_Latn eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-rus_Cyrl eng_Latn-ukr_Cyrl"
+SEEDS="1000 1001 1002 1003 1004"
+PROBAS="0.1 0.2 0.3 0.4 0.5"
+
 # Aggregate scores
 
-python $HOME/robust-embeddings/src/sonar/aggregate.py \
-    -i $EXPERIMENT_DIR \
-    -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
-    -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
-    -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-    -m $MODELS
+if [ "$SLURM_ARRAY_TASK_ID" -eq 5 ]
+then
+    python $HOME/robust-embeddings/src/sonar/aggregate-artificial.py \
+        -i $EXPERIMENT_DIR \
+        -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
+        -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
+        -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
+        -m $MODELS \
+        -s $SEEDS \
+        -p $PROBAS
+else:
+    python $HOME/robust-embeddings/src/sonar/aggregate.py \
+        -i $EXPERIMENT_DIR \
+        -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
+        -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
+        -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
+        -m $MODELS
+fi
 
 echo "Done..."
