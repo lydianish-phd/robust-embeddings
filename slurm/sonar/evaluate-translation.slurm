@@ -14,8 +14,8 @@
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-# Using anaconda-py3/2023.09 which has pytorch 2.2.2 but no accelerate (otherwise fails to load NLLB pretrained model from HF)
-module load anaconda-py3/2023.09
+# Using pytorch-gpu/py3/2.3.0 which has pytorch 2.2.2 and accelerate
+module load pytorch-gpu/py3/2.3.0
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
