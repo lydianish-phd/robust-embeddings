@@ -21,6 +21,7 @@ def multilingual_delta(scores, lang_pairs, ugc_file_name="raw.en.test", std_file
         std_col = "__".join([col_name_prefix, std_file_name])
         delta_column_name = "__".join(["delta", col_name_prefix])
         scores[delta_column_name] = scores[ugc_col] - scores[std_col]
+    return scores
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -70,8 +71,9 @@ if __name__ == "__main__":
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores).set_index("model")
     comet_scores_df = pd.DataFrame.from_dict(comet_scores).set_index("model")
 
-    
-
+    if args.table_name == "multilingual":
+        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df), args.lang_pairs).round(2)
+        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df), args.lang_pairs).round(3)
 
     bleu_scores_df.to_csv(bleu_score_file)
     comet_scores_df.to_csv(comet_score_file)
