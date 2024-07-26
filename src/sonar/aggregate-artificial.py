@@ -39,7 +39,7 @@ if __name__ == "__main__":
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
                     if os.path.isdir(model_output_dir):
                         scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
-                        print(score_files)
+                        print(len(score_files))
                         for score_file in scores_files:
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                             column_name = "__".join([args.corpus, lang_pair, file_name])
