@@ -175,17 +175,21 @@ SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
 REF_FILE[27]=${DATA_DIR[27]}/norm.en.test
 SYS_FILE_SUFFIX[27]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
+SYS_FILES=()
+
 for MODEL in $MODELS
 do
     echo "Model: $MODEL"
         
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
-        
-    python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
-        --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
-        --sys-file $OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]} \
-        --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
+    SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
+    
 done
+
+python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
+    --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --sys-files "${SYS_FILES[@]}" \
+    --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
 
 echo "Done..."
 
