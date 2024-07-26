@@ -27,11 +27,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-MODEL=nllb600m
-MODEL_NAME=facebook/nllb-200-distilled-600m
+#MODEL=nllb600m
+#MODEL_NAME=facebook/nllb-200-distilled-600m
 
-#MODEL=nllb1b
-#MODEL_NAME=facebook/nllb-200-distilled-1.3B
+MODEL=nllb1b
+MODEL_NAME=facebook/nllb-200-distilled-1.3B
 
 SPM_MODEL_PATH=$MODELS/nllb200-spm/flores200sacrebleuspm
 SPM_MODEL_DICT=$MODELS/nllb200-spm/nllb200dictionary
