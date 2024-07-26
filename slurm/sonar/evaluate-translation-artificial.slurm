@@ -62,7 +62,9 @@ do
             python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
                 --src-file $SRC_FILE \
                 --sys-file $SYS_FILE \
-                --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
+                --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
+        done
+    done 
 done
 
 echo "Done..."
