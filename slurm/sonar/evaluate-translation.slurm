@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=25
+#SBATCH --array=0-27
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -23,8 +23,7 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODEL=nllb1b
-OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
+MODELS="rosonar sonar nllb600m nllb1b"
 
 # Multilingual
 
@@ -176,12 +175,17 @@ SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
 REF_FILE[27]=${DATA_DIR[27]}/norm.en.test
 SYS_FILE[27]=$OUTPUT_DIR/rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
-echo "Model: $MODEL"
-
-python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
-        --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
-        --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
-        --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
+for MODEL in $MODELS
+do
+        echo "Model: $MODEL"
+        
+        OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
+        
+        python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
+                --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+                --sys-file ${SYS_FILE[$SLURM_ARRAY_TASK_ID]} \
+                --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} 
+done
 
 echo "Done..."
 
