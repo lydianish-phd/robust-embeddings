@@ -65,8 +65,6 @@ do
 
             SRC_FILE=$SRC_DIR/$SEED/$PROBA/ugc/norm.en_mix_all.test
             SYS_FILE=$OUTPUT_DIR/$SEED/$PROBA/norm.en_mix_all.test.out
-
-            OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
         
             python $HOME/robust-embeddings/src/sonar/evaluate-translation.py \
                 --src-file $SRC_FILE \
