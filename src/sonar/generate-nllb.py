@@ -42,6 +42,8 @@ if __name__ == "__main__":
     with open(output_file, "w") as f:
         for output in outputs:
             f.write(output + "\n")
+    
+    del model
 
 
 

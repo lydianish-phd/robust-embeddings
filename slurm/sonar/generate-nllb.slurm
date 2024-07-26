@@ -189,7 +189,8 @@ fi
 # Launch the generation of outputs
 for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
 do
-
+    echo "Model: $MODEL"
+    
     python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
         -i $INPUT_FILE \
         -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
