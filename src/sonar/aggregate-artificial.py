@@ -27,6 +27,7 @@ if __name__ == "__main__":
 
     total_files = len(args.seeds) * len(args.probas) * len(args.lang_pairs) * len(args.models)
     print("Total files:", total_files)
+    
     print(f"Aggregating {args.table_name} scores...")
     for model in args.models:
         print("Model:", model)
@@ -41,7 +42,7 @@ if __name__ == "__main__":
                 comet_scores["model"].append(model)
                 comet_scores["seed"].append(seed)
                 comet_scores["proba"].append(proba)
-                
+
                 for lang_pair in args.lang_pairs:
                     print("\t\t\t - lang_pair:", lang_pair)
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
