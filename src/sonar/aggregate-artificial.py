@@ -15,7 +15,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     bleu_scores = {
-        "model": args.models,
+        "model": [],
         "seed": [],
         "proba": []
     }
@@ -36,7 +36,6 @@ if __name__ == "__main__":
                 print("\t\t - proba:", proba)
                 for lang_pair in args.lang_pairs:
                     print("\t\t\t - lang_pair:", lang_pair)
-                    n_files = 0
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
                     if os.path.isdir(model_output_dir):
                         scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
@@ -59,9 +58,6 @@ if __name__ == "__main__":
                             comet_scores["model"].append(model)
                             comet_scores["seed"].append(seed)
                             comet_scores["proba"].append(proba)
-                            n_files += 1
-                            print("\t\t\t\t file no.:", n_files)
-
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
