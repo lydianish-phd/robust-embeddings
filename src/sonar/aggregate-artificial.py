@@ -28,18 +28,18 @@ if __name__ == "__main__":
     total_files = len(args.seeds) * len(args.probas) * len(args.lang_pairs) * len(args.models)
     print("Total files:", total_files)
     print(f"Aggregating {args.table_name} scores...")
-    for seed in args.seeds:
-        print("- seed:", seed)
-        for proba in args.probas:
-            print("\t - proba:", proba)
-            for lang_pair in args.lang_pairs:
-                print("\t\t - lang_pair:", lang_pair)
-                n_files = 0
-                for model in args.models:
+    for model in args.models:
+        print("Model:", model)
+        for seed in args.seeds:
+            print("\t - seed:", seed)
+            for proba in args.probas:
+                print("\t\t - proba:", proba)
+                for lang_pair in args.lang_pairs:
+                    print("\t\t\t - lang_pair:", lang_pair)
+                    n_files = 0
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
                     if os.path.isdir(model_output_dir):
                         scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
-                        print(len(scores_files))
                         for score_file in scores_files:
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                             column_name = "__".join([args.corpus, lang_pair, file_name])
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                             comet_scores["seed"].append(seed)
                             comet_scores["proba"].append(proba)
                             n_files += 1
-                            #print("\t\t\t file no.:", n_files)
+                            print("\t\t\t\t file no.:", n_files)
 
     
     print(f"Writing aggregated score files...")
