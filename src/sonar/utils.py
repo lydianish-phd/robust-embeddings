@@ -11,3 +11,6 @@ COLUMN_NAME_SEPARATOR = "__"
 
 AVERAGE_ROCSMT_NORM_COLUMN= "avg__rocsmt__norm.en.test"
 AVERAGE_ROCSMT_RAW_COLUMN= "avg__rocsmt__raw.en.test"
+
+BLEU_ROUND_DECIMALS = 2
+COMET_ROUND_DECIMALS = 3

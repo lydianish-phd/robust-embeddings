@@ -1,7 +1,12 @@
 import os, argparse, json
 import pandas as pd
-import numpy as np
-from utils import SCORE_FILE_SUFFIX, MODEL_NAMES, COLUMN_NAME_SEPARATOR
+from utils import (
+    SCORE_FILE_SUFFIX,
+    MODEL_NAMES,
+    COLUMN_NAME_SEPARATOR,
+    BLEU_ROUND_DECIMALS,
+    COMET_ROUND_DECIMALS
+)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -24,8 +29,6 @@ if __name__ == "__main__":
         "seed": [],
         "proba": []
     }
-
-    score_columns = set()
 
     total_files = len(args.seeds) * len(args.probas) * len(args.lang_pairs) * len(args.models)
     print("Total files:", total_files)
@@ -53,7 +56,6 @@ if __name__ == "__main__":
                         for score_file in scores_files:
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                             column_name = COLUMN_NAME_SEPARATOR.join([args.corpus, lang_pair, file_name])
-                            score_columns.add(column_name)
                             with open(score_file) as f:
                                 scores = json.load(f)
                             if column_name in bleu_scores:
@@ -65,6 +67,7 @@ if __name__ == "__main__":
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
     
+    score_columns = [col for col in bleu_scores.columns if COLUMN_NAME_SEPARATOR in col]
     bleu_scores["avg"] = bleu_scores[np.array(score_columns)].mean(axis=1)
     comet_scores["avg"] = comet_scores[np.array(score_columns)].mean(axis=1)
     
@@ -77,6 +80,6 @@ if __name__ == "__main__":
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores)
 
-    bleu_scores_df.to_csv(bleu_score_file)
-    comet_scores_df.to_csv(comet_score_file)
+    bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
+    comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
         

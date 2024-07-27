@@ -1,6 +1,12 @@
 import os, argparse, json
 import pandas as pd
-from utils import SCORE_FILE_SUFFIX, MODEL_NAMES, COLUMN_NAME_SEPARATOR
+from utils import (
+    SCORE_FILE_SUFFIX,
+    MODEL_NAMES,
+    COLUMN_NAME_SEPARATOR,
+    BLEU_ROUND_DECIMALS,
+    COMET_ROUND_DECIMALS
+)
 
 def multilingual_average(scores):
     unique_files_names = set()
@@ -75,6 +81,6 @@ if __name__ == "__main__":
         bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df), args.lang_pairs)
         comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df), args.lang_pairs)
 
-    bleu_scores_df.to_csv(bleu_score_file)
-    comet_scores_df.to_csv(comet_score_file)
+    bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
+    comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
 
