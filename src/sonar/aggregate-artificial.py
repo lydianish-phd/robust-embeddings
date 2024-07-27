@@ -67,7 +67,7 @@ if __name__ == "__main__":
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
     
-    score_columns = [col for col in bleu_scores.columns if COLUMN_NAME_SEPARATOR in col]
+    score_columns = [col for col in bleu_scores.keys() if COLUMN_NAME_SEPARATOR in col]
     bleu_scores["avg"] = bleu_scores[np.array(score_columns)].mean(axis=1)
     comet_scores["avg"] = comet_scores[np.array(score_columns)].mean(axis=1)
     
