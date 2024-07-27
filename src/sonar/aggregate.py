@@ -78,8 +78,8 @@ if __name__ == "__main__":
     comet_scores_df = pd.DataFrame.from_dict(comet_scores)
 
     if args.table_name == "multilingual":
-        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df), args.lang_pairs)
-        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df), args.lang_pairs)
+        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS), args.lang_pairs)
+        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS), args.lang_pairs)
 
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
