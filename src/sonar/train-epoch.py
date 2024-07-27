@@ -4,9 +4,6 @@ from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
     load_sonar_tokenizer,
 )
-from sonar.models.sonar_text.builder import (
-    create_sonar_text_encoder_model
-)
 from sonar_distillation import (
     DataCollatorForSonarDistillation,
     SonarDistillationTrainer,
@@ -92,11 +89,6 @@ if __name__=="__main__":
 
     teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder"))
 
-    print("Instantiating student model...")
-
-    student_config = get_student_model_config()
-    student_model = create_sonar_text_encoder_model(student_config)
-
     print("Initializing student model...")
 
     nllb_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
@@ -139,7 +131,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        compute_metrics=compute_metrics,
+        #compute_metrics=compute_metrics,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
