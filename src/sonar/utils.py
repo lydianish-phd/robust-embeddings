@@ -6,5 +6,3 @@ MODEL_NAMES = {
     "sonar": "SONAR",
     "rosonar": "RoSONAR"
 }
-
-COLORS = plt.cm.tab10.colors

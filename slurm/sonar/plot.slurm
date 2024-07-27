@@ -35,5 +35,4 @@ do
         --multilingual-scores-file $MULTI_FILE \
 
 done
-
 echo "Done..."

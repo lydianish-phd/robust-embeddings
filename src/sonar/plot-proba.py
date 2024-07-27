@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils import COLORS
+COLORS = plt.cm.tab10.colors
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
