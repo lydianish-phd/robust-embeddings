@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from utils import AVERAGE_ROCSMT_NORM_COLUMN, AVERAGE_ROCSMT_RAW_COLUMN
+
 COLORS = plt.cm.tab10.colors
 
 if __name__ == "__main__":
@@ -12,25 +14,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     output_dir , file_name = os.path.split(args.artificial_scores_file)
-    metric = file_name.split('_')[0]
+    metric = file_name.split("_")[0]
     output_file = os.path.join(output_dir, f"{metric}_noise_proba_plot.pdf")
 
     artificial_scores = pd.read_csv(args.artificial_scores_file)
     multilingual_scores = pd.read_csv(args.multilingual_scores_file)
 
-    artificial_scores['model'] = artificial_scores['model'].apply(lambda x: MODEL_NAMES[x])
-    multilingual_scores['model'] = multilingual_scores['model'].apply(lambda x: MODEL_NAMES[x])
+    artificial_scores["model"] = artificial_scores["model"].apply(lambda x: MODEL_NAMES[x])
+    multilingual_scores["model"] = multilingual_scores["model"].apply(lambda x: MODEL_NAMES[x])
 
     print("Concatenating multingual scores to artificial ones...")
     
-    seeds = artificial_scores['seed'].unique()
+    seeds = artificial_scores["seed"].unique()
 
-    arti_data = artificial_scores[['model', 'seed', 'proba', 'avg']]
-    multi_data = pd.DataFrame(columns=['model', 'seed', 'proba', 'avg'])
-    multi_data['model'] = np.repeat(multilingual_scores['model'], len(seeds))
-    multi_data['seed'] = np.tile(seeds, len(multilingual_scores))
-    multi_data['proba'] = np.repeat(0, len(multilingual_scores)*len(seeds))
-    multi_data['avg'] = np.repeat(multilingual_scores['avg__rocsmt__norm.en.test'], len(seeds))
+    arti_data = artificial_scores[["model", "seed", "proba", "avg"]]
+    multi_data = pd.DataFrame(columns=["model", "seed", "proba", "avg"])
+    multi_data["model"] = np.repeat(multilingual_scores["model"], len(seeds))
+    multi_data["seed"] = np.tile(seeds, len(multilingual_scores))
+    multi_data["proba"] = np.repeat(0, len(multilingual_scores)*len(seeds))
+    multi_data["avg"] = np.repeat(multilingual_scores[AVERAGE_ROCSMT_NORM_COLUMN], len(seeds))
     plot_data = pd.concat([arti_data, multi_data], ignore_index=True)
 
     print("Creating plot...")
@@ -41,7 +43,7 @@ if __name__ == "__main__":
     g.set(ylabel="COMET score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
     _, labels = g.get_legend_handles_labels()
     for i, model in enumerate(labels):
-        g.axhline(multilingual_scores["avg__rocsmt__raw.en.test"].loc[model], ls='dashdot', c=COLORS[i])
+        g.axhline(multilingual_scores[AVERAGE_ROCSMT_RAW_COLUMN].loc[model], ls="dashdot", c=COLORS[i])
     g.grid()
     plt.tight_layout()
     plt.savefig(output_file)

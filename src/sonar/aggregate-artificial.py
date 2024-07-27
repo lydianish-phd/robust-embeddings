@@ -1,6 +1,7 @@
 import os, argparse, json
 import pandas as pd
-from utils import SCORE_FILE_SUFFIX, MODEL_NAMES
+import numpy as np
+from utils import SCORE_FILE_SUFFIX, MODEL_NAMES, COLUMN_NAME_SEPARATOR
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -51,7 +52,7 @@ if __name__ == "__main__":
                         scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
                         for score_file in scores_files:
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
-                            column_name = "__".join([args.corpus, lang_pair, file_name])
+                            column_name = COLUMN_NAME_SEPARATOR.join([args.corpus, lang_pair, file_name])
                             score_columns.add(column_name)
                             with open(score_file) as f:
                                 scores = json.load(f)
@@ -64,8 +65,8 @@ if __name__ == "__main__":
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
     
-    bleu_scores["avg"] = bleu_scores[list(score_columns)].mean(axis=1)
-    comet_scores["avg"] = comet_scores[list(score_columns)].mean(axis=1)
+    bleu_scores["avg"] = bleu_scores[np.array(score_columns)].mean(axis=1)
+    comet_scores["avg"] = comet_scores[np.array(score_columns)].mean(axis=1)
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")

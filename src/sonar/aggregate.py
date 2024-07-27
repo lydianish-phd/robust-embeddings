@@ -1,24 +1,25 @@
 import os, argparse, json
 import pandas as pd
-from utils import SCORE_FILE_SUFFIX, MODEL_NAMES
+from utils import SCORE_FILE_SUFFIX, MODEL_NAMES, COLUMN_NAME_SEPARATOR
 
 def multilingual_average(scores):
     unique_files_names = set()
     for name in scores.columns:
-        corpus, _ , name = name.split("__")
-        unique_files_names.add((corpus, name))
+        if COLUMN_NAME_SEPARATOR in name:
+            corpus, _ , name = name.split(COLUMN_NAME_SEPARATOR)
+            unique_files_names.add((corpus, name))
     for corpus, name in unique_files_names:
         column_names = [col for col in scores.columns if name in col]
-        avg_column_name = "__".join(["avg", corpus, name])
+        avg_column_name = COLUMN_NAME_SEPARATOR.join(["avg", corpus, name])
         scores[avg_column_name] = scores[column_names].mean(axis=1)
     return scores
 
 def multilingual_delta(scores, lang_pairs, ugc_file_name="raw.en.test", std_file_name="norm.en.test"):
     column_names = [col for col in scores.columns if ugc_file_name in col]
     for ugc_col in column_names:
-        col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip("__")
-        std_col = "__".join([col_name_prefix, std_file_name])
-        delta_column_name = "__".join(["delta", col_name_prefix])
+        col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip(COLUMN_NAME_SEPARATOR)
+        std_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix, std_file_name])
+        delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
         scores[delta_column_name] = scores[ugc_col] - scores[std_col]
     return scores
 
@@ -48,7 +49,7 @@ if __name__ == "__main__":
                     scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
                     for score_file in scores_files:
                         file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
-                        column_name = "__".join([corpus, lang_pair, file_name])
+                        column_name = COLUMN_NAME_SEPARATOR.join([corpus, lang_pair, file_name])
                         with open(score_file) as f:
                             scores = json.load(f)
                         if column_name in bleu_scores:
