@@ -1,7 +1,6 @@
 import os, argparse, json
 import pandas as pd
-
-SCORE_FILE_SUFFIX = ".out.json"
+from utils import SCORE_FILE_SUFFIX, MODEL_NAMES
 
 def multilingual_average(scores):
     unique_files_names = set()
@@ -33,10 +32,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     bleu_scores = {
-        "model": args.models
+        "model": [ MODEL_NAMES[model] for model in args.models ]
     }
     comet_scores = {
-        "model": args.models
+        "model": [ MODEL_NAMES[model] for model in args.models ]
     }
 
     print(f"Aggregating {args.table_name} scores...")

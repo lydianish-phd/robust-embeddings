@@ -1,7 +1,6 @@
 import os, argparse, json
 import pandas as pd
-
-SCORE_FILE_SUFFIX = ".out.json"
+from utils import SCORE_FILE_SUFFIX, MODEL_NAMES
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -25,9 +24,11 @@ if __name__ == "__main__":
         "proba": []
     }
 
+    score_columns = set()
+
     total_files = len(args.seeds) * len(args.probas) * len(args.lang_pairs) * len(args.models)
     print("Total files:", total_files)
-    
+
     print(f"Aggregating {args.table_name} scores...")
     for model in args.models:
         print("Model:", model)
@@ -36,10 +37,10 @@ if __name__ == "__main__":
             for proba in args.probas:
                 print("\t\t - proba:", proba)
 
-                bleu_scores["model"].append(model)
+                bleu_scores["model"].append(MODEL_NAMES[model])
                 bleu_scores["seed"].append(seed)
                 bleu_scores["proba"].append(proba)
-                comet_scores["model"].append(model)
+                comet_scores["model"].append(MODEL_NAMES[model])
                 comet_scores["seed"].append(seed)
                 comet_scores["proba"].append(proba)
 
@@ -51,6 +52,7 @@ if __name__ == "__main__":
                         for score_file in scores_files:
                             file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                             column_name = "__".join([args.corpus, lang_pair, file_name])
+                            score_columns.add(column_name)
                             with open(score_file) as f:
                                 scores = json.load(f)
                             if column_name in bleu_scores:
@@ -61,6 +63,9 @@ if __name__ == "__main__":
                                 comet_scores[column_name].append(scores["comet"])
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
+    
+    bleu_scores["avg"] = bleu_scores[score_columns].mean(axis=1)
+    comet_scores["avg"] = comet_scores[score_columns].mean(axis=1)
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
