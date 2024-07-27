@@ -132,7 +132,7 @@ if __name__=="__main__":
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
         #compute_metrics=compute_metrics,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
     trainer.train(resume_from_checkpoint=True)
