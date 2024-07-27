@@ -68,10 +68,6 @@ if __name__ == "__main__":
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
     
-    score_columns = [col for col in bleu_scores.keys() if COLUMN_NAME_SEPARATOR in col]
-    bleu_scores["avg"] = bleu_scores[np.array(score_columns)].mean(axis=1)
-    comet_scores["avg"] = comet_scores[np.array(score_columns)].mean(axis=1)
-    
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
@@ -80,6 +76,10 @@ if __name__ == "__main__":
     
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores)
+
+    score_columns = [col for col in bleu_scores_df.columns if COLUMN_NAME_SEPARATOR in col]
+    bleu_scores_df["avg"] = bleu_scores_df[np.array(score_columns)].mean(axis=1)
+    comet_scores_df["avg"] = comet_scores_df[np.array(score_columns)].mean(axis=1)
 
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
