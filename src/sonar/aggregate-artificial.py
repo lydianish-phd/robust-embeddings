@@ -1,5 +1,6 @@
 import os, argparse, json
 import pandas as pd
+import numpy as np
 from utils import (
     SCORE_FILE_SUFFIX,
     MODEL_NAMES,
