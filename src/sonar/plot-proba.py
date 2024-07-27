@@ -20,9 +20,6 @@ if __name__ == "__main__":
     artificial_scores = pd.read_csv(args.artificial_scores_file)
     multilingual_scores = pd.read_csv(args.multilingual_scores_file)
 
-    artificial_scores["model"] = artificial_scores["model"].apply(lambda x: MODEL_NAMES[x])
-    multilingual_scores["model"] = multilingual_scores["model"].apply(lambda x: MODEL_NAMES[x])
-
     print("Concatenating multingual scores to artificial ones...")
     
     seeds = artificial_scores["seed"].unique()
