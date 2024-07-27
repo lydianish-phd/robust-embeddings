@@ -5,7 +5,9 @@ from utils import (
     MODEL_NAMES,
     COLUMN_NAME_SEPARATOR,
     BLEU_ROUND_DECIMALS,
-    COMET_ROUND_DECIMALS
+    COMET_ROUND_DECIMALS,
+    ROCSMT_NORM_FILE_NAME,
+    ROCSMT_RAW_FILE_NAME
 )
 
 def multilingual_average(scores):
@@ -20,7 +22,7 @@ def multilingual_average(scores):
         scores[avg_column_name] = scores[column_names].mean(axis=1)
     return scores
 
-def multilingual_delta(scores, lang_pairs, ugc_file_name="raw.en.test", std_file_name="norm.en.test"):
+def multilingual_delta(scores, lang_pairs, ugc_file_name=ROCSMT_RAW_FILE_NAME, std_file_name=ROCSMT_NORM_FILE_NAME):
     column_names = [col for col in scores.columns if ugc_file_name in col]
     for ugc_col in column_names:
         col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip(COLUMN_NAME_SEPARATOR)
