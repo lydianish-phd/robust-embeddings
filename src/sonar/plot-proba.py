@@ -3,7 +3,11 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils import AVERAGE_ROCSMT_NORM_COLUMN, AVERAGE_ROCSMT_RAW_COLUMN
+from utils import (
+    AVERAGE_ROCSMT_NORM_COLUMN,
+    AVERAGE_ROCSMT_RAW_COLUMN,
+    METRIC_NAMES
+)
 
 COLORS = plt.cm.tab10.colors
 
@@ -37,7 +41,7 @@ if __name__ == "__main__":
     multilingual_scores.set_index("model", inplace=True)
 
     g = sns.lineplot(data=plot_data, x="proba", y="avg", hue="model", style="model", markers=True, dashes=False)
-    g.set(ylabel=f"{metric.upper()} score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
+    g.set(ylabel=f"{METRIC_NAMES[metric]} score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
     _, labels = g.get_legend_handles_labels()
     for i, model in enumerate(labels):
         g.axhline(multilingual_scores[AVERAGE_ROCSMT_RAW_COLUMN].loc[model], ls="dashdot", c=COLORS[i])

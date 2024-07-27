@@ -1,5 +1,10 @@
 SCORE_FILE_SUFFIX = ".out.json"
 
+COLUMN_NAME_SEPARATOR = "__"
+
+AVERAGE_ROCSMT_NORM_COLUMN= "avg__rocsmt__norm.en.test"
+AVERAGE_ROCSMT_RAW_COLUMN= "avg__rocsmt__raw.en.test"
+
 MODEL_NAMES = {
     "nllb1b": "NLLB-1.3B",
     "nllb600m": "NLLB-600M",
@@ -7,10 +12,10 @@ MODEL_NAMES = {
     "rosonar": "RoSONAR"
 }
 
-COLUMN_NAME_SEPARATOR = "__"
-
-AVERAGE_ROCSMT_NORM_COLUMN= "avg__rocsmt__norm.en.test"
-AVERAGE_ROCSMT_RAW_COLUMN= "avg__rocsmt__raw.en.test"
+METRIC_NAMES = {
+    "bleu": "BLEU",
+    "comet": "COMET",
+}
 
 BLEU_ROUND_DECIMALS = 2
 COMET_ROUND_DECIMALS = 3
