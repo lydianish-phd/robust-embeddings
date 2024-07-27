@@ -37,7 +37,7 @@ if __name__ == "__main__":
     multilingual_scores.set_index("model", inplace=True)
 
     g = sns.lineplot(data=plot_data, x="proba", y="avg", hue="model", style="model", markers=True, dashes=False)
-    g.set(ylabel="COMET score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
+    g.set(ylabel=f"{metric.upper()} score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
     _, labels = g.get_legend_handles_labels()
     for i, model in enumerate(labels):
         g.axhline(multilingual_scores[AVERAGE_ROCSMT_RAW_COLUMN].loc[model], ls="dashdot", c=COLORS[i])
