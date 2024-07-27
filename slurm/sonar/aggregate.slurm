@@ -69,7 +69,7 @@ then
         -m $MODELS \
         -s $SEEDS \
         -p $PROBAS
-else:
+else
     python $HOME/robust-embeddings/src/sonar/aggregate.py \
         -i $EXPERIMENT_DIR \
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \

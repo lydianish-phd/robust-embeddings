@@ -34,12 +34,14 @@ if __name__ == "__main__":
             print("\t - seed:", seed)
             for proba in args.probas:
                 print("\t\t - proba:", proba)
+
                 bleu_scores["model"].append(model)
                 bleu_scores["seed"].append(seed)
                 bleu_scores["proba"].append(proba)
                 comet_scores["model"].append(model)
                 comet_scores["seed"].append(seed)
                 comet_scores["proba"].append(proba)
+                
                 for lang_pair in args.lang_pairs:
                     print("\t\t\t - lang_pair:", lang_pair)
                     model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, lang_pair, str(seed), str(proba))
@@ -58,7 +60,6 @@ if __name__ == "__main__":
                                 comet_scores[column_name].append(scores["comet"])
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
-
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
