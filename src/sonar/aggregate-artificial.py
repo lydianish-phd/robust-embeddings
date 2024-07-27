@@ -64,8 +64,8 @@ if __name__ == "__main__":
                             else:
                                 comet_scores[column_name] = [scores["comet"]]
     
-    bleu_scores["avg"] = bleu_scores[score_columns].mean(axis=1)
-    comet_scores["avg"] = comet_scores[score_columns].mean(axis=1)
+    bleu_scores["avg"] = bleu_scores[list(score_columns)].mean(axis=1)
+    comet_scores["avg"] = comet_scores[list(score_columns)].mean(axis=1)
     
     print(f"Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
