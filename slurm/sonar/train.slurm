@@ -27,10 +27,12 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047b
 SEED=42
-LAST_CHECKPOINT=$EXPERIMENT_DIR/models
-mkdir -p $LAST_CHECKPOINT
+CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
-accelerate launch $HOME/robust-embeddings/src/sonar/train.py -o $EXPERIMENT_DIR --seed $SEED --last-checkpoint $LAST_CHECKPOINT 
+accelerate launch $HOME/robust-embeddings/src/sonar/train.py \
+    -o $EXPERIMENT_DIR \
+    --seed $SEED \
+    --checkpoint-dir $CHECKPOINT_DIR
 
 echo "Done..."
 

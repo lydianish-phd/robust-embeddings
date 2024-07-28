@@ -24,7 +24,7 @@ from accelerate import Accelerator
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
-    parser.add_argument("--last-checkpoint", help="path to last saved checkpoint", type=str)
+    parser.add_argument("--checkpoint-dir", help="path to saved checkpoint", type=str)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -120,7 +120,7 @@ if __name__=="__main__":
         eval_steps=20_000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         seed=args.seed,
-        resume_from_checkpoint=args.last_checkpoint
+        resume_from_checkpoint=args.checkpoint_dir
     )
 
     trainer = SonarDistillationTrainer(
@@ -133,5 +133,6 @@ if __name__=="__main__":
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
-    trainer.train(resume_from_checkpoint=True)
+    resume_from_checkpoint = os.path.isdir(args.checkpoint_dir) and os.listdir(args.checkpoint_dir)
+    trainer.train(resume_from_checkpoint=resume_from_checkpoint)
 
