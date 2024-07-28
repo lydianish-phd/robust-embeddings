@@ -133,6 +133,8 @@ if __name__=="__main__":
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
-    resume_from_checkpoint = os.path.isdir(args.checkpoint_dir) and os.listdir(args.checkpoint_dir)
+    resume_from_checkpoint = False
+    if os.path.isdir(args.checkpoint_dir):
+        resume_from_checkpoint = len(os.listdir(args.checkpoint_dir)) > 0
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
 
