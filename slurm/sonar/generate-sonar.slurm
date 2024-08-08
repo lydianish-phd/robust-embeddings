@@ -29,7 +29,7 @@ MODEL=sonar
 MODEL_DIR=""
 
 #MODEL=rosonar
-#MODEL_DIR=$EXPERIMENT_DIR/models/checkpoint-720000
+#MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-720000"
 
 # Multilingual
 
@@ -195,7 +195,8 @@ do
         -i $INPUT_FILE \
         -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
         -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -o $OUTPUT_DIR -m $MODEL_DIR
+        -o $OUTPUT_DIR \
+        $MODEL_DIR
 
     if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
     then
