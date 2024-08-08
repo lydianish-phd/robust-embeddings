@@ -2,9 +2,7 @@ import os, argparse
 import re
 from nltk.tokenize.treebank import TreebankWordDetokenizer
 
-def detokenize_urls_hashtags_usernames(sentence):
-    # Define regex patterns for tokenized URLs, hashtags, and usernames
-    url_pattern = re.compile(r'https?\s*:\s*/\s*/\s*t\.co\s*/\s*\w+')
+def detokenize_hashtags_usernames(sentence):
     hashtag_pattern = re.compile(r'#\s*\w+')
     username_pattern = re.compile(r'@\s*\w+')
     
@@ -12,21 +10,35 @@ def detokenize_urls_hashtags_usernames(sentence):
     def detokenize(match):
         return match.group(0).replace(' ', '')
     
-    # Substitute all tokenized URLs, hashtags, and usernames in the sentence with their detokenized versions
-    sentence = url_pattern.sub(detokenize, sentence)
     sentence = hashtag_pattern.sub(detokenize, sentence)
     sentence = username_pattern.sub(detokenize, sentence)
     
     return sentence
 
+def remove_extra_spaces(sentence):
+    # Remove spaces before full stops
+    sentence = re.sub(r'\s+\.', '.', sentence)
+    # Remove spaces around all other slashes
+    sentence = re.sub(r'\s*/\s*', '/', sentence)
+    return sentence
+
+def insert_missing_spaces(sentence):
+    # Insert a space before hashtags and usernames that are stuck to a previous character
+    sentence = re.sub(r'(?<!^)(?<!\s)(#\w+)', r' \1', sentence)
+    sentence = re.sub(r'(?<!^)(?<!\s)(@\w+)', r' \1', sentence)
+    # Fix emoji that was ruined by previous rule
+    sentence = re.sub(r'@- @', '@-@ ', sentence)
+    # Keep "w/" as abbreviation for "with"
+    sentence = re.sub(r'\bw\s*/(?!o\b)', 'w/ ', sentence)
+
+    return sentence
+
 def detokenize_tweet(tweet):
-    # Detokenize URLs, hashtags, and usernames
-    tweet = detokenize_urls_hashtags_usernames(tweet)
-    
-    # Detokenize the tweet using the TreebankWordDetokenizer
+    tweet = detokenize_hashtags_usernames(tweet)
     detokenizer = TreebankWordDetokenizer()
     detokenized_tweet = detokenizer.detokenize(tweet.split())
-    
+    detokenized_tweet = remove_extra_spaces(detokenized_tweet)
+    detokenized_tweet = insert_missing_spaces(detokenized_tweet)
     return detokenized_tweet
 
 if __name__ == "__main__":
