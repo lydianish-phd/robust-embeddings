@@ -26,11 +26,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-MODEL=sonar
-MODEL_DIR=""
+#MODEL=sonar
+#MODEL_DIR=""
 
-#MODEL=rosonar
-#MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-100000"
+MODEL=rosonar
+MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-740000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
