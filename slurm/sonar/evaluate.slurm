@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-27
+#SBATCH --array=18
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -122,9 +122,9 @@ SYS_FILE_SUFFIX[17]=wmt2015/fra_Latn-eng_Latn/newsdiscusstest2015-enfr-ref.fr.ou
 # Non-standard English
 
 DATA_DIR[18]=$DATASETS/footweets
-SRC_FILE[18]=${DATA_DIR[18]}/twitter.sent.en.txt
-REF_FILE[18]=${DATA_DIR[18]}/twitter.sent.de.txt
-SYS_FILE_SUFFIX[18]=footweets/eng_Latn-deu_Latn/twitter.sent.en.txt.out
+SRC_FILE[18]=${DATA_DIR[18]}/detok.twitter.sent.en.txt
+REF_FILE[18]=${DATA_DIR[18]}/detok.twitter.sent.de.txt
+SYS_FILE_SUFFIX[18]=footweets/eng_Latn-deu_Latn/detok.twitter.sent.en.txt.out
 
 DATA_DIR[19]=$DATASETS/mtnt/MTNT2019
 SRC_FILE[19]=${DATA_DIR[19]}/en-fr.en
