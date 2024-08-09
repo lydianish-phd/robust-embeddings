@@ -26,11 +26,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-#MODEL=sonar
-#MODEL_DIR=""
+MODEL[0]=sonar
+MODEL_DIR[0]=""
 
-MODEL=rosonar
-MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-740000"
+MODEL[1]=rosonar
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-740000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
@@ -50,31 +50,34 @@ TGT_LANG[3]=ukr_Cyrl
 SRC_LANG[4]=eng_Latn
 TGT_LANG[4]=rus_Cyrl
 
-OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/$MODEL/$CORPUS/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
-
-# Launch the generation of outputs
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
-echo "Model: ${MODEL[$i]}"
-
-for SEED in {1000..1004}
+for i in {1..1}
 do
-    echo -e "\t - seed: $SEED"
+    echo "Model: ${MODEL[$i]}"
 
-    for PROBA in $PROBAS
+    OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/$CORPUS/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
+
+    # Launch the generation of outputs
+    for SEED in {1000..1004}
     do
-        echo -e "\t\t - proba: $PROBA"
+        echo -e "\t - seed: $SEED"
+
+        for PROBA in $PROBAS
+        do
+            echo -e "\t\t - proba: $PROBA"
+            
+            INPUT_FILE=$INPUT_DIR/$SEED/$PROBA/ugc/norm.en_mix_all.test
+            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$SEED/$PROBA
+
+            python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
+                -i $INPUT_FILE \
+                -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+                -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+                -o $OUTPUT_DIR \
+                ${MODEL_DIR[$i]}
         
-        INPUT_FILE=$INPUT_DIR/$SEED/$PROBA/ugc/norm.en_mix_all.test
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$SEED/$PROBA
-
-        python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
-            -i $INPUT_FILE \
-            -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -o $OUTPUT_DIR \
-            $MODEL_DIR
-
+        done
     done
 done
 

@@ -9,9 +9,9 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=2:00:00                # Time limit hrs:min:sec
+#SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-21
+#SBATCH --array=13
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -26,11 +26,11 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-#MODEL=sonar
-#MODEL_DIR=""
+MODEL[0]=sonar
+MODEL_DIR[0]=""
 
-MODEL=rosonar
-MODEL_DIR="-m $EXPERIMENT_DIR/models/checkpoint-740000"
+MODEL[1]=rosonar
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-740000"
 
 # Multilingual
 
@@ -174,37 +174,38 @@ INPUT_FILES[21]="${DATA_DIR[21]}/raw.en.test"
 SRC_LANG[21]=eng_Latn
 TGT_LANG[21]=eng_Latn
 
-# Output dir
+for i in {0..1}
+do
+    echo "Model: ${MODEL[$i]}"
 
-OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/$MODEL/${CORPUS[$SLURM_ARRAY_TASK_ID]}
+    OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
-if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
-then 
-    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
-else
-    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
-fi
-
-# Launch the generation of outputs
-echo "Model: $MODEL"
-
-for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
-do 
-    echo -e "\t - input file: $INPUT_FILE"
-
-    python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
-        -i $INPUT_FILE \
-        -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-        -o $OUTPUT_DIR \
-        $MODEL_DIR
-
-    if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
-    then
-        NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
-        mkdir -p $NEW_OUTPUT_DIR
-        cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
+    if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
+    then 
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
+    else
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
     fi
+
+    # Launch the generation of outputs
+    for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
+    do 
+        echo -e "\t - input file: $INPUT_FILE"
+
+        python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
+            -i $INPUT_FILE \
+            -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
+            -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
+            -o $OUTPUT_DIR \
+            ${MODEL_DIR[$i]}
+
+        if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
+        then
+            NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+            mkdir -p $NEW_OUTPUT_DIR
+            cp $OUTPUT_DIR/raw.en.test.out $NEW_OUTPUT_DIR
+        fi
+    done
 done
 
 echo "Done..."
