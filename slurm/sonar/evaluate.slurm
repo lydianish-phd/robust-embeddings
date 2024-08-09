@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=18
+#SBATCH --array=23
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -148,7 +148,7 @@ SRC_FILE[22]=${DATA_DIR[22]}/fr-en.fr
 REF_FILE[22]=${DATA_DIR[22]}/fr-en.en
 SYS_FILE_SUFFIX[22]=mtnt/fra_Latn-eng_Latn/fr-en.fr.out
 
-DATA_DIR[23]=$DATASETS/pfsmb/tmp
+DATA_DIR[23]=$DATASETS/pfsmb
 SRC_FILE[23]=${DATA_DIR[23]}/test.fr
 REF_FILE[23]=${DATA_DIR[23]}/test.en
 SYS_FILE_SUFFIX[23]=pfsmb/fra_Latn-eng_Latn/test.fr.out
