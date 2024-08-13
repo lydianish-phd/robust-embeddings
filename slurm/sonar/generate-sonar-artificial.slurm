@@ -30,7 +30,7 @@ MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-740000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-1000000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial

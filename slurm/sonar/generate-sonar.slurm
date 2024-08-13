@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-1
+#SBATCH --array=0-21
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -30,7 +30,7 @@ MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-600000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-1000000"
 
 # Multilingual
 
