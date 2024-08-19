@@ -29,9 +29,13 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
+# Setting the main process IP and port
 ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/default_config.yaml
-IP_ADDRESS=$(python -c "import idr_torch; print(idr_torch.master_addr)")
-sed -i "s/^main_process_ip:.*/main_process_ip: $IP_ADDRESS/" $ACCELERATE_CONFIG
+output=$(python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
+MASTER_ADDRESS=$(echo $output | cut -d, -f1)
+MASTER_PORT=$(echo $output | cut -d, -f2)
+sed -i "s/^main_process_ip:.*/main_process_ip: $MASTER_ADDRESS/" $ACCELERATE_CONFIG
+sed -i "s/^main_process_port:.*/main_process_port: $MASTER_PORT/" $ACCELERATE_CONFIG
 
 accelerate launch $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
