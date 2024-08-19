@@ -29,6 +29,10 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047b
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
+ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/default_config.yaml
+IP_ADDRESS=$(hostname -I | cut -d ' ' -f3)
+sed -i "s/^main_process_ip:.*/main_process_ip: $IP_ADDRESS/" $ACCELERATE_CONFIG
+
 accelerate launch $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
