@@ -114,7 +114,7 @@ if __name__=="__main__":
         max_steps=4_000_000,
         warmup_steps=8_000,
         learning_rate=1e-4,
-        lr_scheduler_type="linear",
+        lr_scheduler_type="constant_with_warmup",
         save_steps=20_000,
         logging_steps=10_000,
         eval_steps=20_000,
