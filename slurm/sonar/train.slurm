@@ -4,14 +4,14 @@
 #SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
-#SBATCH --nodes=1		# node count
+#SBATCH --nodes=2		# node count
 #SBATCH --ntasks-per-node=8               # number of tasks per node
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-13%1
+#SBATCH --array=0 #-13%1
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -25,12 +25,12 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047b
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
 ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/default_config.yaml
-IP_ADDRESS=$(echo $SLURM_JOB_NODELIST | cut -d, -f1)
+IP_ADDRESS=$(python -c "import idr_torch; print(idr_torch.master_addr)")
 sed -i "s/^main_process_ip:.*/main_process_ip: $IP_ADDRESS/" $ACCELERATE_CONFIG
 
 accelerate launch $HOME/robust-embeddings/src/sonar/train.py \
