@@ -26,6 +26,10 @@ if __name__=="__main__":
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
     parser.add_argument("--checkpoint-dir", help="path to saved checkpoint", type=str)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--lr-scheduler-type", type=str, default="constant_with_warmup")
+    parser.add_argument("--fraction-en-fr", type=int, help="numerator to compute the sampling probability of the en-fr dataset as a fraction of 8. eg. 5 will produce 5/8 = 0.625", default=5, choices=range(0, 9))
+    parser.add_argument("--fraction-fr", type=int, help="numerator to compute the sampling probability of the en dataset as a fraction of 8. eg. 2 will produce 2/8 = 0.25", default=2, choices=range(0, 9))
+    parser.add_argument("--fraction-en", type=int, help="numerator to compute the sampling probability of the fr dataset as a fraction of 8. eg. 1 will produce 5/8 = 0.125", default=1, choices=range(0, 9))
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -56,10 +60,7 @@ if __name__=="__main__":
     data_en = load_dataset("json", data_files=data_en_files, streaming=True)
     data_en = data_en.shuffle(seed=args.seed, buffer_size=10_000)
 
-    # all_train_data = interleave_datasets([data_fr["train"], data_en["train"]], probabilities=[0.5, 0.5], seed=args.seed)
-    # all_valid_data = interleave_datasets([data_fr["valid"], data_en["valid"]], probabilities=[0.5, 0.5], seed=args.seed)
-
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[0.625, 0.25, 0.125], seed=args.seed)
+    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[args.fraction_en_fr/8, args.fraction_fr/8, args.fraction_en/8], seed=args.seed)
     all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], seed=args.seed)
 
     print("Loading tokenizers...")
@@ -114,7 +115,7 @@ if __name__=="__main__":
         max_steps=4_000_000,
         warmup_steps=8_000,
         learning_rate=1e-4,
-        lr_scheduler_type="constant_with_warmup",
+        lr_scheduler_type=args.lr_scheduler_type,
         save_steps=20_000,
         logging_steps=10_000,
         eval_steps=20_000,
