@@ -36,7 +36,7 @@ FRACTION_EN=1
 
 # Set the IP and port for the main process
 SRC_DIR=$HOME/robust-embeddings/src/sonar
-source $SRC_DIR/main-process-ip-and-port.sh
+srun source $SRC_DIR/main-process-ip-and-port.sh
 echo "Main process IP: $MASTER_ADDRESS and port: $MASTER_PORT"
 
 # Launch the training
