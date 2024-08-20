@@ -4,14 +4,14 @@
 #SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
-#SBATCH --nodes=2		# node count
+#SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # number of tasks per node
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0 #-13%1
+#SBATCH --array=0-13%1
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -26,24 +26,37 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 set -e
 
 # Set the experiment parameters
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047c
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
-LR_SCHEDULER=constant_with_warmup
+LR_SCHEDULER=constant #_with_warmup
 FRACTION_EN_FR=5
 FRACTION_FR=2
 FRACTION_EN=1
 
-# Set the IP and port for the main process
-ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/default_config.yaml
+# Set the accelerate config
+
+if [ $SLURM_NNODES -eq 1 ]; then
+    DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_single_node_config.yaml
+else
+    DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
+fi
+
+ACCELERATE_CONFIG=$EXPERIMENT_DIR/accelerate_config.yaml
+cp $DEFAULT_ACCELERATE_CONFIG $ACCELERATE_CONFIG
+
 output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
 MASTER_ADDRESS=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2)
+
+sed -i "s/^num_machines:.*/num_machines: $SLURM_NNODES/" $ACCELERATE_CONFIG
+sed -i "s/^num_processes:.*/num_processes: $SLURM_NPROCS/" $ACCELERATE_CONFIG
 sed -i "s/^main_process_ip:.*/main_process_ip: $MASTER_ADDRESS/" $ACCELERATE_CONFIG
 sed -i "s/^main_process_port:.*/main_process_port: $MASTER_PORT/" $ACCELERATE_CONFIG
 
 # Launch the training
-accelerate launch $HOME/robust-embeddings/src/sonar/train.py \
+
+accelerate launch --config_file $ACCELERATE_CONFIG $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
     --checkpoint-dir $CHECKPOINT_DIR \
