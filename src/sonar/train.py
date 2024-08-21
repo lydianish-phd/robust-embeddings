@@ -26,6 +26,7 @@ if __name__=="__main__":
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
     parser.add_argument("--checkpoint-dir", help="path to saved checkpoint", type=str)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--learning rate", type=float, default=1e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="constant_with_warmup")
     parser.add_argument("--fraction-en-fr", type=int, help="numerator to compute the sampling probability of the en-fr dataset as a fraction of 8. eg. 5 will produce 5/8 = 0.625", default=5, choices=range(0, 9))
     parser.add_argument("--fraction-fr", type=int, help="numerator to compute the sampling probability of the en dataset as a fraction of 8. eg. 2 will produce 2/8 = 0.25", default=2, choices=range(0, 9))
@@ -100,7 +101,7 @@ if __name__=="__main__":
     training_args = TrainingArguments(
         output_dir=f"{args.output_dir}/models",
         log_level="info",
-        fp16=False,
+        bf16=True,
         logging_dir=f"{args.output_dir}/tensorboard",
         logging_strategy="steps",
         eval_strategy="steps",
@@ -114,8 +115,11 @@ if __name__=="__main__":
         remove_unused_columns=False,
         max_steps=4_000_000,
         warmup_steps=8_000,
-        learning_rate=1e-4,
+        learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
+        adam_beta1=0.9,
+        adam_beta2=0.98,
+        adam_epsilon=1e-6,
         save_steps=20_000,
         logging_steps=10_000,
         eval_steps=20_000,

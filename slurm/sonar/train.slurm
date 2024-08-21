@@ -4,7 +4,7 @@
 #SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
-#SBATCH --nodes=2		# node count
+#SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # number of tasks per node
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
@@ -30,10 +30,11 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 mkdir -p $EXPERIMENT_DIR
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
-LR_SCHEDULER=constant_with_warmup
+LEARNING_RATE=5e-4
+LR_SCHEDULER=inverse_sqrt
 FRACTION_EN_FR=5 # 5/8 selection probability for en-fr
 FRACTION_FR=2 # 2/8 selection probability for fr-fr
-FRACTION_EN=1 # 1/8 selection probability for en-en
+FRACTION_EN=1 # 1/8 selection probability for en-en*
 
 # Set the accelerate config
 
@@ -61,6 +62,7 @@ accelerate launch --config_file $ACCELERATE_CONFIG $HOME/robust-embeddings/src/s
     -o $EXPERIMENT_DIR \
     --seed $SEED \
     --checkpoint-dir $CHECKPOINT_DIR \
+    --learning-rate $LEARNING_RATE \
     --lr-scheduler-type $LR_SCHEDULER \
     --fraction-en-fr $FRACTION_EN_FR \
     --fraction-fr $FRACTION_FR \
