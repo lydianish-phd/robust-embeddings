@@ -31,7 +31,7 @@ data_en_files = {
 }
 data_en = load_dataset("json", data_files=data_en_files, streaming=True)
 
-strategy = "first_exhausted"
+strategy = "all_exhausted"
 all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[fraction_en_fr/8, fraction_fr/8, fraction_en/8], seed=seed, stopping_strategy=strategy)
 
 print("Interleaving strategy", strategy)
