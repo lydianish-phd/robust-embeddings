@@ -111,7 +111,7 @@ if __name__=="__main__":
         report_to="tensorboard",
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
-        gradient_accumulation_steps=1,
+        gradient_accumulation_steps=2,
         remove_unused_columns=False,
         max_steps=4_000_000,
         warmup_steps=8_000,
