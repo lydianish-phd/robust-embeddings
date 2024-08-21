@@ -36,6 +36,7 @@ class SonarDistillationTrainer(Trainer):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
         self.teacher.eval()
+        print(self.teacher)
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):
