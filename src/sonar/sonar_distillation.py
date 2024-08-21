@@ -36,8 +36,6 @@ class SonarDistillationTrainer(Trainer):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
         self.teacher.eval()
-        # print teacher dtype
-        print(self.teacher.module.encoder_frontend.embed.weight.dtype)
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):
@@ -66,6 +64,9 @@ class SonarDistillationTrainer(Trainer):
             "student_source_embeddings": student_source_output.sentence_embeddings,
             "teacher_target_embeddings": teacher_target_output.sentence_embeddings
         }
+
+        print(student_source_output.sentence_embeddings.dtype)
+        print(teacher_target_output.sentence_embeddings.dtype)
 
         return (distillation_loss, outputs) if return_outputs else distillation_loss
     
