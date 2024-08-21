@@ -42,5 +42,7 @@ all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], dat
 n_samples = 0
 for i, example in enumerate(all_train_data):
     n_samples += 1
+    if i % 100_000 == 0:
+        print(f"Example {i}")
 
 print(n_samples)
