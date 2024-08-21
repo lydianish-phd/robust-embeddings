@@ -27,6 +27,7 @@ set -e
 
 # Set the experiment parameters
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
+mkdir -p $EXPERIMENT_DIR
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 LR_SCHEDULER=constant_with_warmup
