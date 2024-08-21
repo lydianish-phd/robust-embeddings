@@ -44,7 +44,7 @@ total_elements = 0
 # Loop through the DataLoader
 for batch in data_loader:
     # Count the elements in the current batch
-    total_elements += len(batch['src_sentence_ids'])
+    total_elements += len(batch['source_sentence'])
 
 # Print total counts
 print(f"Total elements: {total_elements}")
