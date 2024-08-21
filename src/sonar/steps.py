@@ -1,4 +1,5 @@
 import os
+from torch.utils.data import DataLoader
 
 from datasets import (
     load_dataset,
@@ -39,10 +40,15 @@ data_en = data_en.shuffle(seed=seed, buffer_size=10_000)
 all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[fraction_en_fr/8, fraction_fr/8, fraction_en/8], seed=seed)
 all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], seed=seed)
 
-n_samples = 0
-for i, example in enumerate(all_train_data):
-    n_samples += 1
-    if i % 100_000 == 0:
-        print(f"Example {i}")
+data_loader = DataLoader(all_train_data, batch_size=32, num_workers=4)
 
-print(n_samples)
+# Initialize counters
+total_elements = 0
+
+# Loop through the DataLoader
+for batch in data_loader:
+    # Count the elements in the current batch
+    total_elements += len(batch['src_sentence_ids'])
+
+# Print total counts
+print(f"Total elements: {total_elements}")
