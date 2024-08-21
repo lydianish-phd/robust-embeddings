@@ -65,9 +65,6 @@ class SonarDistillationTrainer(Trainer):
             "teacher_target_embeddings": teacher_target_output.sentence_embeddings
         }
 
-        print(student_source_output.sentence_embeddings.dtype)
-        print(teacher_target_output.sentence_embeddings.dtype)
-
         return (distillation_loss, outputs) if return_outputs else distillation_loss
     
     def prediction_step(self, model, inputs, prediction_loss_only, ignore_keys=None):
