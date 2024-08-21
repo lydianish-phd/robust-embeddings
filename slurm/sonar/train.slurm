@@ -3,7 +3,6 @@
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
-#SBATCH --qos=qos_gpu-dev
 #SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # number of tasks per node

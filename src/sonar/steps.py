@@ -7,9 +7,9 @@ from datasets import (
 )
 
 seed = 42
-fraction_en_fr = 5
-fraction_fr = 2
-fraction_en = 1
+fraction_en_fr = 3
+fraction_fr = 3
+fraction_en = 2
 
 print("Loading datasets...")
 
@@ -31,7 +31,7 @@ data_en_files = {
 }
 data_en = load_dataset("json", data_files=data_en_files, streaming=True)
 
-strategy = "all_exhausted"
+strategy = "first_exhausted"
 all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[fraction_en_fr/8, fraction_fr/8, fraction_en/8], seed=seed, stopping_strategy=strategy)
 
 print("Interleaving strategy", strategy)
@@ -49,4 +49,6 @@ for batch in data_loader:
         print(f"Processed {total_elements} elements")
 
 # Print total counts
+print("Interleaving strategy", strategy)    
+print("Proportions (out of 8):", [fraction_en_fr, fraction_fr, fraction_en])    
 print(f"Total elements: {total_elements}")

@@ -114,7 +114,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=32,
         eval_accumulation_steps=32,
         remove_unused_columns=False,
-        max_steps=4_000_000,
+        max_steps=130_000,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
