@@ -10,7 +10,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=8
+#SBATCH --array=0-2
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -23,7 +23,7 @@ source $HOME/.bash_python_exports
 
 set -e
 
-EXPERIMENT_BASE_NUM="042"
+EXPERIMENT_BASE_NUM="048"
 LEARNING_RATE="0.0001" 
 CONFIG="distil:robertaugc-laserstd" 
 POOLING="maxpool"
