@@ -30,6 +30,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 mkdir -p $EXPERIMENT_DIR
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
+ACCUMULATION_STEPS=16
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
 FRACTION_EN_FR=5 # 5/8 selection probability for en-fr
@@ -63,6 +64,7 @@ accelerate launch --config_file $ACCELERATE_CONFIG $HOME/robust-embeddings/src/s
     --seed $SEED \
     --checkpoint-dir $CHECKPOINT_DIR \
     --learning-rate $LEARNING_RATE \
+    --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
     --fraction-en-fr $FRACTION_EN_FR \
     --fraction-fr $FRACTION_FR \

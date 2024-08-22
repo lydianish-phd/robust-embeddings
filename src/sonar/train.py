@@ -26,6 +26,7 @@ if __name__=="__main__":
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
     parser.add_argument("--checkpoint-dir", help="path to saved checkpoint", type=str)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--accumulation-steps", type=int, default=1)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="constant_with_warmup")
     parser.add_argument("--fraction-en-fr", type=int, help="numerator to compute the sampling probability of the en-fr dataset as a fraction of 8. eg. 5 will produce 5/8 = 0.625", default=5, choices=range(0, 9))
@@ -111,8 +112,8 @@ if __name__=="__main__":
         report_to="tensorboard",
         push_to_hub=False,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
-        gradient_accumulation_steps=32,
-        eval_accumulation_steps=32,
+        gradient_accumulation_steps=args.accumulation_steps,
+        eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
         max_steps=130_000,
         warmup_steps=8_000,
