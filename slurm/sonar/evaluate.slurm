@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-27
+#SBATCH --array=24
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -23,8 +23,8 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODELS="rosonar"
-#MODELS="nllb1b sonar nllb600m rosonar"
+#MODELS="rosonar"
+MODELS="nllb1b sonar nllb600m"
 
 # Multilingual
 
@@ -154,27 +154,32 @@ SRC_FILE[23]=${DATA_DIR[23]}/test.fr
 REF_FILE[23]=${DATA_DIR[23]}/test.en
 SYS_FILE_SUFFIX[23]=pfsmb/fra_Latn-eng_Latn/test.fr.out
 
+DATA_DIR[24]=$DATASETS/foursquare
+SRC_FILE[24]=${DATA_DIR[24]}/test.fr
+REF_FILE[24]=${DATA_DIR[24]}/test.en
+SYS_FILE_SUFFIX[24]=foursquare/fra_Latn-eng_Latn/test.fr.out
+
 # Autoencode
 
-DATA_DIR[24]=$DATASETS/rocsmt/test
-SRC_FILE[24]=${DATA_DIR[24]}/ref.fr.test
-REF_FILE[24]=${DATA_DIR[24]}/ref.fr.test
-SYS_FILE_SUFFIX[24]=rocsmt/fra_Latn/ref.fr.test.out
-
 DATA_DIR[25]=$DATASETS/rocsmt/test
-SRC_FILE[25]=${DATA_DIR[25]}/norm.en.test
-REF_FILE[25]=${DATA_DIR[25]}/norm.en.test
-SYS_FILE_SUFFIX[25]=rocsmt/eng_Latn/norm.en.test.out
+SRC_FILE[25]=${DATA_DIR[25]}/ref.fr.test
+REF_FILE[25]=${DATA_DIR[25]}/ref.fr.test
+SYS_FILE_SUFFIX[25]=rocsmt/fra_Latn/ref.fr.test.out
 
 DATA_DIR[26]=$DATASETS/rocsmt/test
-SRC_FILE[26]=${DATA_DIR[26]}/raw.en.test
-REF_FILE[26]=${DATA_DIR[26]}/raw.en.test
-SYS_FILE_SUFFIX[26]=rocsmt/eng_Latn/raw.en.test.out
+SRC_FILE[26]=${DATA_DIR[26]}/norm.en.test
+REF_FILE[26]=${DATA_DIR[26]}/norm.en.test
+SYS_FILE_SUFFIX[26]=rocsmt/eng_Latn/norm.en.test.out
 
 DATA_DIR[27]=$DATASETS/rocsmt/test
 SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
-REF_FILE[27]=${DATA_DIR[27]}/norm.en.test
-SYS_FILE_SUFFIX[27]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
+REF_FILE[27]=${DATA_DIR[27]}/raw.en.test
+SYS_FILE_SUFFIX[27]=rocsmt/eng_Latn/raw.en.test.out
+
+DATA_DIR[28]=$DATASETS/rocsmt/test
+SRC_FILE[28]=${DATA_DIR[28]}/raw.en.test
+REF_FILE[28]=${DATA_DIR[28]}/norm.en.test
+SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
 SYS_FILES=()
 

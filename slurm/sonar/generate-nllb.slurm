@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=13
+#SBATCH --array=19
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -154,25 +154,31 @@ INPUT_FILES[18]="${DATA_DIR[18]}/test.fr"
 SRC_LANG[18]=fra_Latn
 TGT_LANG[18]=eng_Latn
 
-# Autoencode
-
-CORPUS[19]=rocsmt
-DATA_DIR[19]=$DATASETS/rocsmt/test
-INPUT_FILES[19]="${DATA_DIR[19]}/ref.fr.test"
+CORPUS[19]=foursquare
+DATA_DIR[19]=$DATASETS/foursquare
+INPUT_FILES[19]="${DATA_DIR[19]}/test.fr"
 SRC_LANG[19]=fra_Latn
-TGT_LANG[19]=fra_Latn
+TGT_LANG[19]=eng_Latn
+
+# Autoencode
 
 CORPUS[20]=rocsmt
 DATA_DIR[20]=$DATASETS/rocsmt/test
-INPUT_FILES[20]="${DATA_DIR[20]}/norm.en.test"
-SRC_LANG[20]=eng_Latn
-TGT_LANG[20]=eng_Latn
+INPUT_FILES[20]="${DATA_DIR[20]}/ref.fr.test"
+SRC_LANG[20]=fra_Latn
+TGT_LANG[20]=fra_Latn
 
 CORPUS[21]=rocsmt
 DATA_DIR[21]=$DATASETS/rocsmt/test
-INPUT_FILES[21]="${DATA_DIR[21]}/raw.en.test"
+INPUT_FILES[21]="${DATA_DIR[21]}/norm.en.test"
 SRC_LANG[21]=eng_Latn
 TGT_LANG[21]=eng_Latn
+
+CORPUS[22]=rocsmt
+DATA_DIR[22]=$DATASETS/rocsmt/test
+INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
+SRC_LANG[22]=eng_Latn
+TGT_LANG[22]=eng_Latn
 
 for i in {0..1}
 do
@@ -180,25 +186,26 @@ do
 
     OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
-    if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
+    if [ "$SLURM_ARRAY_TASK_ID" -ge 20 ] # autoencode
     then 
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
     else
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${TGT_LANG[$SLURM_ARRAY_TASK_ID]}
     fi
 
     # Launch the generation of outputs
     for INPUT_FILE in ${INPUT_FILES[$SLURM_ARRAY_TASK_ID]}
-    do
+    do 
         echo -e "\t - input file: $INPUT_FILE"
 
-        python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
+        python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
             -i $INPUT_FILE \
             -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
             -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -o $OUTPUT_DIR -m ${MODEL_NAME[$i]}
+            -o $OUTPUT_DIR \
+            ${MODEL_DIR[$i]}
 
-        if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
+        if [ "$SLURM_ARRAY_TASK_ID" -eq 22 ] # for evaluating against normalised reference
         then
             NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
             mkdir -p $NEW_OUTPUT_DIR

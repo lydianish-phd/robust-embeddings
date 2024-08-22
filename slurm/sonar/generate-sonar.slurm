@@ -11,13 +11,13 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-21
+#SBATCH --array=19
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 # Using pytorch-gpu/py3/2.3.0 which has pytorch 2.2.2 and accelerate
-module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2022.9
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -154,33 +154,39 @@ INPUT_FILES[18]="${DATA_DIR[18]}/test.fr"
 SRC_LANG[18]=fra_Latn
 TGT_LANG[18]=eng_Latn
 
-# Autoencode
-
-CORPUS[19]=rocsmt
-DATA_DIR[19]=$DATASETS/rocsmt/test
-INPUT_FILES[19]="${DATA_DIR[19]}/ref.fr.test"
+CORPUS[19]=foursquare
+DATA_DIR[19]=$DATASETS/foursquare
+INPUT_FILES[19]="${DATA_DIR[19]}/test.fr"
 SRC_LANG[19]=fra_Latn
-TGT_LANG[19]=fra_Latn
+TGT_LANG[19]=eng_Latn
+
+# Autoencode
 
 CORPUS[20]=rocsmt
 DATA_DIR[20]=$DATASETS/rocsmt/test
-INPUT_FILES[20]="${DATA_DIR[20]}/norm.en.test"
-SRC_LANG[20]=eng_Latn
-TGT_LANG[20]=eng_Latn
+INPUT_FILES[20]="${DATA_DIR[20]}/ref.fr.test"
+SRC_LANG[20]=fra_Latn
+TGT_LANG[20]=fra_Latn
 
 CORPUS[21]=rocsmt
 DATA_DIR[21]=$DATASETS/rocsmt/test
-INPUT_FILES[21]="${DATA_DIR[21]}/raw.en.test"
+INPUT_FILES[21]="${DATA_DIR[21]}/norm.en.test"
 SRC_LANG[21]=eng_Latn
 TGT_LANG[21]=eng_Latn
 
-for i in {1..1}
+CORPUS[22]=rocsmt
+DATA_DIR[22]=$DATASETS/rocsmt/test
+INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
+SRC_LANG[22]=eng_Latn
+TGT_LANG[22]=eng_Latn
+
+for i in {0..0}
 do
     echo "Model: ${MODEL[$i]}"
 
     OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/outputs/${MODEL[$i]}/${CORPUS[$SLURM_ARRAY_TASK_ID]}
 
-    if [ "$SLURM_ARRAY_TASK_ID" -ge 19 ] # autoencode
+    if [ "$SLURM_ARRAY_TASK_ID" -ge 20 ] # autoencode
     then 
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]} 
     else
@@ -199,7 +205,7 @@ do
             -o $OUTPUT_DIR \
             ${MODEL_DIR[$i]}
 
-        if [ "$SLURM_ARRAY_TASK_ID" -eq 21 ] # for evaluating against normalised reference
+        if [ "$SLURM_ARRAY_TASK_ID" -eq 22 ] # for evaluating against normalised reference
         then
             NEW_OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${SRC_LANG[$SLURM_ARRAY_TASK_ID]}-${SRC_LANG[$SLURM_ARRAY_TASK_ID]}
             mkdir -p $NEW_OUTPUT_DIR

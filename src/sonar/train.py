@@ -29,9 +29,7 @@ if __name__=="__main__":
     parser.add_argument("--accumulation-steps", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
-    parser.add_argument("--fraction-en-fr", type=int, help="numerator to compute the sampling probability of the en-fr dataset as a fraction of 8. eg. 5 will produce 5/8 = 0.625", default=5, choices=range(0, 9))
-    parser.add_argument("--fraction-fr", type=int, help="numerator to compute the sampling probability of the en dataset as a fraction of 8. eg. 2 will produce 2/8 = 0.25", default=2, choices=range(0, 9))
-    parser.add_argument("--fraction-en", type=int, help="numerator to compute the sampling probability of the fr dataset as a fraction of 8. eg. 1 will produce 5/8 = 0.125", default=1, choices=range(0, 9))
+    parser.add_argument("--no-ugc-en", type=bool, default=False, action="store_true")
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -55,15 +53,29 @@ if __name__=="__main__":
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
     data_fr = data_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
-    data_en_files = {
-        "train": f"{monolingual_data_dir}/eng/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/eng/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+    data_en_1_files = {
+        "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/eng/part1/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
     }
-    data_en = load_dataset("json", data_files=data_en_files, streaming=True)
-    data_en = data_en.shuffle(seed=args.seed, buffer_size=10_000)
+    data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
+    data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"]], probabilities=[args.fraction_en_fr/8, args.fraction_fr/8, args.fraction_en/8], seed=args.seed)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en["valid"]], seed=args.seed)
+    if args.no_ugc_en:
+        data_en_2_files = {
+            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        }
+    else:
+        data_en_2_files = {
+            "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+            "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        }
+    data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
+    data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
+
+
+    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
+    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
 
     print("Loading tokenizers...")
 
@@ -123,7 +135,7 @@ if __name__=="__main__":
         adam_beta2=0.98,
         adam_epsilon=1e-6,
         save_steps=10_000,
-        logging_steps=1_000,
+        logging_steps=100,
         eval_steps=10_000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         seed=args.seed,

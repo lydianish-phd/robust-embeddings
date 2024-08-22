@@ -8,7 +8,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-5
+#SBATCH --array=3
 
 set -e 
 
@@ -23,7 +23,7 @@ source $HOME/.bash_profile
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 
-MODELS="nllb1b sonar nllb600m rosonar"
+MODELS="nllb1b sonar nllb600m"
 
 # Multilingual
 TABLE_NAME[0]=multilingual
@@ -42,7 +42,7 @@ LANG_PAIRS[2]="eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-jpn_Jpan"
 
 # Non-standard French
 TABLE_NAME[3]=ugc_french
-CORPORA[3]="mmtc mtnt pfsmb"
+CORPORA[3]="mmtc mtnt pfsmb foursquare"
 LANG_PAIRS[3]="fra_Latn-eng_Latn"
 
 # Autoencode
