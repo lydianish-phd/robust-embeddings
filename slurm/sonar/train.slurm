@@ -33,9 +33,6 @@ CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 ACCUMULATION_STEPS=16
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
-FRACTION_EN_FR=5 # 5/8 selection probability for en-fr
-FRACTION_FR=2 # 2/8 selection probability for fr-fr
-FRACTION_EN=1 # 1/8 selection probability for en-en*
 
 echo "Setting the accelerate config..."
 
@@ -66,9 +63,7 @@ accelerate launch --config_file $ACCELERATE_CONFIG $HOME/robust-embeddings/src/s
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    --fraction-en-fr $FRACTION_EN_FR \
-    --fraction-fr $FRACTION_FR \
-    --fraction-en $FRACTION_EN
+    --ugc-en \
 
 echo "Done..."
 
