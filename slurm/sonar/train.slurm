@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --account=rnh@a100
+#SBATCH --account=ncm@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
-#SBATCH --nodes=1		# node count
+#SBATCH --nodes=2		# node count
 #SBATCH --ntasks-per-node=8               # number of tasks per node
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
@@ -36,10 +36,10 @@ FRACTION_EN_FR=5 # 5/8 selection probability for en-fr
 FRACTION_FR=2 # 2/8 selection probability for fr-fr
 FRACTION_EN=1 # 1/8 selection probability for en-en*
 
-# Set the accelerate config
+echo "Setting the accelerate config..."
 
 if [ $SLURM_NNODES -eq 1 ]; then
-    DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_single_node_config.yaml
+    DEFAULT_ACCELEgit statRATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_single_node_config.yaml
 else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
@@ -49,7 +49,7 @@ cp $DEFAULT_ACCELERATE_CONFIG $ACCELERATE_CONFIG
 
 output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
 MASTER_ADDRESS=$(echo $output | cut -d, -f1)
-MASTER_PORT=$(echo $output | cut -d, -f2)
+MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
 
 sed -i "s/^num_machines:.*/num_machines: $SLURM_NNODES/" $ACCELERATE_CONFIG
 sed -i "s/^num_processes:.*/num_processes: $SLURM_NPROCS/" $ACCELERATE_CONFIG
