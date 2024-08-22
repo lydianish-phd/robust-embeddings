@@ -123,7 +123,7 @@ if __name__=="__main__":
         adam_beta2=0.98,
         adam_epsilon=1e-6,
         save_steps=10_000,
-        logging_steps=5_000,
+        logging_steps=1_000,
         eval_steps=10_000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         seed=args.seed,
