@@ -66,14 +66,14 @@ echo "SLURM_NPROCS: $SLURM_NPROCS"
 echo "NUM_PROCESSES: $NUM_PROCESSES"
 echo "SLURM_JOB_GPUS: $SLURM_JOB_GPUS"
 echo "N_GPUS: $N_GPUS"
-echo "SLURM_PROCID: \$SLURM_PROCID"
+echo "SLURM_PROCID: $SLURM_PROCID"
 echo "Launching the training script..."
 
-srun accelerate launch \
+srun --jobid $SLURM_JOBID accelerate launch \
     --config_file $DEFAULT_ACCELERATE_CONFIG \
     --main_process_ip $MASTER_ADDR \
     --main_process_port $MASTER_PORT \
-    --machine_rank \$SLURM_PROCID \
+    --machine_rank $SLURM_PROCID \
     --num_processes $NUM_PROCESSES \
     --num_machines $SLURM_NNODES \
     $HOME/robust-embeddings/src/sonar/train.py \
