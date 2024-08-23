@@ -45,7 +45,7 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.rank}')")
+output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.local_rank}')")
 MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
 MACHINE_RANK=$(echo $output | cut -d, -f3 | cut -d' ' -f1)
@@ -56,6 +56,7 @@ NUM_PROCESSES=$(expr $SLURM_NNODES \* $GPUS_PER_NODE)
 
 N_GPUS=$(srun nvidia-smi --query-gpu=gpu_name --format=csv,noheader | wc -l)
 
+echo "output: $output"
 echo "MASTER_ADDR: $MASTER_ADDR"
 echo "MASTER_PORT: $MASTER_PORT"
 echo "MACHINE_RANK: $MACHINE_RANK"
