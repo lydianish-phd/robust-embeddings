@@ -56,7 +56,7 @@ echo "MASTER_PORT: $MASTER_PORT"
 echo "MACHINE_RANK: $MACHINE_RANK"
 echo "ACCUMULATION_STEPS: $ACCUMULATION_STEPS"
 
-srun accelerate launch \
+accelerate launch \
     --config_file $DEFAULT_ACCELERATE_CONFIG \
     --main_process_ip $MASTER_ADDR \
     --main_process_port $MASTER_PORT \
