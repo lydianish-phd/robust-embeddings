@@ -50,6 +50,7 @@ MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
 MACHINE_RANK=$(echo $output | cut -d, -f3 | cut -d' ' -f1)
 
+LOG_PATH="$HOME/robust-embeddings/main_log.txt"
 
 GPUS_PER_NODE=2
 NUM_PROCESSES=$((SLURM_NNODES * GPUS_PER_NODE))
@@ -69,13 +70,17 @@ echo "N_GPUS: $N_GPUS"
 echo "SLURM_PROCID: $SLURM_PROCID"
 echo "Launching the training script..."
 
-srun --jobid $SLURM_JOBID accelerate launch \
+export LAUNCHER="accelerate launch \
     --config_file $DEFAULT_ACCELERATE_CONFIG \
     --main_process_ip $MASTER_ADDR \
     --main_process_port $MASTER_PORT \
-    --machine_rank $SLURM_PROCID \
+    --machine_rank \$SLURM_PROCID \
     --num_processes $NUM_PROCESSES \
     --num_machines $SLURM_NNODES \
+    "
+# Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
+
+export PROGRAM="\
     $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
@@ -84,6 +89,27 @@ srun --jobid $SLURM_JOBID accelerate launch \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
     $NO_UGC_EN
+    "
+
+export CMD="$LAUNCHER $PROGRAM"
+
+srun --jobid $SLURM_JOBID bash -c "$CMD" 2>&1 | tee -a $LOG_PATH
+
+# srun --jobid $SLURM_JOBID bash -c accelerate launch \
+#     --config_file $DEFAULT_ACCELERATE_CONFIG \
+#     --main_process_ip $MASTER_ADDR \
+#     --main_process_port $MASTER_PORT \
+#     --machine_rank $SLURM_PROCID \
+#     --num_processes $NUM_PROCESSES \
+#     --num_machines $SLURM_NNODES \
+#     $HOME/robust-embeddings/src/sonar/train.py \
+#     -o $EXPERIMENT_DIR \
+#     --seed $SEED \
+#     --checkpoint-dir $CHECKPOINT_DIR \
+#     --learning-rate $LEARNING_RATE \
+#     --accumulation-steps $ACCUMULATION_STEPS \
+#     --lr-scheduler-type $LR_SCHEDULER \
+#     $NO_UGC_EN
 
 echo "Done..."
 
