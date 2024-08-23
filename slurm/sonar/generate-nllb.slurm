@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=18
+#SBATCH --array=18-19
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -198,7 +198,7 @@ do
     do 
         echo -e "\t - input file: $INPUT_FILE"
 
-        python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
+        python $HOME/robust-embeddings/src/sonar/generate-nllb.py \
             -i $INPUT_FILE \
             -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
             -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
