@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=24
+#SBATCH --array=23
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -183,10 +183,10 @@ SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
 SYS_FILES=()
 
+echo "Models: $MODELS"
+
 for MODEL in $MODELS
 do
-    echo "Model: $MODEL"
-        
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
 done
