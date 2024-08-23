@@ -45,9 +45,10 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
+output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.size}')")
 MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
+WORLD_SIZE=$(echo $output | cut -d, -f3)
 GPUS_PER_NODE=8
 NUM_PROCESSES=$((SLURM_NNODES * GPUS_PER_NODE))
 
@@ -57,6 +58,7 @@ echo "MACHINE_RANK: $SLURM_PROCID"
 echo "SLURM_NNODES: $SLURM_NNODES"
 echo "SLURM_NPROCS: $SLURM_NPROCS"
 echo "NUM_PROCESSES: $NUM_PROCESSES"
+echo "WORLD_SIZE: $WORLD_SIZE"
 echo "ACCUMULATION_STEPS: $ACCUMULATION_STEPS"
 
 echo "Launching the training script..."
