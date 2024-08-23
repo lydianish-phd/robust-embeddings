@@ -26,7 +26,7 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 
 set -e
 
-# Set the experiment parameters
+# Setting the experiment parameters
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 mkdir -p $EXPERIMENT_DIR
@@ -35,7 +35,7 @@ CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
-NO_UGC_EN="--no-ugc-en"
+NO_UGC_EN="" #"--no-ugc-en"
 
 echo "Setting the accelerate config..."
 
@@ -45,10 +45,9 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.local_rank}')")
+output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
 MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
-MACHINE_RANK=$(echo $output | cut -d, -f3 | cut -d' ' -f1)
 
 LOG_PATH="$HOME/robust-embeddings/main_log.txt"
 
@@ -93,7 +92,7 @@ export PROGRAM="\
 
 export CMD="$LAUNCHER $PROGRAM"
 
-srun --jobid $SLURM_JOBID bash -c "$CMD" 2>&1 | tee -a $LOG_PATH
+srun --jobid $SLURM_JOBID bash -c "$CMD" # 2>&1 | tee -a $LOG_PATH
 
 # srun --jobid $SLURM_JOBID bash -c accelerate launch \
 #     --config_file $DEFAULT_ACCELERATE_CONFIG \
