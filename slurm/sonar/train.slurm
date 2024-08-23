@@ -47,7 +47,7 @@ fi
 output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.rank}')")
 MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
-MACHINE_RANK=$(echo $output | cut -d, -f3)
+MACHINE_RANK=$(echo $output | cut -d, -f3| cut -d' ' -f1)
 
 echo "Launch the training the training script..."
 
