@@ -6,7 +6,7 @@
 #SBATCH -C a100
 #SBATCH --nodes=2		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
-#SBATCH --gres=gpu:1        # numper of GPUs per node
+#SBATCH --gres=gpu:2        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
