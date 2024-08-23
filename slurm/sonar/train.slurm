@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --account=ncm@a100
+#SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
 #SBATCH --nodes=2		# node count
@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=1:00:00                # Time limit hrs:min:sec
+#SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0 #-10%1
 
@@ -31,7 +31,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 mkdir -p $EXPERIMENT_DIR
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
-ACCUMULATION_STEPS=32
+ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
 NO_UGC_EN="--no-ugc-en"
@@ -44,21 +44,26 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-ACCELERATE_CONFIG=$EXPERIMENT_DIR/accelerate_config.yaml
-cp $DEFAULT_ACCELERATE_CONFIG $ACCELERATE_CONFIG
-
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
-MASTER_ADDRESS=$(echo $output | cut -d, -f1)
+output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.rank}')")
+MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
-
-sed -i "s/^num_machines:.*/num_machines: $SLURM_NNODES/" $ACCELERATE_CONFIG
-sed -i "s/^num_processes:.*/num_processes: $SLURM_NPROCS/" $ACCELERATE_CONFIG
-sed -i "s/^main_process_ip:.*/main_process_ip: $MASTER_ADDRESS/" $ACCELERATE_CONFIG
-sed -i "s/^main_process_port:.*/main_process_port: $MASTER_PORT/" $ACCELERATE_CONFIG
+MACHINE_RANK=$(echo $output | cut -d, -f3)
 
 echo "Launch the training the training script..."
 
-srun accelerate launch --config_file $ACCELERATE_CONFIG $HOME/robust-embeddings/src/sonar/train.py \
+echo "MASTER_ADDR: $MASTER_ADDR"
+echo "MASTER_PORT: $MASTER_PORT"
+echo "MACHINE_RANK: $MACHINE_RANK"
+echo "ACCUMULATION_STEPS: $ACCUMULATION_STEPS"
+
+srun accelerate launch \
+    --config_file $DEFAULT_ACCELERATE_CONFIG \
+    --main_process_ip $MASTER_ADDR \
+    --main_process_port $MASTER_PORT \
+    --machine_rank $MACHINE_RANK \
+    --num_processes $SLURM_NPROCS \
+    --num_machines $SLURM_NNODES \
+    $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
     --checkpoint-dir $CHECKPOINT_DIR \
