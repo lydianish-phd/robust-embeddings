@@ -16,8 +16,8 @@
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
-# Using pytorch-gpu/py3/2.3.0 which has pytorch 2.2.2 and accelerate
-module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2022.9
+# Using pytorch-gpu/py3/2.3.0 which has pytorch 2.2.2 AND accelerate
+module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
