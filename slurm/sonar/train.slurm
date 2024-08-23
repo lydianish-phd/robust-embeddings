@@ -6,13 +6,12 @@
 #SBATCH -C a100
 #SBATCH --nodes=2		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
-#SBATCH --gres=gpu:8        # numper of GPUs per node
+#SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=1:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0 #-10%1
-#SBATCH --qos=qos_gpu-dev
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -32,10 +31,10 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 mkdir -p $EXPERIMENT_DIR
 SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
-ACCUMULATION_STEPS=16
+ACCUMULATION_STEPS=32
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
-NO_UGC_EN="" #"--no-ugc-en"
+NO_UGC_EN="--no-ugc-en"
 
 echo "Setting the accelerate config..."
 
