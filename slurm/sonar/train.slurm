@@ -51,9 +51,10 @@ MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
 MACHINE_RANK=$(echo $output | cut -d, -f3 | cut -d' ' -f1)
 
 
-GPUS_PER_NODE=1
+GPUS_PER_NODE=2
 NUM_PROCESSES=$(expr $SLURM_NNODES \* $GPUS_PER_NODE)
 
+N_GPUS=$(srun nvidia-smi --query-gpu=gpu_name --format=csv,noheader | wc -l)
 
 echo "MASTER_ADDR: $MASTER_ADDR"
 echo "MASTER_PORT: $MASTER_PORT"
@@ -62,7 +63,8 @@ echo "ACCUMULATION_STEPS: $ACCUMULATION_STEPS"
 echo "SLURM_NNODES: $SLURM_NNODES"
 echo "SLURM_NPROCS: $SLURM_NPROCS"
 echo "NUM_PROCESSES: $NUM_PROCESSES"
-
+echo "SLURM_JOB_GPUS: $SLURM_JOB_GPUS"
+echo "N_GPUS: $N_GPUS"
 
 echo "Launching the training script..."
 
