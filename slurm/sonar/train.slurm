@@ -4,7 +4,7 @@
 #SBATCH --account=rnh@a100
 #SBATCH --partition=gpu_p5
 #SBATCH -C a100
-#SBATCH --nodes=2		# node count
+#SBATCH --nodes=4		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
@@ -45,10 +45,9 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port},{idr_torch.size}')")
+output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
 MASTER_ADDR=$(echo $output | cut -d, -f1)
 MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
-WORLD_SIZE=$(echo $output | cut -d, -f3)
 GPUS_PER_NODE=8
 NUM_PROCESSES=$((SLURM_NNODES * GPUS_PER_NODE))
 
@@ -56,10 +55,7 @@ echo "MASTER_ADDR: $MASTER_ADDR"
 echo "MASTER_PORT: $MASTER_PORT"
 echo "MACHINE_RANK: $SLURM_PROCID"
 echo "SLURM_NNODES: $SLURM_NNODES"
-echo "SLURM_NPROCS: $SLURM_NPROCS"
 echo "NUM_PROCESSES: $NUM_PROCESSES"
-echo "WORLD_SIZE: $WORLD_SIZE"
-echo "ACCUMULATION_STEPS: $ACCUMULATION_STEPS"
 
 echo "Launching the training script..."
 
@@ -87,22 +83,6 @@ export PROGRAM="\
 export CMD="$LAUNCHER $PROGRAM"
 
 srun --jobid $SLURM_JOBID bash -c "$CMD" 
-
-# srun --jobid $SLURM_JOBID bash -c accelerate launch \
-#     --config_file $DEFAULT_ACCELERATE_CONFIG \
-#     --main_process_ip $MASTER_ADDR \
-#     --main_process_port $MASTER_PORT \
-#     --machine_rank $SLURM_PROCID \
-#     --num_processes $NUM_PROCESSES \
-#     --num_machines $SLURM_NNODES \
-#     $HOME/robust-embeddings/src/sonar/train.py \
-#     -o $EXPERIMENT_DIR \
-#     --seed $SEED \
-#     --checkpoint-dir $CHECKPOINT_DIR \
-#     --learning-rate $LEARNING_RATE \
-#     --accumulation-steps $ACCUMULATION_STEPS \
-#     --lr-scheduler-type $LR_SCHEDULER \
-#     $NO_UGC_EN
 
 echo "Done..."
 
