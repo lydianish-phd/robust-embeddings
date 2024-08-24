@@ -36,7 +36,7 @@ if __name__=="__main__":
 
     print("Loading datasets...")
 
-    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual-v1/concatenated")
+    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
     monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
 
     data_en_fr_files = {
@@ -53,33 +53,29 @@ if __name__=="__main__":
     data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
     data_fr = data_fr.shuffle(seed=args.seed, buffer_size=10_000)
 
-    # data_en_1_files = {
-    #     "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #     "valid": f"{monolingual_data_dir}/eng/part1/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    # }
-    # data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
-    # data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
+    data_en_1_files = {
+        "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/eng/part1/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+    }
+    data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
+    data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
 
-    # if args.no_ugc_en:
-    #     data_en_2_files = {
-    #         "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #         "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    #     }
-    # else:
-    #     data_en_2_files = {
-    #         "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #         "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    #     }
-    # data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
-    # data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
-
-
-    # all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
-    # all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
+    if args.no_ugc_en:
+        data_en_2_files = {
+            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        }
+    else:
+        data_en_2_files = {
+            "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+            "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        }
+    data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
+    data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
 
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"]], seed=args.seed)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"]], seed=args.seed)
+    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
+    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
 
     print("Loading tokenizers...")
 

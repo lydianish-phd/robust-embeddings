@@ -9,10 +9,10 @@
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=0:30:00                # Time limit hrs:min:sec
+#SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0 #-10%1
-#SBATCH --qos=qos_gpu-dev
+#SBATCH --array=0-3%1
+##SBATCH --qos=qos_gpu-dev
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -27,15 +27,17 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 set -e
 
 # Setting the experiment parameters
+EXPERIMENT_NUM="047d"
+NO_UGC_EN="" #"--no-ugc-en"
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 mkdir -p $EXPERIMENT_DIR
-SEED=42
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
+
+SEED=42
 ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
 LEARNING_RATE=5e-4
 LR_SCHEDULER=inverse_sqrt
-NO_UGC_EN="" #"--no-ugc-en"
 
 echo "Setting the accelerate config..."
 
