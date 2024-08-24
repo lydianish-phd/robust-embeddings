@@ -29,7 +29,7 @@ if __name__=="__main__":
     parser.add_argument("--accumulation-steps", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
-    parser.add_argument("--no-ugc-en", type=bool, default=False, action="store_true")
+    parser.add_argument("--no-ugc-en", help="no artificial UGC English in training data", action="store_true")
     args = parser.parse_args()
 
     accelerator = Accelerator()
