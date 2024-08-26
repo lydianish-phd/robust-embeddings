@@ -26,8 +26,8 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 set -e
 
 # Setting the experiment parameters
-EXPERIMENT_NUM="047d"
-NO_UGC_EN="" #"--no-ugc-en"
+EXPERIMENT_NUM="047e"
+NO_UGC_EN="--no-ugc-en"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
