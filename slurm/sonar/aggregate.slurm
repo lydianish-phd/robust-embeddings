@@ -8,7 +8,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=3
+#SBATCH --array=0-5
 
 set -e 
 
@@ -21,9 +21,11 @@ module load pytorch-gpu/py3/2.3.0
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
+BASE_EXPERIMENT_NUM=047
+CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}d
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$CURRENT_EXPERIMENT_NUM
 
-MODELS="nllb1b sonar nllb600m"
+MODELS="nllb1b sonar nllb600m rosonar"
 
 # Multilingual
 TABLE_NAME[0]=multilingual
@@ -42,7 +44,7 @@ LANG_PAIRS[2]="eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-jpn_Jpan"
 
 # Non-standard French
 TABLE_NAME[3]=ugc_french
-CORPORA[3]="mmtc mtnt pfsmb foursquare"
+CORPORA[3]="foursquare mmtc mtnt pfsmb"
 LANG_PAIRS[3]="fra_Latn-eng_Latn"
 
 # Autoencode
@@ -56,6 +58,16 @@ CORPORA[5]="rocsmt_artificial"
 LANG_PAIRS[5]="eng_Latn-ces_Latn eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-rus_Cyrl eng_Latn-ukr_Cyrl"
 SEEDS="1000 1001 1002 1003 1004"
 PROBAS="0.1 0.2 0.3 0.4 0.5"
+
+# Copy baselines outputs
+
+for MODEL in ${MODELS[@]:0:3}
+do
+    if [ ! -d $EXPERIMENT_DIR/outputs/$MODEL ]
+    then
+        cp -r $EXPERIMENT_DIR/../experiment_$BASE_EXPERIMENT_NUM/outputs/$MODEL $EXPERIMENT_DIR/outputs/
+    fi
+done
 
 # Aggregate scores
 
