@@ -21,7 +21,7 @@ module load pytorch-gpu/py3/2.3.0
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
 
 MODELS="nllb1b sonar nllb600m"
 
