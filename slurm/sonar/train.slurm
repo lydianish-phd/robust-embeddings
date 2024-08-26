@@ -83,7 +83,8 @@ export PROGRAM="\
 
 export CMD="$LAUNCHER $PROGRAM"
 
-srun --jobid $SLURM_JOBID bash -c "$CMD" 
+srun bash -c "$CMD" 
+# srun --jobid $SLURM_JOBID bash -c "$CMD" 
 
 echo "Done..."
 
