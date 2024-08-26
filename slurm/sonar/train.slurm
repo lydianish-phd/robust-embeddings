@@ -9,10 +9,10 @@
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=8	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=0:30:00                # Time limit hrs:min:sec
+#SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/gpfsscratch/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0 #-5%1
-#SBATCH --qos=qos_gpu-dev
+#SBATCH --array=0-5%1
+##SBATCH --qos=qos_gpu-dev
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -46,9 +46,8 @@ else
     DEFAULT_ACCELERATE_CONFIG=$HOME/.cache/huggingface/accelerate/accelerate_multi_node_config.yaml
 fi
 
-output=$(srun python -c "import idr_torch; print(f'{idr_torch.master_addr},{idr_torch.master_port}')")
-MASTER_ADDR=$(echo $output | cut -d, -f1)
-MASTER_PORT=$(echo $output | cut -d, -f2 | cut -d' ' -f1)
+MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
+MASTER_PORT=12345
 GPUS_PER_NODE=8
 NUM_PROCESSES=$((SLURM_NNODES * GPUS_PER_NODE))
 
@@ -84,7 +83,6 @@ export PROGRAM="\
 export CMD="$LAUNCHER $PROGRAM"
 
 srun bash -c "$CMD" 
-# srun --jobid $SLURM_JOBID bash -c "$CMD" 
 
 echo "Done..."
 
