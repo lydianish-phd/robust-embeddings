@@ -16,7 +16,7 @@ source $HOME/.bash_python_exports
 source activate laser_env
 
 BACKBONE_MODEL=roberta-base
-STUDENT_VOCAB=$MODELS/checkpoints/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
+STUDENT_VOCAB=$MODELS/$BACKBONE_MODEL/$BACKBONE_MODEL.cvocab
 TEACHER_VOCAB=$LASER/models/laser2.cvocab
 TEACHER_LANG=laserstd
 STUDENT_LANG[0]=robertastd

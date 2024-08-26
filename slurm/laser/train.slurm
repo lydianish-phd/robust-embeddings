@@ -4,7 +4,7 @@
 #SBATCH --account=rnh@v100
 ##SBATCH -C a100
 #SBATCH --partition=gpu_p2
-##SBATCH --qos=qos_gpu-t4
+#SBATCH --qos=qos_gpu-t4
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
 #SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
@@ -12,7 +12,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1
+#SBATCH --array=0-2
 
 echo $LD_LIBRARY_PATH
 
