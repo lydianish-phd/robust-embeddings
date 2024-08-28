@@ -13,7 +13,7 @@
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-2
 
-echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+echo "### Running $SLURM_JOB_NAME ###"
 
 module purge
 module load cpuarch/amd anaconda-py3/2022.10
