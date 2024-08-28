@@ -78,7 +78,7 @@ then
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
         -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-        -m $MODELS \
+        -m ${MODELS[@]} \
         -s $SEEDS \
         -p $PROBAS
 else
@@ -87,7 +87,7 @@ else
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
         -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-        -m $MODELS
+        -m ${MODELS[@]}
 fi
 
 echo "Done..."
