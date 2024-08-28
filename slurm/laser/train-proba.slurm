@@ -3,12 +3,13 @@
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@v100
 #SBATCH --partition=gpu_p2
+#SBATCH --qos=qos_gpu-t4
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=8               # total number of tasks across all nodes
 #SBATCH --gres=gpu:8        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=3	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=20:00:00
+#SBATCH --time=100:00:00
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-2
 
@@ -28,6 +29,7 @@ LEARNING_RATE="0.0001"
 CONFIG="distil:robertaugc-laserstd" 
 POOLING="maxpool"
 MAX_EPOCH=100
+MAX_STEPS=500000
 
 TEACHER_MODEL=$LASER/models/laser2.pt
 STUDENT_MODEL=$WORK/models/roberta-base/pytorch_model.bin
@@ -90,7 +92,7 @@ srun fairseq-train \
     --activation-dropout 0.1 \
     --attention-dropout 0.1 \
     --max-tokens 4000 \
-    --max-epoch $MAX_EPOCH \
+    --max-steps $MAX_STEPS \
     --student-bpe-symbol roberta \
     --left-pad-source True \
     --left-pad-target False \
