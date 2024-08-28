@@ -77,7 +77,7 @@ if __name__ == "__main__":
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
-    comet_scores_df = pd.DataFrame.from_dict(comet_scores)
+    comet_scores_df = pd.DataFrame.from_dict(comet_scores) * 100
 
     if args.table_name == "multilingual":
         bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS), args.lang_pairs)

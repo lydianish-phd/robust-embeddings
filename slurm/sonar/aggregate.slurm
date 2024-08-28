@@ -22,10 +22,10 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 
 BASE_EXPERIMENT_NUM=047
-CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}d
+CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$CURRENT_EXPERIMENT_NUM
 
-MODELS="nllb1b sonar nllb600m rosonar"
+MODELS="nllb1b sonar nllb600m" # rosonar"
 
 # Multilingual
 TABLE_NAME[0]=multilingual
