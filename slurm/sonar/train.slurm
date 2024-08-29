@@ -11,7 +11,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-5%1
+#SBATCH --array=0 #-5%1
 ##SBATCH --qos=qos_gpu-dev
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
@@ -27,7 +27,7 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 set -e
 
 # Setting the experiment parameters
-EXPERIMENT_NUM="047d"
+EXPERIMENT_NUM="047f"
 NO_UGC_EN="" #"--no-ugc-en"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
@@ -35,7 +35,7 @@ CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
 SEED=42
 ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
-LEARNING_RATE=5e-4
+LEARNING_RATE=1e-3
 LR_SCHEDULER=inverse_sqrt
 
 echo "Setting the accelerate config..."
