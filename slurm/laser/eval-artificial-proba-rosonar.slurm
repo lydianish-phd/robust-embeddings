@@ -63,12 +63,12 @@ PROBAS="0.1 0.2 0.3 0.4 0.5"
 for SEED in {1005..1009}
 do
     echo "Seed $SEED"
-    OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$CORPUS_PART
     
     for PROBA in $PROBAS
     do
-        echo "$PROBA"
-
+        echo -e "\t$PROBA"
+        
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
         cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
         cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
         

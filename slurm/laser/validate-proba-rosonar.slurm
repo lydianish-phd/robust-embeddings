@@ -51,7 +51,8 @@ VOCAB_FILE[3]=$DATASETS_DIR/30/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 VALID_FILE[3]=$DATASETS_DIR/30/${VALID_FILE_BASENAME}_chunks/ugc/${VALID_FILE_BASENAME}-0.txt
 
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_valid
+VALIDATION_SEED=110
+OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_valid/$VALIDATION_SEED
 
 python $HOME/robust-embeddings/src/laser/validate.py \
     --teacher-model ${MODEL_NAME[0]} \

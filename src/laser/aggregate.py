@@ -13,7 +13,7 @@ def _file(m):
     return m + "_matrix.csv"
 
 if __name__ == "__main__":
-    parser = configargparse.ArgumentParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/ugc")
     args = parser.parse_args()
  

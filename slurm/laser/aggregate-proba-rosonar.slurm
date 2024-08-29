@@ -30,6 +30,7 @@ MODEL_NAME[3]=RoLASER-0.3
 
 METRICS="xsimpp"
 SEEDS="1005 1006 1007 1008 1009"
+PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 
@@ -42,6 +43,7 @@ python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
     -p $CORPUS_PARTS \
     --metrics $METRICS \
     --seeds $SEEDS \
+    --probas $PROBAS \
     --gold-model ${MODEL_NAME[0]}
 
 echo "Done..."
