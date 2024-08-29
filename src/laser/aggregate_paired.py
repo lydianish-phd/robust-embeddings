@@ -19,16 +19,15 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--model", help="name of model to compare to LASER", type=str)
     parser.add_argument("-c", "--corpus", help="name of corpus", type=str, default="flores200")
     parser.add_argument("-p", "--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])
+    parser.add_argument("--metrics", help="list of metrics", type=str, nargs="+", default=["cosine_distance", "xsim", "xsimpp"])
+    parser.add_argument("--seeds", help="list of seeds", type=str, nargs="+", default=[ str(s) for s in range(100,110) ])
     args = parser.parse_args()
 
-    seeds = [ str(s) for s in range(100,110) ]
-    metrics = ["cosine_distance", "xsim", "xsimpp"]
-
-    for metric in metrics:
+    for metric in args.metrics:
         for corpus_part in args.corpus_parts:
             output_file = os.path.join(args.input_dir, args.model, args.corpus, corpus_part + '-' + _file(metric))
             all_data = pd.DataFrame(columns=["dataset", "src-tgt", _name(metric)])
-            for seed in seeds:
+            for seed in args.seeds:
                 input_file = os.path.join(args.input_dir, args.model, args.corpus, seed, corpus_part, _file(metric))
                 data = pd.read_csv(input_file)
                 data = data[data["src-tgt"] != "average"]

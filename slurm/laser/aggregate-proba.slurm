@@ -27,6 +27,8 @@ MODEL_NAME[0]=LASER
 MODEL_NAME[1]=RoLASER-0.1
 MODEL_NAME[2]=RoLASER-0.2
 MODEL_NAME[3]=RoLASER-0.3
+METRICS="xsimpp"
+SEEDS="1000 1001 1002 1003 1004"
 
 # EXPERIMENT_BASE_NUM="042"
 
@@ -41,11 +43,19 @@ MODEL_NAME[3]=RoLASER-0.3
 # MODEL_NAME[8]=roberta-maxpool-init-0.45
 # MODEL_NAME[9]=roberta-maxpool-init-0.6
 
+# METRICS="cosine_distance xsim xsimpp"
+# SEEDS="100 101 102 103 104 105 106 107 108 109"
+
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 
 INPUT_DIR=$EXPERIMENT_DIR/scores
 CORPUS_PARTS="dev"
 
-python $HOME/robust-embeddings/src/laser/aggregate_paired.py -i $INPUT_DIR -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} -p $CORPUS_PARTS
+python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
+    -i $INPUT_DIR \
+    -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
+    -p $CORPUS_PARTS \
+    --metrics $METRICS \
+    --seeds $SEEDS
 
 echo "Done..."
