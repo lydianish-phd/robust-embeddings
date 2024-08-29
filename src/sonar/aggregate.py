@@ -22,7 +22,7 @@ def multilingual_average(scores):
         scores[avg_column_name] = scores[column_names].mean(axis=1)
     return scores
 
-def multilingual_delta(scores, lang_pairs, ugc_file_name=ROCSMT_RAW_FILE_NAME, std_file_name=ROCSMT_NORM_FILE_NAME):
+def multilingual_delta(scores, ugc_file_name=ROCSMT_RAW_FILE_NAME, std_file_name=ROCSMT_NORM_FILE_NAME):
     column_names = [col for col in scores.columns if ugc_file_name in col]
     for ugc_col in column_names:
         col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip(COLUMN_NAME_SEPARATOR)
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     comet_scores_df[comet_scores_df.select_dtypes(include='number').columns] *= 100
 
     if args.table_name == "multilingual":
-        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS), args.lang_pairs)
-        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS), args.lang_pairs)
+        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))
+        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))
 
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)

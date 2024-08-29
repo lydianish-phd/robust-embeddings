@@ -15,6 +15,7 @@ def _file(m):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to ugc directory with outputs of different seeds", type=str, default="/home/lnishimw/scratch/datasets/flores200/cleaned/ugc")
+    parser.add_argument("-m", "--model", help="name of model to compare to LASER", type=str)
     parser.add_argument("--metrics", help="list of metrics", type=str, nargs="+", default=["cosine_distance", "xsim", "xsimpp"])
     parser.add_argument("--seeds", help="list of seeds", type=str, nargs="+", default=[ str(s) for s in range(100,110) ])
     parser.add_argument("--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])

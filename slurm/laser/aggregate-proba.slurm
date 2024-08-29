@@ -45,7 +45,7 @@ CORPUS_PARTS="devtest"
 python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
     -i $INPUT_DIR \
     -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
-    -p $CORPUS_PARTS \
+    --corpus-parts $CORPUS_PARTS \
     --metrics $METRICS \
     --seeds $SEEDS \
     --gold-model ${MODEL_NAME[0]}

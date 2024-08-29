@@ -37,13 +37,12 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE
 INPUT_DIR=$EXPERIMENT_DIR/scores
 CORPUS_PARTS="dev"
 
-python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
+python $HOME/robust-embeddings/src/laser/aggregate_proba.py \
     -i $INPUT_DIR \
     -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
     -p $CORPUS_PARTS \
     --metrics $METRICS \
     --seeds $SEEDS \
     --probas $PROBAS \
-    --gold-model ${MODEL_NAME[0]}
 
 echo "Done..."
