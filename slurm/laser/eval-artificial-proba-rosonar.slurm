@@ -33,17 +33,17 @@ EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 DATASETS_DIR=$DATASETS/rosonar/monolingual/rolaser/eng
 
 MODEL_NAME[1]=RoLASER-0.1
-MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_last.pt
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_best.pt
 VOCAB_FILE[1]=$DATASETS_DIR/10/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=RoLASER-0.2
-MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}b/models/checkpoint_last.pt
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}b/models/checkpoint_best.pt
 VOCAB_FILE[2]=$DATASETS_DIR/20/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=RoLASER-0.3
-MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}c/models/checkpoint_last.pt
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}c/models/checkpoint_best.pt
 VOCAB_FILE[3]=$DATASETS_DIR/30/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 
@@ -52,11 +52,6 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 
 #------------------ FLORES ------------------#
 
-# NOISY_LANGS="eng_abr1_Latn,eng_abr2_Latn,\
-# eng_abr3_Latn,eng_cont_Latn,\
-# eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
-# eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
-# eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 NOISY_LANGS="eng_Latn_mix_all"
 TARGET_LANG=eng_Latn
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
