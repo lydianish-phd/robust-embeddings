@@ -33,17 +33,17 @@ EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
 DATASETS_DIR=$DATASETS/rosonar/monolingual/rolaser/eng
 
 MODEL_NAME[1]=roberta-maxpool-init-0.1
-MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_best.pt
+MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_last.pt
 VOCAB_FILE[1]=$DATASETS_DIR/10/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[1]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[2]=roberta-maxpool-init-0.2
-MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}b/models/checkpoint_best.pt
+MODEL_PATH[2]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}b/models/checkpoint_last.pt
 VOCAB_FILE[2]=$DATASETS_DIR/20/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[2]=$HOME/data-preparation/src/roberta-tokenizer.py
 
 MODEL_NAME[3]=roberta-maxpool-init-0.3
-MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}c/models/checkpoint_best.pt
+MODEL_PATH[3]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}c/models/checkpoint_last.pt
 VOCAB_FILE[3]=$DATASETS_DIR/30/bin/robertaugc-laserstd/dict.robertaugc.txt
 TOKENIZER[3]=$HOME/data-preparation/src/roberta-tokenizer.py
 
