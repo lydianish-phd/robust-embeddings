@@ -74,6 +74,7 @@ do
     do
         echo "$PROBA"
 
+        cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
         cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
         
         echo " - calculating xsim++"
