@@ -29,12 +29,12 @@ MODELS=(nllb1b sonar nllb600m) # rosonar)
 
 # Multilingual
 TABLE_NAME[0]=multilingual
-CORPORA[0]="rocsmt flores200"
+CORPORA[0]="flores200 rocsmt"
 LANG_PAIRS[0]="eng_Latn-ces_Latn eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-rus_Cyrl eng_Latn-ukr_Cyrl"
 
 # Standard bilingual
 TABLE_NAME[1]=bilingual
-CORPORA[1]="wmt2015 flores200"
+CORPORA[1]="flores200 wmt2015"
 LANG_PAIRS[1]="eng_Latn-fra_Latn fra_Latn-eng_Latn"
 
 # Non-standard English
