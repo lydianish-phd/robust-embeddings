@@ -21,6 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--corpus-parts", help="name of corpus parts", type=str,  nargs="+", default= [ "dev", "devtest" ])
     parser.add_argument("--metrics", help="list of metrics", type=str, nargs="+", default=["cosine_distance", "xsim", "xsimpp"])
     parser.add_argument("--seeds", help="list of seeds", type=str, nargs="+", default=[ str(s) for s in range(100,110) ])
+    parser.add_argument("--gold-model", help="name of model to compare to", type=str, default="laser")
     args = parser.parse_args()
 
     for metric in args.metrics:
@@ -34,7 +35,7 @@ if __name__ == "__main__":
                 all_data = pd.concat([all_data, data[all_data.columns]], ignore_index=True)
             all_data.to_csv(output_file)
 
-            gold_score_file = os.path.join(args.input_dir, "laser", args.corpus, corpus_part + '-' + _file(metric))
+            gold_score_file = os.path.join(args.input_dir, args.gold_model, args.corpus, corpus_part + '-' + _file(metric))
             gold_data = pd.read_csv(gold_score_file)
 
             average_output_file = os.path.join(args.input_dir, args.model, args.corpus, corpus_part + '-avg-' + _file(metric))

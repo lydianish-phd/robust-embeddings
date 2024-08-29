@@ -56,6 +56,7 @@ python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
     -m ${MODEL_NAME[$SLURM_ARRAY_TASK_ID]} \
     -p $CORPUS_PARTS \
     --metrics $METRICS \
-    --seeds $SEEDS
+    --seeds $SEEDS \
+    --gold-model ${MODEL_NAME[0]}
 
 echo "Done..."
