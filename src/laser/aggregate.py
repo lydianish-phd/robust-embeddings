@@ -1,16 +1,10 @@
 import pandas as pd
 from scipy.stats import ttest_1samp
 import os, argparse
-
-def _name(m):
-    if m == "xsimpp":
-        return "xsim(++)"
-    if m == "cosine_distance":
-        return "cosdist"
-    return m
-
-def _file(m):
-    return m + "_matrix.csv"
+from utils import (
+    _name,
+    _file
+)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

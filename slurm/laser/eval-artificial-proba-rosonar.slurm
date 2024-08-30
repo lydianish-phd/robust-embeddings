@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=eval-natural      # Job name
+#SBATCH --job-name=eval-artificial      # Job name
 #SBATCH --account=rnh@cpu
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
