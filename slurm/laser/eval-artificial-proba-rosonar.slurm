@@ -67,7 +67,7 @@ do
     
     if [ $PROBA == "0.0" ]
     then
-        SEED=$SEEDS[0]
+        SEED=${SEEDS[0]}
         
         echo " - Seed $SEED"
         
@@ -101,7 +101,7 @@ do
             OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
             
             echo -e "\t copying xsim++"
-            cp -r $OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART/* $OUTPUT_DIR
+            cp -r $OUTPUT_DIR_PREFIX/$CORPUS/${SEEDS[0]}/$PROBA/$CORPUS_PART/* $OUTPUT_DIR
         done
     else
         for SEED in ${SEEDS[@]}
