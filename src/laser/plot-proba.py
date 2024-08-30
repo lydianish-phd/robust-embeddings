@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from utils import _name, _display_name
 
 COLORS = plt.cm.tab10.colors
 
@@ -16,27 +17,11 @@ if __name__ == "__main__":
     output_file = os.path.join(output_dir, f"{metric}_noise_proba_plot.pdf")
     artificial_scores = pd.read_csv(args.artificial_scores_file)
 
-    print("Concatenating multingual scores to artificial ones...")
-    
-    seeds = artificial_scores["seed"].unique()
-
-    arti_data = artificial_scores[["model", "seed", "proba", "avg"]]
-    multi_data = pd.DataFrame(columns=["model", "seed", "proba", "avg"])
-    multi_data["model"] = np.repeat(multilingual_scores["model"], len(seeds))
-    multi_data["seed"] = np.tile(seeds, len(multilingual_scores))
-    multi_data["proba"] = np.repeat(0, len(multilingual_scores)*len(seeds))
-    multi_data["avg"] = np.repeat(multilingual_scores[AVERAGE_ROCSMT_NORM_COLUMN], len(seeds))
-    plot_data = pd.concat([arti_data, multi_data], ignore_index=True)
-
     print("Creating plot...")
 
-    multilingual_scores.set_index("model", inplace=True)
-
-    g = sns.lineplot(data=plot_data, x="proba", y="avg", hue="model", style="model", markers=True, dashes=False)
-    g.set(ylabel=f"{METRIC_NAMES[metric]} score", xlabel="Probability of artificial UGC", xticks=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
+    g = sns.lineplot(data=artificial_scores, x="proba", y=_name(metric), hue="model", style="model", markers=True, dashes=False)
+    g.set(ylabel=f"{_display_name(metric)} score", xlabel="Probability of artificial UGC", xticks=[0.0, 0.1, 0.2, 0.3, 0.4, 0.5])
     _, labels = g.get_legend_handles_labels()
-    for i, model in enumerate(labels):
-        g.axhline(multilingual_scores[AVERAGE_ROCSMT_RAW_COLUMN].loc[model], ls="dashdot", c=COLORS[i])
     g.grid()
     plt.tight_layout()
     plt.savefig(output_file)

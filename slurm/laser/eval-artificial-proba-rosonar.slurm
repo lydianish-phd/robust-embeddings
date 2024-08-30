@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/laser/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=1-3
+#SBATCH --array=0-3
 
 set -e 
 
@@ -52,41 +52,81 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 
 #------------------ FLORES ------------------#
 
-NOISY_LANGS="eng_Latn_mix_all"
+NOISY_LANGS=(eng_Latn_mix_all)
 TARGET_LANG=eng_Latn
 OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
 CORPUS_PART=dev
-PROBAS="0.1 0.2 0.3 0.4 0.5"
+PROBAS=(0.0 0.1 0.2 0.3 0.4 0.5)
+SEEDS=(1005 1006 1007 1008 1009)
 
-for SEED in {1005..1009}
+for PROBA in ${PROBAS[@]}
 do
-    echo "Seed $SEED"
+    echo "Proba $PROBA"
     
-    for PROBA in $PROBAS
-    do
-        echo -e "\t$PROBA"
+    if [ $PROBA == "0.0" ]
+    then
+        SEED=$SEEDS[0]
+        
+        echo " - Seed $SEED"
         
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
         cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
         cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
         
-        echo " - calculating xsim++"
+        for NOISY_LANG in ${NOISY_LANGS[@]}
+        do
+            cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART/$NOISY_LANG.$CORPUS_PART
+        done
 
+        echo -e "\t calculating xsim++"
+        
         python3 $LASER/source/eval.py                \
             --base-dir $DATASETS                         \
-            --corpus $CORPUS/artificial/$SEED/$PROBA/ugc                         \
+            --corpus $CORPUS                         \
             --corpus-part $CORPUS_PART               \
             --margin ratio                           \
             --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
             --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
             --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
-            --src-langs $NOISY_LANGS      \
+            --src-langs ${NOISY_LANGS[@]}      \
             --tgt-langs $TARGET_LANG \
-            --tgt-aug-langs $TARGET_LANG \
             --output-dir $OUTPUT_DIR \
             --verbose 
-    done
+
+        for SEED in ${SEEDS[@]:1}
+        do
+            echo " - Seed $SEED"
+            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
+            
+            echo -e "\t copying xsim++"
+            cp -r $OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART/* $OUTPUT_DIR
+        done
+    else
+        for SEED in ${SEEDS[@]}
+        do
+            echo " - Seed $SEED"
+            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
+            cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
+            cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
+            
+            echo -e "\t calculating xsim++"
+
+            python3 $LASER/source/eval.py                \
+                --base-dir $DATASETS                         \
+                --corpus $CORPUS/artificial/$SEED/$PROBA/ugc                         \
+                --corpus-part $CORPUS_PART               \
+                --margin ratio                           \
+                --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
+                --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+                --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+                --src-langs ${NOISY_LANGS[@]}      \
+                --tgt-langs $TARGET_LANG \
+                --tgt-aug-langs $TARGET_LANG \
+                --output-dir $OUTPUT_DIR \
+                --verbose 
+        done
+    fi
 done
 echo "Done..."
