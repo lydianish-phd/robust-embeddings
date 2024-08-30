@@ -23,14 +23,13 @@ source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
 EXPERIMENT_BASE_NUM="048"
+EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
+DATASETS_DIR=$DATASETS/rosonar/monolingual/rolaser/eng
 
 MODEL_NAME[0]=LASER
 MODEL_PATH[0]=$LASER/models/laser2.pt
 VOCAB_FILE[0]=$LASER/models/laser2.cvocab
 TOKENIZER[0]=$HOME/data-preparation/src/spm-tokenizer.py
-
-EXPERIMENTS_DIR=$EXPERIMENTS/robust-embeddings/laser
-DATASETS_DIR=$DATASETS/rosonar/monolingual/rolaser/eng
 
 MODEL_NAME[1]=RoLASER-0.1
 MODEL_PATH[1]=$EXPERIMENTS_DIR/experiment_${EXPERIMENT_BASE_NUM}/models/checkpoint_best.pt
@@ -61,39 +60,34 @@ CORPUS_PART=dev
 PROBAS=(0.0 0.1 0.2 0.3 0.4 0.5)
 SEEDS=(1005 1006 1007 1008 1009)
 
+export EVAL_SCRIPT_CMD="$LASER/source/eval.py \
+    --base-dir $DATASETS \
+    --corpus-part $CORPUS_PART \
+    --margin ratio \
+    --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
+    --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
+    --src-langs ${NOISY_LANGS[@]} \
+    --tgt-langs $TARGET_LANG \
+    --verbose"
+
 for PROBA in ${PROBAS[@]}
 do
     echo "Proba $PROBA"
     
-    if [ $PROBA == "0.0" ]
+    if [ $PROBA == "0.0" ] # compute the first one and copy the rest
     then
         SEED=${SEEDS[0]}
         
         echo " - Seed $SEED"
         
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
-        cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
-        cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
-        
-        for NOISY_LANG in ${NOISY_LANGS[@]}
-        do
-            cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART/$NOISY_LANG.$CORPUS_PART
-        done
 
         echo -e "\t calculating xsim++"
         
-        python3 $LASER/source/eval.py                \
-            --base-dir $DATASETS                         \
-            --corpus $CORPUS                         \
-            --corpus-part $CORPUS_PART               \
-            --margin ratio                           \
-            --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
-            --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
-            --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
-            --src-langs ${NOISY_LANGS[@]}      \
-            --tgt-langs $TARGET_LANG \
-            --output-dir $OUTPUT_DIR \
-            --verbose 
+        python3 $EVAL_SCRIPT_CMD \
+            --corpus $CORPUS/artificial/$SEED/$PROBA/ugc \
+            --output-dir $OUTPUT_DIR
 
         for SEED in ${SEEDS[@]:1}
         do
@@ -103,29 +97,17 @@ do
             echo -e "\t copying xsim++"
             cp -r $OUTPUT_DIR_PREFIX/$CORPUS/${SEEDS[0]}/$PROBA/$CORPUS_PART/* $OUTPUT_DIR
         done
-    else
+    else # compute all
         for SEED in ${SEEDS[@]}
         do
             echo " - Seed $SEED"
             OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
-            cp -r $DATASETS/$CORPUS/${CORPUS_PART}/$TARGET_LANG.$CORPUS_PART $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc/$CORPUS_PART
-            cp -r $DATASETS/$CORPUS/${CORPUS_PART}_augmented $DATASETS/$CORPUS/artificial/$SEED/$PROBA/ugc
             
             echo -e "\t calculating xsim++"
 
-            python3 $LASER/source/eval.py                \
-                --base-dir $DATASETS                         \
-                --corpus $CORPUS/artificial/$SEED/$PROBA/ugc                         \
-                --corpus-part $CORPUS_PART               \
-                --margin ratio                           \
-                --src-encoder ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]}  \
-                --src-vocab-file ${VOCAB_FILE[$SLURM_ARRAY_TASK_ID]} \
-                --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
-                --src-langs ${NOISY_LANGS[@]}      \
-                --tgt-langs $TARGET_LANG \
-                --tgt-aug-langs $TARGET_LANG \
-                --output-dir $OUTPUT_DIR \
-                --verbose 
+            python3 $EVAL_SCRIPT_CMD \
+            --corpus $CORPUS/artificial/$SEED/$PROBA/ugc \
+            --output-dir $OUTPUT_DIR
         done
     fi
 done
