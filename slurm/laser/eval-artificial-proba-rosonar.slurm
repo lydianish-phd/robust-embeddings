@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH --job-name=eval-artificial      # Job name
-#SBATCH --account=rnh@cpu
+#SBATCH --account=rnh@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
@@ -53,8 +53,6 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 
 NOISY_LANGS=(eng_Latn_mix_all)
 TARGET_LANG=eng_Latn
-OUTPUT_EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
-OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_ID]}
 CORPUS=flores200
 CORPUS_PART=dev
 PROBAS=(0.0 0.1 0.2 0.3 0.4 0.5)
@@ -69,6 +67,7 @@ export EVAL_SCRIPT_CMD="$LASER/source/eval.py \
     --src-tokenizer ${TOKENIZER[$SLURM_ARRAY_TASK_ID]} \
     --src-langs ${NOISY_LANGS[@]} \
     --tgt-langs $TARGET_LANG \
+    --tgt-aug-langs $TARGET_LANG \
     --verbose"
 
 for PROBA in ${PROBAS[@]}
@@ -93,6 +92,7 @@ do
         do
             echo " - Seed $SEED"
             OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$CORPUS/$SEED/$PROBA/$CORPUS_PART
+            mkdir -p $OUTPUT_DIR
             
             echo -e "\t copying xsim++"
             cp -r $OUTPUT_DIR_PREFIX/$CORPUS/${SEEDS[0]}/$PROBA/$CORPUS_PART/* $OUTPUT_DIR
