@@ -9,13 +9,13 @@ COLORS = plt.cm.tab10.colors
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--artificial-scores-file", help="path to artificial scores csv file", type=str)
+    parser.add_argument("-i", "--input-file", help="path to artificial scores csv file", type=str)
     args = parser.parse_args()
 
-    output_dir , file_name = os.path.split(args.artificial_scores_file)
+    output_dir , file_name = os.path.split(args.input_file)
     metric = file_name.split("_")[0]
     output_file = os.path.join(output_dir, f"{metric}_noise_proba_plot.pdf")
-    artificial_scores = pd.read_csv(args.artificial_scores_file)
+    artificial_scores = pd.read_csv(args.input_file)
 
     print("Creating plot...")
 
