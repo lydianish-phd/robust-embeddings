@@ -25,14 +25,16 @@ EXPERIMENT_BASE_NUM="048"
 MODELS="LASER RoLASER-0.1 RoLASER-0.2 RoLASER-0.3"
 METRICS="xsimpp"
 SEEDS="1005 1006 1007 1008 1009"
-PROBAS="0.1 0.2 0.3 0.4 0.5"
+PROBAS="0.0 0.1 0.2 0.3 0.4 0.5"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/laser/experiment_${EXPERIMENT_BASE_NUM}_eval
 INPUT_DIR=$EXPERIMENT_DIR/scores
 CORPUS=flores200
 CORPUS_PARTS="dev"
 
-python $HOME/robust-embeddings/src/laser/aggregate_proba.py \
+SRC_PATH=$HOME/robust-embeddings/src/laser
+
+python $SRC_PATH/aggregate_proba.py \
     -i $INPUT_DIR \
     -m $MODELS \
     -c $CORPUS \
@@ -40,5 +42,13 @@ python $HOME/robust-embeddings/src/laser/aggregate_proba.py \
     --metrics $METRICS \
     --seeds $SEEDS \
     --probas $PROBAS \
+
+for CORPUS_PART in $CORPUS_PARTS; do
+    for METRIC in $METRICS; do
+        SCORES_FILE=$INPUT_DIR/${CORPUS}-${CORPUS_PART}-${METRIC}_matrix.csv  
+        python $SRC_PATH/plot-proba.py -i $SCORES_FILE
+    done
+done
+
 
 echo "Done..."
