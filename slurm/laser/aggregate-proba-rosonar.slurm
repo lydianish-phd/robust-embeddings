@@ -46,7 +46,9 @@ python $SRC_PATH/aggregate_proba.py \
 for CORPUS_PART in $CORPUS_PARTS; do
     for METRIC in $METRICS; do
         SCORES_FILE=$INPUT_DIR/${CORPUS}-${CORPUS_PART}-${METRIC}_matrix.csv  
-        python $SRC_PATH/plot-proba.py -i $SCORES_FILE
+        python $SRC_PATH/plot-proba.py \
+            -i $SCORES_FILE \
+            -m $METRIC
     done
 done
 
