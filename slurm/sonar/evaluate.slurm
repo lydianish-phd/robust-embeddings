@@ -23,7 +23,7 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
-MODELS="nllb1b sonar nllb6OOm"
+MODELS="nllb1b sonar nllb600m"
 
 # Multilingual
 
