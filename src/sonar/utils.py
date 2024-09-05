@@ -22,3 +22,30 @@ METRIC_NAMES = {
 
 BLEU_ROUND_DECIMALS = 2
 COMET_ROUND_DECIMALS = 2
+
+MULTILINGUAL_COLUMNS = [
+    "flores200__eng_Latn-ces_Latn__eng_Latn.devtest",
+    "rocsmt__eng_Latn-ces_Latn__norm.en.test",
+    "rocsmt__eng_Latn-ces_Latn__raw.en.test",
+    "delta__rocsmt__eng_Latn-ces_Latn",
+    "flores200__eng_Latn-deu_Latn__eng_Latn.devtest",
+    "rocsmt__eng_Latn-deu_Latn__norm.en.test",
+    "rocsmt__eng_Latn-deu_Latn__raw.en.test",
+    "delta__rocsmt__eng_Latn-deu_Latn",
+    "flores200__eng_Latn-fra_Latn__eng_Latn.devtest",
+    "rocsmt__eng_Latn-fra_Latn__norm.en.test",
+    "rocsmt__eng_Latn-fra_Latn__raw.en.test",
+    "delta__rocsmt__eng_Latn-fra_Latn",
+    "flores200__eng_Latn-rus_Cyrl__eng_Latn.devtest",
+    "rocsmt__eng_Latn-rus_Cyrl__norm.en.test",
+    "rocsmt__eng_Latn-rus_Cyrl__raw.en.test",
+    "delta__rocsmt__eng_Latn-rus_Cyrl",
+    "flores200__eng_Latn-ukr_Cyrl__eng_Latn.devtest",
+    "rocsmt__eng_Latn-ukr_Cyrl__norm.en.test",
+    "rocsmt__eng_Latn-ukr_Cyrl__raw.en.test",
+    "delta__rocsmt__eng_Latn-ukr_Cyrl",
+    "avg__flores200__eng_Latn.devtest",
+    "avg__rocsmt__norm.en.test",
+    "avg__rocsmt__raw.en.test",
+    "delta__avg__rocsmt"
+]

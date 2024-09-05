@@ -7,7 +7,8 @@ from utils import (
     BLEU_ROUND_DECIMALS,
     COMET_ROUND_DECIMALS,
     ROCSMT_NORM_FILE_NAME,
-    ROCSMT_RAW_FILE_NAME
+    ROCSMT_RAW_FILE_NAME,
+    MULTILINGUAL_COLUMNS
 )
 
 def multilingual_average(scores):
@@ -81,8 +82,8 @@ if __name__ == "__main__":
     comet_scores_df[comet_scores_df.select_dtypes(include='number').columns] *= 100
 
     if args.table_name == "multilingual":
-        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))
-        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))
+        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
+        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
 
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
