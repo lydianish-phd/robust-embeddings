@@ -10,7 +10,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("Loading metric models...")
-    bleu_model = BLEU()
+    bleu_model = BLEU(tokenize="ja-mecab") if args.ref_file.endswith("en-ja.ja") else BLEU()
     comet_model_path = download_model("Unbabel/wmt22-comet-da")
     comet_model = load_from_checkpoint(comet_model_path)
     
