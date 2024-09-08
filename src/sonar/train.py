@@ -123,6 +123,7 @@ if __name__=="__main__":
         metric_for_best_model="loss",
         report_to="tensorboard",
         push_to_hub=False,
+        dataloader_num_workers=8,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
