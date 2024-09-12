@@ -32,16 +32,16 @@ def multilingual_delta(scores, ugc_file_name=ROCSMT_RAW_FILE_NAME, norm_file_nam
     ugc_column_names = [col for col in scores.columns if ugc_file_name in col]
     for ugc_col in ugc_column_names:
         col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip(COLUMN_NAME_SEPARATOR)
-        std_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix, norm_file_name])
+        norm_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix, norm_file_name])
         delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
-        scores[delta_column_name] = scores[ugc_col] - scores[std_col]
+        scores[delta_column_name] = scores[ugc_col] - scores[norm_col]
     
     std_column_names = [col for col in scores.columns if std_file_name in col]
     for std_col in std_column_names:
         col_name_prefix = std_col.removesuffix(std_file_name).strip(COLUMN_NAME_SEPARATOR)
         norm_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix.replace(FLORES_CORPUS_NAME, ROCSMT_CORPUS_NAME), norm_file_name])
         delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
-        scores[delta_column_name] = scores[std_col] - scores[norm_col]
+        scores[delta_column_name] = scores[norm_col] - scores[std_col]
     return scores
 
 def statistical_significance(scores, column_name_prefixes, p_value_threshold=0.05):
