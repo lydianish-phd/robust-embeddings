@@ -8,6 +8,7 @@ from utils import (
     COMET_ROUND_DECIMALS,
     ROCSMT_NORM_FILE_NAME,
     ROCSMT_RAW_FILE_NAME,
+    FLORES_FILE_NAME,
     MULTILINGUAL_COLUMNS
 )
 
@@ -23,13 +24,20 @@ def multilingual_average(scores):
         scores[avg_column_name] = scores[column_names].mean(axis=1)
     return scores
 
-def multilingual_delta(scores, ugc_file_name=ROCSMT_RAW_FILE_NAME, std_file_name=ROCSMT_NORM_FILE_NAME):
-    column_names = [col for col in scores.columns if ugc_file_name in col]
-    for ugc_col in column_names:
+def multilingual_delta(scores, ugc_file_name=ROCSMT_RAW_FILE_NAME, norm_file_name=ROCSMT_NORM_FILE_NAME, std_file_name=FLORES_FILE_NAME):
+    ugc_column_names = [col for col in scores.columns if ugc_file_name in col]
+    for ugc_col in ugc_column_names:
         col_name_prefix = ugc_col.removesuffix(ugc_file_name).strip(COLUMN_NAME_SEPARATOR)
-        std_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix, std_file_name])
+        std_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix, norm_file_name])
         delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
         scores[delta_column_name] = scores[ugc_col] - scores[std_col]
+    
+    std_column_names = [col for col in scores.columns if std_file_name in col]
+    for std_col in std_column_names:
+        col_name_prefix = std_col.removesuffix(std_file_name).strip(COLUMN_NAME_SEPARATOR)
+        norm_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix.replace("flores200", "rocsmt"), norm_file_name])
+        delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
+        scores[delta_column_name] = scores[std_col] - scores[norm_col]
     return scores
 
 if __name__ == "__main__":
