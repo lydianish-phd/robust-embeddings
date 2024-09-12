@@ -24,6 +24,16 @@ METRIC_NAMES = {
     "comet": "COMET",
 }
 
+LANG_NAMES = {
+    "eng_Latn": "English",
+    "fra_Latn": "French",
+    "deu_Latn": "German",
+    "ces_Latn": "Czech",
+    "rus_Cyrl": "Russian",
+    "ukr_Cyrl": "Ukrainian",
+    "jap_Japn": "Japanese"
+}
+
 BLEU_ROUND_DECIMALS = 2
 COMET_ROUND_DECIMALS = 2
 
