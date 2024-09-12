@@ -28,6 +28,7 @@ BLEU_ROUND_DECIMALS = 2
 COMET_ROUND_DECIMALS = 2
 
 MULTILINGUAL_COLUMNS = [
+    "model",
     "flores200__eng_Latn-ces_Latn__eng_Latn.devtest",
     "rocsmt__eng_Latn-ces_Latn__norm.en.test",
     "rocsmt__eng_Latn-ces_Latn__raw.en.test",
