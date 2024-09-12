@@ -1,5 +1,7 @@
 import os, argparse, json
 import pandas as pd
+import numpy as np
+from scipy.stats import ttest_1samp
 from utils import (
     SCORE_FILE_SUFFIX,
     MODEL_NAMES,
@@ -9,6 +11,8 @@ from utils import (
     ROCSMT_NORM_FILE_NAME,
     ROCSMT_RAW_FILE_NAME,
     FLORES_FILE_NAME,
+    ROCSMT_CORPUS_NAME,
+    FLORES_CORPUS_NAME,
     MULTILINGUAL_COLUMNS
 )
 
@@ -35,9 +39,16 @@ def multilingual_delta(scores, ugc_file_name=ROCSMT_RAW_FILE_NAME, norm_file_nam
     std_column_names = [col for col in scores.columns if std_file_name in col]
     for std_col in std_column_names:
         col_name_prefix = std_col.removesuffix(std_file_name).strip(COLUMN_NAME_SEPARATOR)
-        norm_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix.replace("flores200", "rocsmt"), norm_file_name])
+        norm_col = COLUMN_NAME_SEPARATOR.join([col_name_prefix.replace(FLORES_CORPUS_NAME, ROCSMT_CORPUS_NAME), norm_file_name])
         delta_column_name = COLUMN_NAME_SEPARATOR.join(["delta", col_name_prefix])
         scores[delta_column_name] = scores[std_col] - scores[norm_col]
+    return scores
+
+def statistical_significance(scores, column_name_prefixes, p_value_threshold=0.05):
+    for column_name_prefix in column_name_prefixes:
+        columns = scores.columns[scores.columns.str.startswith(column_name_prefix)]
+        p_values = np.array([ ttest_1samp(scores[scores["model"] == model][columns].values.flatten(), 0)[1] for model in scores["model"] ])
+        scores[COLUMN_NAME_SEPARATOR.join([column_name_prefix, "significant"])] = p_values < p_value_threshold
     return scores
 
 if __name__ == "__main__":
@@ -93,6 +104,10 @@ if __name__ == "__main__":
         bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
         comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
 
+    delta_column_prefixes = [ "delta" + COLUMN_NAME_SEPARATOR + corpus for corpus in args.corpora ]
+    bleu_scores_df = statistical_significance(bleu_scores_df, delta_column_prefixes, 0.05)
+    comet_scores_df = statistical_significance(comet_scores_df, delta_column_prefixes, 0.05)
+       
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
 

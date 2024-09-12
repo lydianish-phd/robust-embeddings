@@ -1,5 +1,8 @@
 SCORE_FILE_SUFFIX = ".out.json"
 
+ROCSMT_CORPUS_NAME = "rocsmt"
+FLORES_CORPUS_NAME = "flores200"
+
 ROCSMT_NORM_FILE_NAME = "norm.en.test"
 ROCSMT_RAW_FILE_NAME = "raw.en.test"
 FLORES_FILE_NAME = "eng_Latn.devtest"
@@ -53,6 +56,6 @@ MULTILINGUAL_COLUMNS = [
     "avg__flores200__eng_Latn.devtest",
     "avg__rocsmt__norm.en.test",
     "avg__rocsmt__raw.en.test",
-    "delta__avg__flores200"
+    "delta__avg__flores200",
     "delta__avg__rocsmt"
 ]
