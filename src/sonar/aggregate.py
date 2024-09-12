@@ -48,7 +48,8 @@ def statistical_significance(scores, column_name_prefixes, p_value_threshold=0.0
     for column_name_prefix in column_name_prefixes:
         columns = scores.columns[scores.columns.str.startswith(column_name_prefix)]
         p_values = np.array([ ttest_1samp(scores[scores["model"] == model][columns].values.flatten(), 0)[1] for model in scores["model"] ])
-        scores[COLUMN_NAME_SEPARATOR.join([column_name_prefix, "significant"])] = p_values < p_value_threshold
+        signif_column_name = column_name_prefix + COLUMN_NAME_SEPARATOR + "significant"
+        scores[signif_column_name] = p_values < p_value_threshold
     return scores
 
 if __name__ == "__main__":
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     delta_column_prefixes = [ "delta" + COLUMN_NAME_SEPARATOR + corpus for corpus in args.corpora ]
     bleu_scores_df = statistical_significance(bleu_scores_df, delta_column_prefixes, 0.05)
     comet_scores_df = statistical_significance(comet_scores_df, delta_column_prefixes, 0.05)
-       
+
     bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
     comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
 
