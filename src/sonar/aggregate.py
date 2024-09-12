@@ -99,8 +99,9 @@ if __name__ == "__main__":
 
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores) 
-    comet_scores_df[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)] *= 100
-
+    columns_to_multiply = comet_scores_df.columns[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)]
+    comet_scores_df[columns_to_multiply] *= 100
+    
     if args.table_name == "multilingual":
         bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
         comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]

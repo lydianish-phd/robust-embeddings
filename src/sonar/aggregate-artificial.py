@@ -76,7 +76,8 @@ if __name__ == "__main__":
     
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores)
-    comet_scores_df[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)] *= 100
+    columns_to_multiply = comet_scores_df.columns[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)]
+    comet_scores_df[columns_to_multiply] *= 100
 
     score_columns = [col for col in bleu_scores_df.columns if COLUMN_NAME_SEPARATOR in col]
     bleu_scores_df["avg"] = bleu_scores_df[np.array(score_columns)].mean(axis=1)
