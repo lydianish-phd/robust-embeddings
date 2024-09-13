@@ -76,7 +76,8 @@ if __name__ == "__main__":
             raw_score_column=AVERAGE_ROCSMT_RAW_COLUMN, 
             ax=ax
         )
-        g.set(ylabel=f"{METRIC_NAMES[metric]} score", xlabel="Probability of artificial UGC", fontsize=16)
+        ax.set_ylabel(f"{METRIC_NAMES[metric]} score", fontsize=16)
+        ax.set_xlabel("Probability of artificial UGC", fontsize=16)
         ax.legend(fontsize=14)
         plt.tight_layout()
         plt.savefig(output_file)
