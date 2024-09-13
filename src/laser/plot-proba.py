@@ -22,6 +22,7 @@ if __name__ == "__main__":
     g = sns.lineplot(data=scores, x="proba", y=_name(args.metric), hue="model", style="model", markers=True, dashes=False)
     g.set_ylabel(f"{_display_name(args.metric)} score", fontsize=16)
     g.set_xlabel("Probability of artificial UGC", fontsize=16)
+    g.legend(fontsize=14)
     _, labels = g.get_legend_handles_labels()
     g.grid()
     plt.tight_layout()
