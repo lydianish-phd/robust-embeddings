@@ -52,7 +52,7 @@ if __name__ == "__main__":
         artificial_scores[metric] = pd.read_csv(f"{args.scores_dir}/{metric}_artificial.csv")
         multilingual_scores[metric] = pd.read_csv(f"{args.scores_dir}/{metric}_multilingual.csv")
     
-    seeds = artificial_scores["seed"].unique()
+    seeds = artificial_scores["comet"]["seed"].unique()
     probas = np.insert(artificial_scores["comet"]["proba"].unique(), 0, 0.0)
     models = artificial_scores["comet"]["model"].unique()
     target_langs = sorted(set([ col.split('__')[1].split('-')[1] for col in artificial_scores["comet"].columns if col.startswith("rocsmt")]))
@@ -76,7 +76,8 @@ if __name__ == "__main__":
             raw_score_column=AVERAGE_ROCSMT_RAW_COLUMN, 
             ax=ax
         )
-        g.set(ylabel=f"{METRIC_NAMES[metric]} score", xlabel="Probability of artificial UGC")
+        g.set(ylabel=f"{METRIC_NAMES[metric]} score", xlabel="Probability of artificial UGC", fontsize=16)
+        ax.legend(fontsize=14)
         plt.tight_layout()
         plt.savefig(output_file)
     
@@ -86,9 +87,9 @@ if __name__ == "__main__":
     fig, axes = plt.subplots(nrows=len(args.metrics), ncols=len(target_langs), sharex=True, sharey=True, figsize=(15, 6))
 
     for i, metric in enumerate(args.metrics):
-        axes[i, 0].set_ylabel(f"{METRIC_NAMES[metric]} score")
+        axes[i, 0].set_ylabel(f"{METRIC_NAMES[metric]} score", fontsize=16)
         for j, lang in enumerate(target_langs):
-            axes[0, j].set_title(r"English$\rightarrow$" + LANG_NAMES[lang])
+            axes[0, j].set_title(r"English$\rightarrow$" + LANG_NAMES[lang], fontsize=16)
             _ = plot_probas(
                 artificial_scores, 
                 multilingual_scores, 
@@ -101,7 +102,7 @@ if __name__ == "__main__":
                 ax=axes[i, j]
             )
 
-    fig.supxlabel("Probability of artificial UGC")
+    fig.supxlabel("Probability of artificial UGC", fontsize=16)
 
     # Remove individual x-axis labels
     for ax in axes.flat:
@@ -111,6 +112,7 @@ if __name__ == "__main__":
     for ax in axes[:,:-1].flat:
         ax.legend_.remove()
     axes[-1,-1].legend_.remove()
+    axes[0,-1].legend(fontsize=14)
     
     plt.tight_layout()
     plt.savefig(output_file)
