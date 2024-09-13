@@ -37,6 +37,7 @@ def plot_probas(
     for k, model in enumerate(labels):
         g.axhline(multilingual_scores[metric][raw_score_column].loc[model], ls="dashdot", c=COLORS[k])
     g.grid()
+    return g
     
 
 if __name__ == "__main__":
@@ -81,13 +82,14 @@ if __name__ == "__main__":
     
     print("Plotting language scores...")
     output_file = f"{args.scores_dir}/noise_proba_plot_all.pdf"
+    plt.clf()
     fig, axes = plt.subplots(nrows=len(args.metrics), ncols=len(target_langs), sharex=True, sharey=True, figsize=(15, 6))
 
     for i, metric in enumerate(args.metrics):
         axes[i, 0].set_ylabel(f"{METRIC_NAMES[metric]} score")
         for j, lang in enumerate(target_langs):
             axes[0, j].set_title(r"English$\rightarrow$" + LANG_NAMES[lang])
-            plot_probas(
+            _ = plot_probas(
                 artificial_scores, 
                 multilingual_scores, 
                 metric,
