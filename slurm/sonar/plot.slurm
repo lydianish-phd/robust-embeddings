@@ -25,14 +25,8 @@ SCORES_DIR=$EXPERIMENT_DIR/scores
 
 METRICS="bleu comet"
 
-for METRIC in $METRICS
-do
-    ARTI_FILE=$SCORES_DIR/${METRIC}_artificial.csv
-    MULTI_FILE=$SCORES_DIR/${METRIC}_multilingual.csv
+python $HOME/robust-embeddings/src/sonar/plot-proba.py \
+    -d $SCORES_DIR \
+    -m $METRICS \
 
-    python $HOME/robust-embeddings/src/sonar/plot-proba.py \
-        --artificial-scores-file $ARTI_FILE \
-        --multilingual-scores-file $MULTI_FILE \
-
-done
 echo "Done..."

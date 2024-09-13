@@ -22,11 +22,18 @@ source activate sonar_env
 
 set -e
 
-EXPERIMENT_NUM="047f"
-NO_UGC_EN="" #"--no-ugc-en"
+# Setting the experiment parameters
+DATA_CONFIG=0
+
+EXPERIMENT_NUM[0]="047f"
+NO_UGC_EN[0]="" #"--no-ugc-en"
+
+EXPERIMENT_NUM[1]="047g"
+NO_UGC_EN[1]=#"--no-ugc-en"
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/draft_experiment
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
+
 SEED=42
 ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
 LEARNING_RATE=1e-3
@@ -73,7 +80,7 @@ export PROGRAM="\
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    $NO_UGC_EN
+    ${NO_UGC_EN[$DATA_CONFIG]}
     "
 
 export CMD="$LAUNCHER $PROGRAM"

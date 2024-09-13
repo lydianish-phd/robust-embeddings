@@ -27,10 +27,15 @@ module load cpuarch/amd pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb
 set -e
 
 # Setting the experiment parameters
-EXPERIMENT_NUM="047f"
-NO_UGC_EN="" #"--no-ugc-en"
+DATA_CONFIG=0
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
+EXPERIMENT_NUM[0]="047f"
+NO_UGC_EN[0]="" #"--no-ugc-en"
+
+EXPERIMENT_NUM[1]="047g"
+NO_UGC_EN[1]=#"--no-ugc-en"
+
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_${EXPERIMENT_NUM[$DATA_CONFIG]}
 CHECKPOINT_DIR=$EXPERIMENT_DIR/models
 
 SEED=42
@@ -77,7 +82,7 @@ export PROGRAM="\
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    $NO_UGC_EN
+    ${NO_UGC_EN[$DATA_CONFIG]}
     "
 
 export CMD="$LAUNCHER $PROGRAM"
