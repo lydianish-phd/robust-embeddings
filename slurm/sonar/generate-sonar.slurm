@@ -24,13 +24,16 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047g
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
 
 MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-80000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-100000"
+
+MODEL[2]=rosonar_std
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-100000"
 
 # Multilingual
 

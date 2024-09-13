@@ -24,13 +24,16 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
 
 MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/checkpoint-100000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-100000"
+
+MODEL[2]=rosonar_std
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-100000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
@@ -52,7 +55,7 @@ TGT_LANG[4]=rus_Cyrl
 
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
-for i in {1..1}
+for i in {1..2}
 do
     echo "Model: ${MODEL[$i]}"
 

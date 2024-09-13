@@ -22,8 +22,8 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047d
-MODELS="rosonar"
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
+MODELS="rosonar" # rosonar_std"
 
 CORPUS=rocsmt_artificial
 DATA_DIR=$DATASETS/rocsmt

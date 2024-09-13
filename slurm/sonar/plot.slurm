@@ -20,7 +20,7 @@ module load pytorch-gpu/py3/2.3.0
 source $HOME/.bashrc
 source $HOME/.bash_profile
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
 SCORES_DIR=$EXPERIMENT_DIR/scores
 
 METRICS="bleu comet"

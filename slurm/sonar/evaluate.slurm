@@ -22,9 +22,9 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047g
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
 # MODELS="nllb1b sonar nllb600m"
-MODELS="rosonar"
+MODELS="rosonar" # rosonar_std"
 
 # Multilingual
 

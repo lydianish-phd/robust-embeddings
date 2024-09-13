@@ -16,7 +16,8 @@ MODEL_NAMES = {
     "nllb1b": "NLLB-1.3B",
     "nllb600m": "NLLB-600M",
     "sonar": "SONAR",
-    "rosonar": "RoSONAR"
+    "rosonar": "RoSONAR",
+    "rosonar_std": "RoSONAR w/o UGC",
 }
 
 METRIC_NAMES = {
