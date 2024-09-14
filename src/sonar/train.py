@@ -24,12 +24,13 @@ from accelerate import Accelerator
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
-    parser.add_argument("--checkpoint-dir", help="path to saved checkpoint", type=str)
+    parser.add_argument("--model-name", help="name of the model to train", type=str, default="rosonar")
+    parser.add_argument("--resume-last", help="whether to resume training from last checkpoint", type=bool, default=True)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--accumulation-steps", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
-    parser.add_argument("--no-ugc-en", help="no artificial UGC English in training data", action="store_true")
+    parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -60,15 +61,15 @@ if __name__=="__main__":
     data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
     data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
 
-    if args.no_ugc_en:
-        data_en_2_files = {
-            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-        }
-    else:
+    if args.ugc_en:
         data_en_2_files = {
             "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
             "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+        }        
+    else:
+        data_en_2_files = {
+            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
         }
     data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
     data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
@@ -111,8 +112,10 @@ if __name__=="__main__":
 
     print("Training student model...")
 
+    checkpoint_dir = f"{args.output_dir}/models/{args.model_name}"
+    
     training_args = TrainingArguments(
-        output_dir=f"{args.output_dir}/models",
+        output_dir=checkpoint_dir,
         log_level="info",
         bf16=True,
         logging_dir=f"{args.output_dir}/tensorboard",
@@ -123,7 +126,7 @@ if __name__=="__main__":
         metric_for_best_model="loss",
         report_to="tensorboard",
         push_to_hub=False,
-        dataloader_num_workers=8,
+        dataloader_num_workers=64,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
@@ -153,8 +156,6 @@ if __name__=="__main__":
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
-    resume_from_checkpoint = False
-    if os.path.isdir(args.checkpoint_dir):
-        resume_from_checkpoint = len(os.listdir(args.checkpoint_dir)) > 0
+    resume_from_checkpoint = args.resume_last and os.path.exists(checkpoint_dir) and len(os.listdir(checkpoint_dir)) > 0
     trainer.train(resume_from_checkpoint=resume_from_checkpoint)
 

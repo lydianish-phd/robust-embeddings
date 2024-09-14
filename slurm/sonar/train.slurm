@@ -29,16 +29,15 @@ set -e
 DATA_CONFIG=0
 
 MODEL[0]="rosonar"
-NO_UGC_EN[0]=""
+UGC_EN[0]=True
 
 MODEL[1]="rosonar_std"
-NO_UGC_EN[1]="--no-ugc-en"
+UGC_EN[1]=False
 
 # Setting the experiment parameters
 
 EXPERIMENT_NUM="047f"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
-CHECKPOINT_DIR=$EXPERIMENT_DIR/models/${MODEL[$DATA_CONFIG]}
 
 SEED=42
 ACCUMULATION_STEPS=$((32 / SLURM_NNODES))
@@ -79,12 +78,12 @@ export LAUNCHER="accelerate launch \
 export PROGRAM="\
     $HOME/robust-embeddings/src/sonar/train.py \
     -o $EXPERIMENT_DIR \
+    --model-name ${MODEL[$DATA_CONFIG]} \
     --seed $SEED \
-    --checkpoint-dir $CHECKPOINT_DIR \
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    ${NO_UGC_EN[$DATA_CONFIG]}
+    --ugc-en ${UGC_EN[$DATA_CONFIG]}
     "
 
 export CMD="$LAUNCHER $PROGRAM"
