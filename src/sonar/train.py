@@ -143,7 +143,7 @@ if __name__=="__main__":
         eval_steps=10_000,
         label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
         seed=args.seed,
-        resume_from_checkpoint=args.checkpoint_dir
+        resume_from_checkpoint=checkpoint_dir
     )
 
     trainer = SonarDistillationTrainer(
