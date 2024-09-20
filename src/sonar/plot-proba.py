@@ -85,7 +85,7 @@ if __name__ == "__main__":
     print("Plotting language scores...")
     output_file = f"{args.scores_dir}/noise_proba_plot_all.pdf"
     plt.clf()
-    fig, axes = plt.subplots(nrows=len(args.metrics), ncols=len(target_langs), sharex=True, sharey=True, figsize=(15, 6))
+    fig, axes = plt.subplots(nrows=len(args.metrics), ncols=len(target_langs), sharex=True, figsize=(15, 6))
 
     for i, metric in enumerate(args.metrics):
         axes[i, 0].set_ylabel(f"{METRIC_NAMES[metric]} score", fontsize=16)
@@ -108,14 +108,19 @@ if __name__ == "__main__":
     # Remove individual x-axis labels
     for ax in axes.flat:
         ax.set_xlabel('')
-
-    # Remove individual legends (except for the top right one)
-    for ax in axes[:,:-1].flat:
-        ax.legend_.remove()
-    axes[-1,-1].legend_.remove()
-    axes[0,-1].legend(fontsize=14)
+        ax.set_xticks(probas)
     
+    # Remove individual y-axis labels (except for the leftmost ones)
+    for ax in axes[:,1:].flat:
+        ax.set_ylabel('')
+
+    # Remove individual legends
+    for ax in axes.flat:
+        ax.legend_.remove()
+    handles, labels = axes[0,0].get_legend_handles_labels()
+    fig.legend(handles, labels, fontsize=14, loc="upper center", bbox_to_anchor=(0.5, 1.075), ncol=3)
+
     plt.tight_layout()
-    plt.savefig(output_file)
+    plt.savefig(output_file, bbox_inches='tight')
 
 
