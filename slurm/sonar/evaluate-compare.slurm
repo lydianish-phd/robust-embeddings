@@ -31,10 +31,8 @@ SRC_FILE=${DATA_DIR}/raw.en.test
 REF_FILE=${DATA_DIR}/norm.en.test
 SYS_FILE_SUFFIX=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
-echo "Copying $SRC_FILE to $OUTPUT_DIR/$SYS_FILE_SUFFIX"
-
 SYS_FILES=()
-for MODEL IN $MODELS
+for MODEL in $MODELS
 do 
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/$SYS_FILE_SUFFIX")
