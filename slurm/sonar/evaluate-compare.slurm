@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=40	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=2:00:00                # Time limit hrs:min:sec
+#SBATCH --time=1:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
@@ -40,7 +40,12 @@ done
 
 echo "Comparing scores for $MODELS"
 
-comet-compare -s ${SRC_FILE} -r ${REF_FILE} -t ${SYS_FILES[@]} --model Unbabel/wmt22-comet-da 
+comet-compare --model Unbabel/wmt22-comet-da \
+    -s ${SRC_FILE} \
+    -r ${REF_FILE} \
+    -t ${SYS_FILES[@]} \
+    --num_workers 20 \
+    --to_json $EXPERIMENT_DIR/scores/comet_compare_rocsmt_eng_Latn-eng_Latn_raw.en.test.out.json
 
 echo "Done..."
 
