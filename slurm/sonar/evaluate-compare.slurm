@@ -33,8 +33,6 @@ SYS_FILE_SUFFIX=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
 echo "Copying $SRC_FILE to $OUTPUT_DIR/$SYS_FILE_SUFFIX"
 
-cp $SRC_FILE $OUTPUT_DIR/$SYS_FILE_SUFFIX
-
 SYS_FILES=()
 for MODEL IN $MODELS
 do 
