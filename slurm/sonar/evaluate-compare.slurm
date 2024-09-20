@@ -40,7 +40,7 @@ done
 
 echo "Comparing scores for $MODELS"
 
-comet-compare -s ${SRC_FILE} -r ${REF_FILE} -t ${SYS_FILES[@]} --model wmt22-comet-da 
+comet-compare -s ${SRC_FILE} -r ${REF_FILE} -t ${SYS_FILES[@]} --model Unbabel/wmt22-comet-da 
 
 echo "Done..."
 
