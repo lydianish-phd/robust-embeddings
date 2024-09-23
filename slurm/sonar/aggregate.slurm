@@ -8,7 +8,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-5
+#SBATCH --array=0-4
 ##SBATCH --partition=prepost
 
 set -e 
@@ -83,7 +83,14 @@ then
         -s $SEEDS \
         -p $PROBAS
 else
-    python $HOME/robust-embeddings/src/sonar/aggregate.py \
+    # python $HOME/robust-embeddings/src/sonar/aggregate.py \
+    #     -i $EXPERIMENT_DIR \
+    #     -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
+    #     -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
+    #     -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
+    #     -m ${MODELS[@]}
+
+    python $HOME/robust-embeddings/src/sonar/aggregate-stats.py \
         -i $EXPERIMENT_DIR \
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \

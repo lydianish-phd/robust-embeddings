@@ -1,4 +1,5 @@
 SCORE_FILE_SUFFIX = ".out.json"
+STATS_FILE_PREFIX = "stats."
 
 ROCSMT_CORPUS_NAME = "rocsmt"
 FLORES_CORPUS_NAME = "flores200"
@@ -70,4 +71,12 @@ MULTILINGUAL_COLUMNS = [
     "avg__rocsmt__raw.en.test",
     "delta__avg__flores200",
     "delta__avg__rocsmt"
+]
+
+STATS = [
+    "fertility",
+    "TTR (%)",
+    "urls",
+    "usernames",
+    "hashtags"
 ]
