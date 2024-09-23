@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=15
+#SBATCH --array=0-28
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -23,8 +23,8 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
-# MODELS="nllb1b sonar nllb600m"
-MODELS="rosonar" # rosonar_std"
+MODELS="nllb1b sonar nllb600m"
+# MODELS="rosonar" # rosonar_std"
 
 # Multilingual
 
@@ -183,6 +183,8 @@ SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
 SYS_FILES=()
 
+SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
+
 echo "Models: $MODELS"
 
 for MODEL in $MODELS
@@ -191,10 +193,14 @@ do
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
 done
 
-python $HOME/robust-embeddings/src/sonar/evaluate.py \
-    --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
-    --sys-files "${SYS_FILES[@]}" \
-    --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
+# python $HOME/robust-embeddings/src/sonar/evaluate.py \
+#     --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+#     --sys-files "${SYS_FILES[@]}" \
+#     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
+
+python $HOME/robust-embeddings/src/sonar/stats.py \
+    -i "${SYS_FILES[@]}" \
+    -m $SPM_MODEL
 
 echo "Done..."
 

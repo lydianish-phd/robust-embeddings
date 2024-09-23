@@ -31,6 +31,7 @@ SRC_FILE=${DATA_DIR}/raw.en.test
 REF_FILE=${DATA_DIR}/norm.en.test
 SYS_FILE_SUFFIX=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 
+SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
 
 OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
 mkdir -p $OUTPUT_DIR/rocsmt/eng_Latn-eng_Latn/
@@ -43,10 +44,14 @@ SYS_FILES=("$OUTPUT_DIR/$SYS_FILE_SUFFIX")
 
 echo "Evaluating $MODEL baseline on $SRC_FILE"
 
-python $HOME/robust-embeddings/src/sonar/evaluate.py \
-    --src-file ${SRC_FILE} \
-    --sys-files "${SYS_FILES[@]}" \
-    --ref-file ${REF_FILE}
+# python $HOME/robust-embeddings/src/sonar/evaluate.py \
+#     --src-file ${SRC_FILE} \
+#     --sys-files "${SYS_FILES[@]}" \
+#     --ref-file ${REF_FILE}
+
+python $HOME/robust-embeddings/src/sonar/stats.py \
+    -i "${SYS_FILES[@]}" \
+    -m $SPM_MODEL
 
 echo "Done..."
 
