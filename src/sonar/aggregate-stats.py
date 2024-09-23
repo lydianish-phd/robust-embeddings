@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--models", type=str, nargs="+")
     args = parser.parse_args()
 
-    all_scores = { key: { "model": [ MODEL_NAMES[model] for model in args.models ] } for key in STATS }
+    all_scores = { key: { "model": [ MODEL_NAMES[model] for model in args.models ] } for key in STAT_NAMES }
 
     print(f"Aggregating {args.table_name} stats...")
 
