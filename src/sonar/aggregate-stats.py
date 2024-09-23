@@ -44,7 +44,5 @@ if __name__ == "__main__":
     os.makedirs(scores_dir, exist_ok=True)
     for stat in STAT_NAMES:
         score_file = os.path.join(scores_dir, f"{stat}_{args.table_name}.csv")
-        scores_df = pd.DataFrame.from_dict(all_scores[stat])
-        print(scores_df)
-        scores_df = scores_df.T
-        scores_df.to_csv(score_file, index=False)
+        scores_df = pd.DataFrame.from_dict(all_scores[stat]).set_index("model").T
+        scores_df.to_csv(score_file)
