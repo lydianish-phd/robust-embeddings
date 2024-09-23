@@ -35,9 +35,9 @@ if __name__ == "__main__":
                             scores = json.load(f)
                         for stat in STATS:
                             if column_name in all_scores[stat]:
-                                all_scores[stat][column_name].append(scores["bleu"])
+                                all_scores[stat][column_name].append(scores[stat])
                             else:
-                                all_scores[stat][column_name] = [scores["bleu"]]
+                                all_scores[stat][column_name] = [scores[stat]]
 
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
