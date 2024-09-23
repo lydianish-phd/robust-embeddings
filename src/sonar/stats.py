@@ -38,10 +38,10 @@ if __name__ == "__main__":
         with open(input_file, "r") as f:
             for line in f:
                 words = line.split()
+                if len(words) == 0:
+                    continue
                 tokens = sp.encode(line)
                 types = set(tokens)
-                if len(words) == 0:
-                    print(line)
                 fertilities.append(len(tokens) / len(words))
                 type_token_ratios.append(len(types) / len(tokens))
                 results = find_usernames_hashtags_urls(line)
