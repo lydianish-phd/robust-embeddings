@@ -26,6 +26,16 @@ METRIC_NAMES = {
     "comet": "COMET",
 }
 
+STAT_NAMES = { 
+    key: key for key in [
+        "fertility",
+        "urls",
+        "usernames",
+        "hashtags"
+    ]
+}
+STAT_NAMES["ttr"] = "TTR (%)"
+
 LANG_NAMES = {
     "eng_Latn": "English",
     "fra_Latn": "French",
@@ -73,10 +83,3 @@ MULTILINGUAL_COLUMNS = [
     "delta__avg__rocsmt"
 ]
 
-STATS = [
-    "fertility",
-    "TTR (%)",
-    "urls",
-    "usernames",
-    "hashtags"
-]
