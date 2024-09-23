@@ -24,7 +24,7 @@ set -e
 
 SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
 MODELS="nllb1b sonar nllb600m"
 # MODELS="rosonar" # rosonar_std"
 
