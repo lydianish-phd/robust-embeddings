@@ -24,7 +24,7 @@ if __name__ == "__main__":
     sp = spm.SentencePieceProcessor(model_file=args.spm_model)
     
     for input_file in args.input_files:
-        output_dir, filename = os.path.split(args.input_file)
+        output_dir, filename = os.path.split(input_file)
         output_file = os.path.join(output_dir, f"stats.{filename}.json")
 
         fertilities = []
@@ -33,9 +33,9 @@ if __name__ == "__main__":
         usernames = []
         hashtags = []
 
-        print(f"Calculating stats for {args.input_file}...")
+        print(f"Calculating stats for {input_file}...")
 
-        with open(args.input_file, "r") as f:
+        with open(input_file, "r") as f:
             for line in f:
                 words = line.split()
                 tokens = sp.encode(line)
