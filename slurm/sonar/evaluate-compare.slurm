@@ -45,6 +45,7 @@ comet-compare --model Unbabel/wmt22-comet-da \
     -r ${REF_FILE} \
     -t ${SYS_FILES[@]} \
     --num_workers 20 \
+    --only_system \
     --to_json $EXPERIMENT_DIR/scores/comet_compare_rocsmt_eng_Latn-eng_Latn_raw.en.test.out.json
 
 echo "Done..."
