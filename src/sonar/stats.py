@@ -27,31 +27,32 @@ if __name__ == "__main__":
         output_dir, filename = os.path.split(input_file)
         output_file = os.path.join(output_dir, f"stats.{filename}.json")
 
-        fertilities = []
-        type_token_ratios = []
+        words = []
+        types = set()
+        tokens = []
         urls = []
         usernames = []
         hashtags = []
 
-        print(f"Calculating stats for {input_file}...")
+        print(f"Calculating stats for {args.input_file}...")
 
-        with open(input_file, "r") as f:
+        with open(args.input_file, "r") as f:
             for line in f:
-                words = line.split()
-                if len(words) == 0:
-                    continue
-                tokens = sp.encode(line)
-                types = set(tokens)
-                fertilities.append(len(tokens) / len(words))
-                type_token_ratios.append(len(types) / len(tokens))
+                words.extend(line.split())
+                line_tokens = sp.encode(line)
+                tokens.extend(line_tokens)
+                types.update(line_tokens)
                 results = find_usernames_hashtags_urls(line)
                 urls.extend(results["urls"])
                 usernames.extend(results["usernames"])
                 hashtags.extend(results["hashtags"])
         
+        
         stats = {
-            "fertility": round(np.array(fertilities).mean(), 2),
-            "TTR (%)": round(np.array(type_token_ratios).mean() * 100, 2),
+            "fertility": round(len(tokens) / len(words), 2),
+            "types": len(types),
+            "tokens": len(tokens),
+            "TTR (%)": round(len(types) / len(tokens) * 100, 2),
             "urls": len(urls),
             "usernames": len(usernames),
             "hashtags": len(hashtags)
