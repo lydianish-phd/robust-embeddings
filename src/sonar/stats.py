@@ -34,9 +34,9 @@ if __name__ == "__main__":
         usernames = []
         hashtags = []
 
-        print(f"Calculating stats for {args.input_file}...")
+        print(f"Calculating stats for {input_file}...")
 
-        with open(args.input_file, "r") as f:
+        with open(input_file, "r") as f:
             for line in f:
                 words.extend(line.split())
                 line_tokens = sp.encode(line)
