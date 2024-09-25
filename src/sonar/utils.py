@@ -26,17 +26,16 @@ METRIC_NAMES = {
     "comet": "COMET",
 }
 
-STAT_NAMES = { 
-    key: key for key in [
-        "fertility",
-        "types",
-        "tokens",
-        "urls",
-        "usernames",
-        "hashtags"
-    ]
-}
-STAT_NAMES["ttr"] = "TTR (%)"
+STATS =  [
+    "fertility",
+    "types",
+    "tokens",
+    "ttr",
+    "urls",
+    "usernames",
+    "hashtags"
+]
+
 
 LANG_NAMES = {
     "eng_Latn": "English",

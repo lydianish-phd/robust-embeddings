@@ -49,10 +49,10 @@ if __name__ == "__main__":
         
         
         stats = {
-            "fertility": round(len(tokens) / len(words), 2),
+            "fertility": len(tokens) / len(words),
             "types": len(types),
             "tokens": len(tokens),
-            "TTR (%)": round(len(types) / len(tokens) * 100, 2),
+            "ttr": len(types) / len(tokens),
             "urls": len(urls),
             "usernames": len(usernames),
             "hashtags": len(hashtags)

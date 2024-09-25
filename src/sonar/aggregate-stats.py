@@ -5,7 +5,7 @@ from utils import (
     SCORE_FILE_SUFFIX,
     MODEL_NAMES,
     COLUMN_NAME_SEPARATOR,
-    STAT_NAMES,
+    STATS,
     STATS_FILE_PREFIX
 )
 
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--models", type=str, nargs="+")
     args = parser.parse_args()
 
-    all_scores = { key: { "model": [ MODEL_NAMES[model] for model in args.models ] } for key in STAT_NAMES }
+    all_scores = { key: { "model": [ MODEL_NAMES[model] for model in args.models ] } for key in STATS }
 
     print(f"Aggregating {args.table_name} stats...")
 
@@ -33,16 +33,16 @@ if __name__ == "__main__":
                         column_name = COLUMN_NAME_SEPARATOR.join([corpus, lang_pair, file_name])
                         with open(score_file) as f:
                             scores = json.load(f)
-                        for stat, stat_name in STAT_NAMES.items():
+                        for stat in STATS:
                             if column_name in all_scores[stat]:
-                                all_scores[stat][column_name].append(scores[stat_name])
+                                all_scores[stat][column_name].append(scores[stat])
                             else:
-                                all_scores[stat][column_name] = [scores[stat_name]]
+                                all_scores[stat][column_name] = [scores[stat]]
 
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
-    for stat in STAT_NAMES:
+    for stat in STATS:
         score_file = os.path.join(scores_dir, f"{stat}_{args.table_name}.csv")
         scores_df = pd.DataFrame.from_dict(all_scores[stat])
         scores_df.to_csv(score_file)
