@@ -33,7 +33,7 @@ MODELS="sonar nllb600m"
 # Autoencode
 
 CORPUS[28]=rocsmt
-DATA_DIR=$DATASETS/${CORPUS[28]}/test
+DATA_DIR[28]=$DATASETS/${CORPUS[28]}/test
 SRC_FILE_NAME[28]=raw.en.test
 REF_FILE_NAME[28]=norm.en.test
 LANG_PAIR[28]=eng_Latn-eng_Latn
