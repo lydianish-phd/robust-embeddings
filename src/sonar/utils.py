@@ -29,6 +29,8 @@ METRIC_NAMES = {
 STAT_NAMES = { 
     key: key for key in [
         "fertility",
+        "types",
+        "tokens",
         "urls",
         "usernames",
         "hashtags"
