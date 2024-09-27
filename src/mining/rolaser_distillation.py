@@ -10,7 +10,7 @@ from torch.nn import MSELoss, Embedding
 from torch.nn.utils.rnn import pad_sequence
 from safetensors import safe_open
 
-class DataCollatorForSonarDistillation(DefaultDataCollator):
+class DataCollatorForRoLaserDistillation(DefaultDataCollator):
   def __init__(self, tokenizer: NllbTokenizer, return_tensors: str = "pt"):
     super().__init__(return_tensors)
     self.padding_value = tokenizer.vocab_info.pad_idx
@@ -31,7 +31,7 @@ class DataCollatorForSonarDistillation(DefaultDataCollator):
     }
     return batch
 
-class SonarDistillationTrainer(Trainer):
+class RoLaserDistillationTrainer(Trainer):
     def __init__(self, teacher_model=None, student_model=None, *args, **kwargs):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model

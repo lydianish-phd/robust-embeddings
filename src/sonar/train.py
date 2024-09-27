@@ -4,9 +4,9 @@ from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
     load_sonar_tokenizer,
 )
-from sonar_distillation import (
-    DataCollatorForSonarDistillation,
-    SonarDistillationTrainer,
+from rosonar_distillation import (
+    DataCollatorForRoSonarDistillation,
+    RoSonarDistillationTrainer,
     compute_metrics,
     tokenize_inputs,
     load_student_encoder_from_checkpoint
@@ -98,7 +98,7 @@ if __name__=="__main__":
 
     print("Instantiating data collator...")
 
-    data_collator = DataCollatorForSonarDistillation(tokenizer=tokenizer)
+    data_collator = DataCollatorForRoSonarDistillation(tokenizer=tokenizer)
     data_collator = accelerator.prepare(data_collator)
 
     print("Loading teacher model...")
@@ -146,7 +146,7 @@ if __name__=="__main__":
         resume_from_checkpoint=checkpoint_dir
     )
 
-    trainer = SonarDistillationTrainer(
+    trainer = RoSonarDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,
         args=training_args,

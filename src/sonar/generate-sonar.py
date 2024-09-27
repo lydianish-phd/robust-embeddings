@@ -1,7 +1,7 @@
 import os, argparse
 import torch
 from sonar.inference_pipelines.text import TextToTextModelPipeline
-from sonar_distillation import load_student_encoder_from_checkpoint
+from rosonar_distillation import load_student_encoder_from_checkpoint
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
