@@ -25,7 +25,7 @@ class RoLaserPooler(XLMRobertaPooler):
         super().__init__(config)
         self.dense = nn.Linear(config.hidden_size, config.output_size)
         self.pooling = config.pooling
-        del self.activation
+        self.activation = None
 
     def forward(self, hidden_states, attention_mask):
         # We project the hidden states to the output size and apply the pooling strategy
@@ -59,7 +59,7 @@ class RoLaserModel(XLMRobertaModel):
         self.post_init()
     
     # Copied from transformers.models.xlm_roberta.modeling_xlm_roberta.XLMRobertaModel.forward
-    # And adapted to use the RoLaserPooler which requires the attention mask
+    # Adapted to use the RoLaserPooler which requires the attention mask
     def forward(
         self,
         input_ids: Optional[torch.Tensor] = None,
