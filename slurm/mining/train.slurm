@@ -3,7 +3,7 @@
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@v100
 #SBATCH --partition=gpu_p2
-#SBATCH --nodes=2		# node count
+#SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
