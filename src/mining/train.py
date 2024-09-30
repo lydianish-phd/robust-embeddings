@@ -73,10 +73,15 @@ if __name__=="__main__":
     all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
     all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
 
+    print("Defining initialisation checkpoint...")
+
+    xlm_checkpoint = "cardiffnlp/twitter-xlm-roberta-base"
+    xlm_checkpoint_path = os.path.join(os.environ["MODELS"], xlm_checkpoint)
+
     print("Loading tokenizers...")
 
     teacher_tokenizer = initialize_tokenizer(lang="english")
-    student_tokenizer = XLMRobertaTokenizerFast.from_pretrained("cardiffnlp/twitter-xlm-roberta-base")
+    student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
 
     print("Loading teacher model...")
 
@@ -84,8 +89,8 @@ if __name__=="__main__":
 
     print("Initializing student model...")
 
-    student_model_config = RoLaserConfig.from_pretrained("cardiffnlp/twitter-xlm-roberta-base", output_size=1024, pooling="max")
-    student_model = RoLaserModel.from_pretrained("cardiffnlp/twitter-xlm-roberta-base", config=student_model_config)
+    student_model_config = RoLaserConfig.from_pretrained(xlm_checkpoint_path, output_size=1024, pooling="max")
+    student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config)
 
     print("Instantiating data collator...")
 
