@@ -32,7 +32,6 @@ if __name__=="__main__":
     parser.add_argument("--accumulation-steps", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
-    parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
     args = parser.parse_args()
 
@@ -64,19 +63,12 @@ if __name__=="__main__":
     data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
     data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
 
-    if args.ugc_en:
-        data_en_2_files = {
-            "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-            "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-        }        
-    else:
-        data_en_2_files = {
-            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-        }
+    data_en_2_files = {
+        "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
+        "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+    }        
     data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
     data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
-
 
     all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
     all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
