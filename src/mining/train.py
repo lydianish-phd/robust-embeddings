@@ -90,7 +90,7 @@ if __name__=="__main__":
     print("Initializing student model...")
 
     student_model_config = RoLaserConfig.from_pretrained(xlm_checkpoint_path, output_size=1024, pooling="max")
-    student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config)
+    student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config, add_pooling_layer=False) #remove the pooling layer from the checkpoint
 
     print("Instantiating data collator...")
 

@@ -21,3 +21,6 @@ source $HOME/.bash_python_exports
 source activate laser_env
 
 set -e
+
+
+$SCRATCH/LASER/source/mine_bitexts.py

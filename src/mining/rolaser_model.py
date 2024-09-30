@@ -53,8 +53,8 @@ class RoLaserPooler(XLMRobertaPooler):
         return pooled_output
 
 class RoLaserModel(XLMRobertaModel):
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, config, **kwargs):
+        super().__init__(config, **kwargs)
         self.pooler = RoLaserPooler(config)
         self.post_init()
     
