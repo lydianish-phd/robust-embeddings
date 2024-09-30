@@ -28,7 +28,7 @@ set -e
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="049"
+EXPERIMENT_NUM="050"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_$EXPERIMENT_NUM
 
 SEED=42
