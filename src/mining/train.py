@@ -138,7 +138,7 @@ if __name__=="__main__":
         adam_epsilon=1e-6,
         save_steps=10_000,
         logging_steps=100,
-        eval_steps=10_000,
+        eval_steps=500, #10_000,
         label_names=['teacher_tgt_pieces'],
         seed=args.seed,
         resume_from_checkpoint=checkpoint_dir
