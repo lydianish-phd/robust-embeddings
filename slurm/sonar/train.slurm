@@ -84,7 +84,8 @@ export PROGRAM="\
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    --ugc-en ${UGC_EN[$DATA_CONFIG]}
+    --ugc-en ${UGC_EN[$DATA_CONFIG]} \
+    --dataloader-workers $SLURM_CPUS_PER_TASK
     "
 
 export CMD="$LAUNCHER $PROGRAM"
