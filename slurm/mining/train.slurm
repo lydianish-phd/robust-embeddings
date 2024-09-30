@@ -70,7 +70,6 @@ export LAUNCHER="accelerate launch \
 export PROGRAM="\
     $HOME/robust-embeddings/src/mining/train.py \
     -o $EXPERIMENT_DIR \
-    --model-name ${MODEL[$DATA_CONFIG]} \
     --seed $SEED \
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \

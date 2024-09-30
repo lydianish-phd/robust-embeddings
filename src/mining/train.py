@@ -27,7 +27,6 @@ from accelerate import Accelerator
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--output-dir", help="path to output directory", type=str)
-    parser.add_argument("--model-name", help="name of the model to train", type=str, default="rosonar")
     parser.add_argument("--resume-last", help="whether to resume training from last checkpoint", type=bool, default=True)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--accumulation-steps", type=int, default=32)
@@ -111,7 +110,7 @@ if __name__=="__main__":
 
     print("Training student model...")
 
-    checkpoint_dir = f"{args.output_dir}/models/{args.model_name}"
+    checkpoint_dir = f"{args.output_dir}/models"
     
     training_args = TrainingArguments(
         output_dir=checkpoint_dir,
