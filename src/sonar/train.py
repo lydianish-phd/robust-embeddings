@@ -20,6 +20,7 @@ from transformers import (
     EarlyStoppingCallback
 )
 from accelerate import Accelerator
+import torch
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -31,6 +32,7 @@ if __name__=="__main__":
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
     parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
+    parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -90,10 +92,22 @@ if __name__=="__main__":
 
     max_seq_len = 512
 
-    tokenized_train_data = all_train_data.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
+    tokenized_train_data = all_train_data.map(
+        tokenize_inputs,
+        batched=True,
+        drop_last_batch=True,
+        fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
+        num_proc=torch.cuda.device_count() # one process per GPU
+    )
     tokenized_train_data = tokenized_train_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
-    tokenized_valid_data = all_valid_data.map(tokenize_inputs, batched=True, drop_last_batch=True, fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx})
+    tokenized_valid_data = all_valid_data.map(
+        tokenize_inputs,
+        batched=True,
+        drop_last_batch=True,
+        fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
+        num_proc=torch.cuda.device_count() # one process per GPU
+    )
     tokenized_valid_data = tokenized_valid_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     print("Instantiating data collator...")
@@ -126,7 +140,7 @@ if __name__=="__main__":
         metric_for_best_model="loss",
         report_to="tensorboard",
         push_to_hub=False,
-        dataloader_num_workers=64,
+        dataloader_num_workers=args.dataloader_workers,
         auto_find_batch_size=True, # per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
