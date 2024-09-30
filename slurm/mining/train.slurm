@@ -1,45 +1,40 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --nodes=1                # node count
-#SBATCH --ntasks-per-node=1               # total number of tasks across all nodes
-#SBATCH --partition=almanach          # Name of the partition
-#SBATCH --account=almanach        # GPU nodes are only available in gpu partition
-#SBATCH --gres=gpu:rtx8000:1        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-gpu=16
+#SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2
+#SBATCH --nodes=2		# node count
+#SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
+#SBATCH --gres=gpu:8        # numper of GPUs per node
+#SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=00:20:00                # Time limit hrs:min:sec
-#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
+#SBATCH --time=0:20:00                # Time limit hrs:min:sec
+#SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
+#SBATCH --array=0
+#SBATCH --exclusive
+#SBATCH --qos=qos_gpu-dev #qos_gpu-t4
 
 echo "### Running $SLURM_JOB_NAME ###"
 
 module purge
-# module load cuda/10.2
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
-source activat pt_env
+
+#module load cpuarch/amd pytorch-gpu/py3/2.0.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load pytorch-gpu/py3/2.0.0
 
 set -e
 
 # Setting the experiment parameters
-DATA_CONFIG=0
 
-EXPERIMENT_NUM[0]="047f"
-NO_UGC_EN[0]="" #"--no-ugc-en"
-
-EXPERIMENT_NUM[1]="047g"
-NO_UGC_EN[1]=#"--no-ugc-en"
-
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/draft_experiment
-CHECKPOINT_DIR=$EXPERIMENT_DIR/models
+EXPERIMENT_NUM="049"
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_$EXPERIMENT_NUM
 
 SEED=42
 ACCUMULATION_STEPS=1 #$((32 / SLURM_NNODES))
 LEARNING_RATE=2e-5 #2e-3
 LR_SCHEDULER=linear #inverse_sqrt
-
-echo "Training student model $SLURM_ARRAY_TASK_ID..."
 
 echo "Setting the accelerate config..."
 
@@ -51,7 +46,7 @@ fi
 
 MASTER_ADDR=$(scontrol show hostnames $SLURM_JOB_NODELIST | head -n 1)
 MASTER_PORT=12345
-GPUS_PER_NODE=4
+GPUS_PER_NODE=8
 NUM_PROCESSES=$((SLURM_NNODES * GPUS_PER_NODE))
 
 echo "MASTER_ADDR: $MASTER_ADDR"
@@ -75,12 +70,13 @@ export LAUNCHER="accelerate launch \
 export PROGRAM="\
     $HOME/robust-embeddings/src/mining/train.py \
     -o $EXPERIMENT_DIR \
+    --model-name ${MODEL[$DATA_CONFIG]} \
     --seed $SEED \
-    --checkpoint-dir $CHECKPOINT_DIR \
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    ${NO_UGC_EN[$DATA_CONFIG]}
+    --ugc-en ${UGC_EN[$DATA_CONFIG]} \
+    --dataloader-workers $SLURM_CPUS_PER_TASK
     "
 
 export CMD="$LAUNCHER $PROGRAM"
