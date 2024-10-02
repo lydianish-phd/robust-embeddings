@@ -63,12 +63,33 @@ if __name__=="__main__":
     print("Tokenizing dataset...")
 
     max_seq_len = 512
+    first_lang = "eng_Latn"
+    second_lang = "fra_Latn"
 
+    # tokenized_data_en_fr = data_en_fr.map(
+    #     tokenize_inputs,
+    #     batched=True,
+    #     batch_size=10_000,
+    #     fn_kwargs={
+    #         "first_tokenizer": tokenizers[first_lang], 
+    #         "first_lang": first_lang, 
+    #         "second_tokenizer": tokenizers[second_lang], 
+    #         "second_lang": second_lang, 
+    #         "max_seq_len": max_seq_len, 
+    #         "pad_idx": tokenizer.vocab_info.pad_idx
+    #     },
+    #     remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
+    #     num_proc=args.num_processes
+    # )
     tokenized_data_en_fr = data_en_fr.map(
         tokenize_inputs,
         batched=True,
         batch_size=10_000,
-        fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
+        fn_kwargs={
+            "tokenizer": tokenizer,
+            "max_seq_len": max_seq_len, 
+            "pad_idx": tokenizer.vocab_info.pad_idx
+        },
         remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
         num_proc=args.num_processes
     )

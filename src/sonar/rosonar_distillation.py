@@ -96,17 +96,42 @@ def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     padded_tensor = torch.cat((tensor, padding), dim=0)
     return padded_tensor[:max_length]
 
-def tokenize_inputs(examples, first_tokenizer, second_tokenizer, first_lang, second_lang, max_seq_len, pad_idx):
+def _choose_tokenizer(first_tokenizer, second_tokenizer, first_lang, second_lang, lang):
+    if lang == first_lang:
+        return first_tokenizer
+    elif lang == second_lang:
+        return second_tokenizer
+    else:
+        raise ValueError(f"Unknown language {lang}. Possible values are {first_lang} or {second_lang}")
+
+# def tokenize_inputs(examples, first_tokenizer, second_tokenizer, first_lang, second_lang, max_seq_len, pad_idx):
+#     src_sentence_ids = []
+#     for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
+#         tokenizer = _choose_tokenizer(first_tokenizer, second_tokenizer, first_lang, second_lang, source_lang)
+#         src_sentence_ids.append(_tokenize_and_pad(tokenizer,sentence,max_seq_len,pad_idx))
+    
+#     tgt_sentence_ids = []
+#     for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]):
+#         tokenizer = _choose_tokenizer(first_tokenizer, second_tokenizer, first_lang, second_lang, target_lang)
+#         tgt_sentence_ids.append(_tokenize_and_pad(tokenizer,sentence,max_seq_len,pad_idx))
+    
+#     model_inputs = {
+#         "src_sentence_ids": src_sentence_ids,
+#         "tgt_sentence_ids": tgt_sentence_ids
+#     }
+#     return model_inputs
+
+def tokenize_inputs(examples, tokenizer, max_seq_len, pad_idx):
     src_sentence_ids = []
     for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
-        if source_lang == first_lang:
-            tokenizer = first_tokenizer 
-        elif source_lang == second_lang:
-            tokenizer = second_tokenizer
-        else:
-            raise ValueError(f"Unknown language {source_lang}. Possible values are {first_lang} or {second_lang}")
-        src_sentence_ids.append(_tokenize_and_pad(tokenizers[source_lang],sentence,max_seq_len,pad_idx))
-    tgt_sentence_ids = [ _tokenize_and_pad(tokenizers[target_lang],sentence,max_seq_len,pad_idx) for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
+        src_tokenizer = tokenizer.create_encoder(lang=source_lang)
+        src_sentence_ids.append(_tokenize_and_pad(src_tokenizer,sentence,max_seq_len,pad_idx))
+    
+    tgt_sentence_ids = []
+    for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]):
+        tgt_tokenizer = tokenizer.create_encoder(lang=target_lang)
+        tgt_sentence_ids.append(_tokenize_and_pad(tgt_tokenizer,sentence,max_seq_len,pad_idx))
+    
     model_inputs = {
         "src_sentence_ids": src_sentence_ids,
         "tgt_sentence_ids": tgt_sentence_ids
