@@ -15,8 +15,6 @@ if __name__=="__main__":
     parser.add_argument("--num-processes", help="number of processes", type=int, default=8)
     args = parser.parse_args()
 
-    accelerator = Accelerator()
-
     print("Loading datasets...")
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
