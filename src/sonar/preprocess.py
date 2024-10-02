@@ -1,3 +1,15 @@
+import os, argparse
+
+from sonar.models.sonar_text.loader import (
+    load_sonar_tokenizer,
+)
+from rosonar_distillation import (
+    tokenize_inputs
+)
+from datasets import (
+    load_dataset
+)
+
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--num-processes", help="number of processes", type=int, default=8)
