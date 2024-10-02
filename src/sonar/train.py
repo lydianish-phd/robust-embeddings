@@ -8,7 +8,6 @@ from rosonar_distillation import (
     DataCollatorForRoSonarDistillation,
     RoSonarDistillationTrainer,
     compute_metrics,
-    tokenize_inputs,
     load_student_encoder_from_checkpoint
 )
 from datasets import (
@@ -39,75 +38,49 @@ if __name__=="__main__":
 
     print("Loading datasets...")
 
-    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
-    monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized")
 
-    data_en_fr_files = {
-        "train": f"{bilingual_data_dir}/eng-fra/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl",
-        "valid": f"{bilingual_data_dir}/eng-fra/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
-    }
-    data_en_fr = load_dataset("json", data_files=data_en_fr_files, streaming=True)
-    data_en_fr = data_en_fr.shuffle(seed=args.seed, buffer_size=10_000)
-
-    data_fr_files = {
-        "train": f"{monolingual_data_dir}/fra/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/fra/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
-    }
-    data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
-    data_fr = data_fr.shuffle(seed=args.seed, buffer_size=10_000)
-
-    data_en_1_files = {
-        "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-        "valid": f"{monolingual_data_dir}/eng/part1/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    }
-    data_en_1 = load_dataset("json", data_files=data_en_1_files, streaming=True)
-    data_en_1 = data_en_1.shuffle(seed=args.seed, buffer_size=10_000)
-
-    if args.ugc_en:
-        data_en_2_files = {
-            "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-            "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-        }        
-    else:
-        data_en_2_files = {
-            "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-            "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
+    all_metadata = {
+        "en-fr": {
+            "input_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra/",
+            "lang_pair": "eng_Latn-fra_Latn"
+        },
+        "fr": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/fra/",
+            "lang_pair": "fra_Latn-fra_Latn"
+        },
+        "en_1": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        },
+        "en_2": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        },
+        "en_2_ugc": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc/",
+            "lang_pair": "eng_Latn-eng_Latn"
         }
-    data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
-    data_en_2 = data_en_2.shuffle(seed=args.seed, buffer_size=10_000)
+    }
 
+    tokenized_data = {}
+    for lang_pair, metadata in all_metadata.items():
+        if lang_pair == "en_2" and args.ugc_en:
+            continue
+        elif lang_pair == "en_2_ugc" and not args.ugc_en:
+            continue
+        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
+        tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
+        tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
+    
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
+    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed)
 
-    all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en_1["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
-    all_valid_data = interleave_datasets([data_en_fr["valid"], data_fr["valid"], data_en_1["valid"], data_en_2["valid"]], seed=args.seed)
-
-    print("Loading tokenizers...")
+    print("Loading tokenizer...")
 
     tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
-    tokenizers = {
-        "eng_Latn": tokenizer.create_encoder(lang="eng_Latn"),
-        "fra_Latn": tokenizer.create_encoder(lang="fra_Latn")
-    }
-
-    print("Tokenizing dataset...")
-
-    max_seq_len = 512
-
-    tokenized_train_data = all_train_data.map(
-        tokenize_inputs,
-        batched=True,
-        batch_size=10_000,
-        fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
-        remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"]
-    )
-
-    tokenized_valid_data = all_valid_data.map(
-        tokenize_inputs,
-        batched=True,
-        batch_size=10_000,
-        fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
-        remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"]
-    )
-
+    
     print("Instantiating data collator...")
 
     data_collator = DataCollatorForRoSonarDistillation(tokenizer=tokenizer)
