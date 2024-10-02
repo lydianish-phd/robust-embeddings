@@ -96,8 +96,16 @@ def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     padded_tensor = torch.cat((tensor, padding), dim=0)
     return padded_tensor[:max_length]
 
-def tokenize_inputs(examples, tokenizers, max_seq_len, pad_idx):
-    src_sentence_ids = [ _tokenize_and_pad(tokenizers[source_lang],sentence,max_seq_len,pad_idx) for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]) ]
+def tokenize_inputs(examples, first_tokenizer, second_tokenizer, first_lang, second_lang, max_seq_len, pad_idx):
+    src_sentence_ids = []
+    for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
+        if source_lang == first_lang:
+            tokenizer = first_tokenizer 
+        elif source_lang == second_lang:
+            tokenizer = second_tokenizer
+        else:
+            raise ValueError(f"Unknown language {source_lang}. Possible values are {first_lang} or {second_lang}")
+        src_sentence_ids.append(_tokenize_and_pad(tokenizers[source_lang],sentence,max_seq_len,pad_idx))
     tgt_sentence_ids = [ _tokenize_and_pad(tokenizers[target_lang],sentence,max_seq_len,pad_idx) for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]) ]
     model_inputs = {
         "src_sentence_ids": src_sentence_ids,
