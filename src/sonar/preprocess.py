@@ -70,7 +70,7 @@ if __name__=="__main__":
         batch_size=10_000,
         fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
         remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
-        num_procs=args.num_processes
+        num_proc=args.num_processes
     )
     
     n_shards = {
