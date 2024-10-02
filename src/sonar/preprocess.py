@@ -10,101 +10,78 @@ from datasets import (
     load_dataset
 )
 
+
+def write_to_jsonl(data, output_dir_prefix, lang_pair):
+    for split, split_dataset in data.items():
+        output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
+        os.makedirs(output_dir, exist_ok=True)
+        for i in range(split_dataset.n_shards):
+            split_dataset.shard(
+                num_shards=split_dataset.n_shards,
+                index=i, contiguous=True
+            ).to_json(
+                f"{output_dir}/{split}.{lang_pair}-{i}.jsonl"
+            )
+
+def tokenize_data(data, tokenizer, max_seq_len, num_proc):
+    return data.map(
+            tokenize_inputs,
+            batched=True,
+            batch_size=20_000,
+            fn_kwargs={"tokenizer": tokenizer, "max_seq_len": max_seq_len},
+            remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
+            num_proc=num_proc
+        )
+
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--num-processes", help="number of processes", type=int, default=8)
     args = parser.parse_args()
 
-    print("Loading datasets...")
-
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
-    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized")
     monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized")
     tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized")
 
-    data_en_fr_files = {
-        "train": f"{bilingual_data_dir}/eng-fra/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl",
-        "valid": f"{bilingual_data_dir}/eng-fra/valid.eng_Latn-fra_Latn_chunks/valid.eng_Latn-fra_Latn-*.jsonl"
+    all_metadata = {
+        "en-fr": {
+            "input_dir_prefix": f"{bilingual_data_dir}/eng-fra/",
+            "output_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra/",
+            "lang_pair": "eng_Latn-fra_Latn"
+        },
+        "fr": {
+            "input_dir_prefix": f"{monolingual_data_dir}/fra/",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/fra/",
+            "lang_pair": "fra_Latn-fra_Latn"
+        },
+        "en_1": {
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part1/",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        },
+        "en_2": {
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2/",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        },
+        "en_2_ugc": {
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2_ugc/",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        }
     }
-    data_en_fr = load_dataset("json", data_files=data_en_fr_files)
 
-    # data_fr_files = {
-    #     "train": f"{monolingual_data_dir}/fra/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl",
-    #     "valid": f"{monolingual_data_dir}/fra/valid.fra_Latn-fra_Latn_chunks/valid.fra_Latn-fra_Latn-*.jsonl"
-    # }
-    # data_fr = load_dataset("json", data_files=data_fr_files)
-
-    # data_en_1_files = {
-    #     "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #     "valid": f"{monolingual_data_dir}/eng/part1/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    # }
-    # data_en_1 = load_dataset("json", data_files=data_en_1_files)
-
-    # data_en_2_ugc_files = {
-    #     "train": f"{monolingual_data_dir}/eng/part2_ugc/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #     "valid": f"{monolingual_data_dir}/eng/part2_ugc/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    # }        
-    # data_en_2_ugc = load_dataset("json", data_files=data_en_2_ugc_files)
-
-    # data_en_2_files = {
-    #     "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl",
-    #     "valid": f"{monolingual_data_dir}/eng/part2/valid.eng_Latn-eng_Latn_chunks/valid.eng_Latn-eng_Latn-*.jsonl"
-    # }
-    # data_en_2 = load_dataset("json", data_files=data_en_2_files)
-
-    print("Loading tokenizers...")
+    print("Loading tokenizer...")
 
     tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
-    tokenizers = {
-        "eng_Latn": tokenizer.create_encoder(lang="eng_Latn"),
-        "fra_Latn": tokenizer.create_encoder(lang="fra_Latn")
-    }
-
-    print("Tokenizing dataset...")
-
     max_seq_len = 512
-    first_lang = "eng_Latn"
-    second_lang = "fra_Latn"
 
-    # tokenized_data_en_fr = data_en_fr.map(
-    #     tokenize_inputs,
-    #     batched=True,
-    #     batch_size=10_000,
-    #     fn_kwargs={
-    #         "first_tokenizer": tokenizers[first_lang], 
-    #         "first_lang": first_lang, 
-    #         "second_tokenizer": tokenizers[second_lang], 
-    #         "second_lang": second_lang, 
-    #         "max_seq_len": max_seq_len, 
-    #         "pad_idx": tokenizer.vocab_info.pad_idx
-    #     },
-    #     remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
-    #     num_proc=args.num_processes
-    # )
-    tokenized_data_en_fr = data_en_fr.map(
-        tokenize_inputs,
-        batched=True,
-        batch_size=10_000,
-        fn_kwargs={
-            "tokenizer": tokenizer,
-            "max_seq_len": max_seq_len, 
-            "pad_idx": tokenizer.vocab_info.pad_idx
-        },
-        remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
-        num_proc=args.num_processes
-    )
+    for lang_pair, metadata in all_metadata.items():
+        print(f"Loading {lang_pair} dataset...")
+        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
+        data = load_dataset("json", data_files=data_files)
+        print(f"Tokenizing {lang_pair} dataset...")
+        tokenized_data = tokenize_data(data, tokenizer, max_seq_len, num_proc=args.num_processes)
+        print(f"Writing {lang_pair} dataset to disk...")
+        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"])
     
-    n_shards = {
-        "train": 1000,
-        "valid": 32
-    }
-
-    for split, split_dataset in tokenized_data_en_fr.items():
-        for i in range(n_shards[split]):
-            split_dataset.shard(
-                num_shards=n_shards[split],
-                index=i, contiguous=True
-            ).to_json(
-                f"{tokenized_bilingual_data_dir}/eng-fra/{split}.eng_Latn-fra_Latn_chunks/{split}.eng_Latn-fra_Latn-{i}.jsonl"
-            )
-
