@@ -10,19 +10,6 @@ from datasets import (
     load_dataset
 )
 
-
-def write_to_jsonl(data, output_dir_prefix, lang_pair):
-    for split, split_dataset in data.items():
-        output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
-        os.makedirs(output_dir, exist_ok=True)
-        for i in range(split_dataset.n_shards):
-            split_dataset.shard(
-                num_shards=split_dataset.n_shards,
-                index=i, contiguous=True
-            ).to_json(
-                f"{output_dir}/{split}.{lang_pair}-{i}.jsonl"
-            )
-
 def tokenize_data(data, tokenizer, max_seq_len, num_proc):
     return data.map(
             tokenize_inputs,
@@ -32,6 +19,19 @@ def tokenize_data(data, tokenizer, max_seq_len, num_proc):
             remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
             num_proc=num_proc
         )
+
+
+def write_to_jsonl(data, output_dir_prefix, lang_pair, num_shards):
+    for split, split_dataset in data.items():
+        output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
+        os.makedirs(output_dir, exist_ok=True)
+        for i in range(num_shards[split]):
+            split_dataset.shard(
+                num_shards=num_shards[split],
+                index=i, contiguous=True
+            ).to_json(
+                f"{output_dir}/{split}.{lang_pair}-{i}.jsonl"
+            )
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -75,6 +75,10 @@ if __name__=="__main__":
 
     tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
     max_seq_len = 512
+    num_shards = {
+        "train": 1000,
+        "valid": 32
+    }
 
     for lang_pair, metadata in all_metadata.items():
         print(f"Loading {lang_pair} dataset...")
@@ -83,5 +87,5 @@ if __name__=="__main__":
         print(f"Tokenizing {lang_pair} dataset...")
         tokenized_data = tokenize_data(data, tokenizer, max_seq_len, num_proc=args.num_processes)
         print(f"Writing {lang_pair} dataset to disk...")
-        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"])
+        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], num_shards=num_shards)
     
