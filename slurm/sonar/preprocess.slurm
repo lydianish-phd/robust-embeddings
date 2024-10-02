@@ -2,11 +2,11 @@
 
 #SBATCH --job-name=preprocess      # Job name
 #SBATCH --account=rnh@v100
-#SBATCH --partition=gpu_p2
+#SBATCH	-C v100-32g
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # total number of tasks across all nodes
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
-#SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
+#SBATCH --cpus-per-task=40	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=20:00:00
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
