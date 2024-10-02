@@ -96,19 +96,17 @@ if __name__=="__main__":
         tokenize_inputs,
         batched=True,
         batch_size=10_000,
-        drop_last_batch=True,
         fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
+        remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"]
     )
-    tokenized_train_data = tokenized_train_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     tokenized_valid_data = all_valid_data.map(
         tokenize_inputs,
         batched=True,
         batch_size=10_000,
-        drop_last_batch=True,
         fn_kwargs={"tokenizers": tokenizers, "max_seq_len": max_seq_len, "pad_idx": tokenizer.vocab_info.pad_idx},
+        remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"]
     )
-    tokenized_valid_data = tokenized_valid_data.remove_columns(["source_lang", "source_sentence", "target_lang", "target_sentence"])
 
     print("Instantiating data collator...")
 
