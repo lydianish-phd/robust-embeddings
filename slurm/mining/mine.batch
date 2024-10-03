@@ -29,8 +29,8 @@ SRC_EMBEDDINGS=$SCRATCH/LASER/data/draft/deu_Latn.dev.bin
 TRG_EMBEDDINGS=$SCRATCH/LASER/data/draft/eng_Latn.dev.bin
 OUTPUT_FILE=$EXPERIMENTS/robust-embeddings/mining/draft_experiment/mine.deu_Latn-eng_Latn.dev
 THRESHOLD=1.04
-MODE=search
-NEIGHBORS=16
+MODE=score
+NEIGHBORS=4
 
 python $SCRATCH/LASER/source/mine_bitexts.py $SRC_FILE $TRG_FILE \
     --src-lang $SRC_LANG --trg-lang $TRG_LANG \
