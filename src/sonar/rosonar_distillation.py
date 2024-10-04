@@ -16,9 +16,9 @@ class DataCollatorForRoSonarDistillation(DefaultDataCollator):
     self.padding_value = tokenizer.vocab_info.pad_idx
 
   def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
-    src_sentence_ids = [ row["src_sentence_ids"].clone().detach() for row in features ]
+    src_sentence_ids = [ torch.tensor(row["src_sentence_ids"], dtype=torch.int) for row in features ]
     src_sentence_ids = pad_sequence(src_sentence_ids, batch_first=True, padding_value=self.padding_value)
-    tgt_sentence_ids = [ row["tgt_sentence_ids"].clone().detach() for row in features ]
+    tgt_sentence_ids = [ torch.tensor(row["tgt_sentence_ids"], dtype=torch.int) for row in features ]
     tgt_sentence_ids = pad_sequence(tgt_sentence_ids, batch_first=True, padding_value=self.padding_value)
 
     batch = {
