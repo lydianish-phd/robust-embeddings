@@ -1,14 +1,33 @@
 import os, argparse
+from sonar.models.sonar_text.loader import load_sonar_tokenizer
+from datasets import load_dataset
 
-from sonar.models.sonar_text.loader import (
-    load_sonar_tokenizer,
-)
-from rosonar_distillation import (
-    tokenize_inputs
-)
-from datasets import (
-    load_dataset
-)
+def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
+    tensor = tokenizer(sentence)
+    padding_length = max_length - tensor.size(0)
+    if padding_length <= 0:
+        return tensor[:max_length]
+    padding = torch.full(torch.Size([padding_length]), fill_value=pad_idx)
+    padded_tensor = torch.cat((tensor, padding), dim=0)
+    return padded_tensor[:max_length]
+
+def tokenize_inputs(examples, tokenizer, max_seq_len=512):
+    pad_idx = tokenizer.vocab_info.pad_idx
+    src_sentence_ids = []
+    for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
+        src_tokenizer = tokenizer.create_encoder(lang=source_lang)
+        src_sentence_ids.append(_tokenize_and_pad(src_tokenizer,sentence,max_seq_len,pad_idx))
+    
+    tgt_sentence_ids = []
+    for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]):
+        tgt_tokenizer = tokenizer.create_encoder(lang=target_lang)
+        tgt_sentence_ids.append(_tokenize_and_pad(tgt_tokenizer,sentence,max_seq_len,pad_idx))
+    
+    model_inputs = {
+        "src_sentence_ids": src_sentence_ids,
+        "tgt_sentence_ids": tgt_sentence_ids
+    }
+    return model_inputs
 
 def tokenize_data(data, tokenizer, max_seq_len, num_proc):
     return data.map(
@@ -19,7 +38,6 @@ def tokenize_data(data, tokenizer, max_seq_len, num_proc):
             remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
             num_proc=num_proc
         )
-
 
 def write_to_jsonl(data, output_dir_prefix, lang_pair, num_shards):
     for split, split_dataset in data.items():

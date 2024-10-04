@@ -87,33 +87,6 @@ def compute_metrics(eval_pred):
     loss = MSELoss(reduction="sum")(predictions, labels)
     return { "loss": loss }
 
-def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
-    tensor = tokenizer(sentence)
-    padding_length = max_length - tensor.size(0)
-    if padding_length <= 0:
-        return tensor[:max_length]
-    padding = torch.full(torch.Size([padding_length]), fill_value=pad_idx)
-    padded_tensor = torch.cat((tensor, padding), dim=0)
-    return padded_tensor[:max_length]
-
-def tokenize_inputs(examples, tokenizer, max_seq_len=512):
-    pad_idx = tokenizer.vocab_info.pad_idx
-    src_sentence_ids = []
-    for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
-        src_tokenizer = tokenizer.create_encoder(lang=source_lang)
-        src_sentence_ids.append(_tokenize_and_pad(src_tokenizer,sentence,max_seq_len,pad_idx))
-    
-    tgt_sentence_ids = []
-    for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]):
-        tgt_tokenizer = tokenizer.create_encoder(lang=target_lang)
-        tgt_sentence_ids.append(_tokenize_and_pad(tgt_tokenizer,sentence,max_seq_len,pad_idx))
-    
-    model_inputs = {
-        "src_sentence_ids": src_sentence_ids,
-        "tgt_sentence_ids": tgt_sentence_ids
-    }
-    return model_inputs
-
 def _get_student_model_config():
     cfg = sonar_text_encoder_archs.get_config("basic")
     cfg.num_encoder_layers = cfg.num_decoder_layers = 12
