@@ -23,14 +23,14 @@ set -e
 
 CORPUS=rocsmt
 SRC_FILE=$DATASETS/$CORPUS/test/raw.en.test
-TRG_FILE=$DATASETS/$CORPUS/test/ref.fr.test
+TRG_FILE=$DATASETS/$CORPUS/test/norm.en.test
 SRC_LANG=eng_Latn
-TRG_LANG=fra_Latn
-MODEL=rolaser.
+TRG_LANG=eng_Latn
+MODEL="" #rolaser.
 SRC_EMBEDDINGS=$SCRATCH/LASER/data/draft/${MODEL}raw.en.test.bin
-TRG_EMBEDDINGS=$SCRATCH/LASER/data/draft/ref.fr.test.bin
+TRG_EMBEDDINGS=$SCRATCH/LASER/data/draft/${MODEL}norm.en.test.bin
 MODE=mine
-THRESHOLD=0.4
+THRESHOLD=0
 NEIGHBORS=4
 OUTPUT_FILE=$EXPERIMENTS/robust-embeddings/mining/draft_experiment/$MODE.$NEIGHBORS.$CORPUS.${MODEL}$SRC_LANG-$TRG_LANG
 
