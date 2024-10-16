@@ -46,7 +46,7 @@ total_elements = 0
 # Loop through the DataLoader
 for batch in data_loader:
     # Count the elements in the current batch
-    total_elements += len(batch['source_sentence'])
+    total_elements += len(batch['src_sentence_ids'])
     if total_elements % 1_000_000 == 0:
         print(f"Processed {total_elements} elements")
 
