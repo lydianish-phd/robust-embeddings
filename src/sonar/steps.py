@@ -10,8 +10,8 @@ seed = 42
 
 print("Loading datasets...")
 
-bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual")
-monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual")
+bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized")
+monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized")
 
 data_en_fr_files = {
     "train": f"{bilingual_data_dir}/eng-fra/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl"
