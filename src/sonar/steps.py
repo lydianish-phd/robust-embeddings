@@ -38,7 +38,7 @@ all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], dat
 
 print("Interleaving strategy", strategy)
 
-data_loader = DataLoader(all_train_data, batch_size=8, num_workers=40)
+data_loader = DataLoader(all_train_data, batch_size=2048, num_workers=40)
 
 # Initialize counters
 total_elements = 0
