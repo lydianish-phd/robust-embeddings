@@ -32,9 +32,9 @@ EXPERIMENT_NUM="050"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_$EXPERIMENT_NUM
 
 SEED=42
-ACCUMULATION_STEPS=1 #$((32 / SLURM_NNODES))
-LEARNING_RATE=2e-5 #2e-3
-LR_SCHEDULER=linear #inverse_sqrt
+ACCUMULATION_STEPS=1 
+LEARNING_RATE=2e-5 # from Reimers and Gurevych (2020)
+LR_SCHEDULER=constant_with_warmup
 
 echo "Setting the accelerate config..."
 
