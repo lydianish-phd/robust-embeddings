@@ -15,14 +15,12 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         self, 
         teacher_tokenizer: LaserTokenizer, 
         student_tokenizer: XLMRobertaTokenizer, 
-        teacher_padding_value: int = 1, 
         max_length: int = 512,
         return_tensors: str = "pt"
     ):
         super().__init__(return_tensors)
         self.teacher_tokenizer = teacher_tokenizer
         self.student_tokenizer = student_tokenizer
-        self.teacher_padding_value = teacher_padding_value
         self.max_length = max_length
 
     def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
@@ -31,12 +29,12 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
 
         teacher_tgt_pieces = self.teacher_tokenizer.tokenize_batch(tgt_sents)
 
-        preproc_src_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in src_sents  ]
-        preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
+        # preproc_src_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in src_sents  ]
+        # preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
 
         rt = return_tensors if return_tensors is not None else self.return_tensors
-        student_src_ids_and_masks = self.student_tokenizer(preproc_src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
-        student_tgt_ids_and_masks = self.student_tokenizer(preproc_tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
+        student_src_ids_and_masks = self.student_tokenizer(src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
+        student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
 
         return {
             "teacher_tgt_pieces": teacher_tgt_pieces,
