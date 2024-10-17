@@ -5,9 +5,9 @@
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
-#SBATCH --cpus-per-task=40	# number of cores per task (8x8 = 64 cores, or all the cores)
+#SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=10:00:00                # Time limit hrs:min:sec
+#SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 
 

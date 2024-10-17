@@ -38,7 +38,7 @@ all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], dat
 
 print("Interleaving strategy", strategy)
 
-data_loader = DataLoader(all_train_data, batch_size=32, num_workers=2)
+data_loader = DataLoader(all_train_data, batch_size=256, num_workers=16)
 
 # Initialize counters
 total_elements = 0
@@ -47,7 +47,7 @@ total_elements = 0
 for batch in data_loader:
     # Count the elements in the current batch
     total_elements += len(batch['src_sentence_ids'])
-    if total_elements % 1_000_000 == 0:
+    if total_elements % 256**2 == 0:
         print(f"Processed {total_elements} elements")
 
 # Print total counts
