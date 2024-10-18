@@ -1,6 +1,7 @@
 import os, argparse
 from sonar.models.sonar_text.loader import load_sonar_tokenizer
 from datasets import load_dataset
+import torch
 
 def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
     tensor = tokenizer(sentence)
