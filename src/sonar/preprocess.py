@@ -94,15 +94,15 @@ if __name__=="__main__":
 
     tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
     max_seq_len = 512
+    num_shards = {
+        "train": 1000,
+        "valid": 32
+    }
 
     for lang_pair, metadata in all_metadata.items():
         print(f"Loading {lang_pair} dataset...")
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
         data = load_dataset("json", data_files=data_files)
-        num_shards = {
-            "train": data["train"].n_shards,
-            "valid": data["valid"].n_shards
-        }
         print(f"Tokenizing {lang_pair} dataset...")
         tokenized_data = tokenize_data(data, tokenizer, max_seq_len, num_proc=args.num_processes)
         print(f"Writing {lang_pair} dataset to disk...")
