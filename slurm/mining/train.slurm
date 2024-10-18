@@ -21,8 +21,7 @@ module purge
 source $HOME/.bashrc 
 source $HOME/.bash_profile
 
-#module load cpuarch/amd pytorch-gpu/py3/2.0.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
-module load pytorch-gpu/py3/2.0.0
+module load pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
 
 set -e
 
@@ -64,7 +63,6 @@ export LAUNCHER="accelerate launch \
     --machine_rank \$SLURM_PROCID \
     --num_processes $NUM_PROCESSES \
     --num_machines $SLURM_NNODES \
-    --mixed_precision no \
     "
 # Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
 
