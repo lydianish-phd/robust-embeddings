@@ -112,7 +112,7 @@ if __name__=="__main__":
         report_to="tensorboard",
         push_to_hub=False,
         dataloader_num_workers=args.dataloader_workers,
-        auto_find_batch_size=True, # per_device_train_batch_size=8,
+        per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
