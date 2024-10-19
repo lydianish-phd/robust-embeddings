@@ -84,7 +84,7 @@ if __name__=="__main__":
             "lang_pair": "eng_Latn-eng_Latn"
         },
         "en_2_ugc": {
-            "input_dir_p refix": f"{monolingual_data_dir}/eng/part2_ugc/",
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2_ugc/",
             "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc/",
             "lang_pair": "eng_Latn-eng_Latn"
         }
