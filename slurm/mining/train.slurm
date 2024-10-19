@@ -21,7 +21,7 @@ module purge
 source $HOME/.bashrc 
 source $HOME/.bash_profile
 
-module load pytorch-gpu/py3/2.3.0 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load pytorch-gpu/py3/2.0.0
 
 set -e
 
