@@ -130,7 +130,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=2_272_211, # steps needed to exhaust all fr data first = 1 epoch
+        max_steps=2_270_671, # steps needed to exhaust all fr data first = 1 epoch
         warmup_steps=10_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
