@@ -45,7 +45,7 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
             "student_tgt_ids": student_tgt_ids_and_masks["input_ids"].unsqueeze(-1),
             "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"].unsqueeze(-1)
         }
-        print(batch["teacher_tgt_ids"].shape, batch["input_ids"].shape, batch["attention_mask"].shape)
+        print(batch["teacher_tgt_ids"].shape, batch["student_src_ids"].shape, batch["student_src_masks"].shape)
         return batch
 
 class RoLaserDistillationTrainer(Trainer):
