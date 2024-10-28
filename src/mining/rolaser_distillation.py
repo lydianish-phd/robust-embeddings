@@ -38,14 +38,15 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         student_src_ids_and_masks = self.student_tokenizer(src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
         student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
 
-        print(teacher_tgt_ids.shape, student_src_ids_and_masks["input_ids"].shape, student_tgt_ids_and_masks["input_ids"].shape)
-        return {
-            "teacher_tgt_ids": teacher_tgt_ids,
-            "student_src_ids": student_src_ids_and_masks["input_ids"],
-            "student_src_masks": student_src_ids_and_masks["attention_mask"],
-            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
-            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
+        batch = {
+            "teacher_tgt_ids": teacher_tgt_ids.unsqueeze(-1),
+            "student_src_ids": student_src_ids_and_masks["input_ids"].unsqueeze(-1),
+            "student_src_masks": student_src_ids_and_masks["attention_mask"].unsqueeze(-1),
+            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"].unsqueeze(-1),
+            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"].unsqueeze(-1)
         }
+        print(batch["teacher_tgt_ids"].shape, batch["input_ids"].shape, batch["attention_mask"].shape)
+        return batch
 
 class RoLaserDistillationTrainer(Trainer):
     def __init__(
