@@ -38,6 +38,7 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         student_src_ids_and_masks = self.student_tokenizer(src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
         student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
 
+        print(teacher_tgt_ids.shape, student_src_ids_and_masks["input_ids"].shape, student_tgt_ids_and_masks["input_ids"].shape)
         return {
             "teacher_tgt_ids": teacher_tgt_ids,
             "student_src_ids": student_src_ids_and_masks["input_ids"],
