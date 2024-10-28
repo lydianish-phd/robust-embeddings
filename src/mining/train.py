@@ -106,6 +106,7 @@ if __name__=="__main__":
         teacher_tokenizer=teacher_tokenizer, 
         student_tokenizer=student_tokenizer, 
         max_length=max_seq_len,
+        teacher_padding_value=teacher_model.pad_index,
         return_tensors="pt"
     )
     data_collator = accelerator.prepare(data_collator)
@@ -148,6 +149,7 @@ if __name__=="__main__":
     trainer = RoLaserDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,
+        teacher_tokenizer=teacher_tokenizer,
         args=training_args,
         train_dataset=all_train_data,
         eval_dataset=all_valid_data,

@@ -47,8 +47,8 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
 class RoLaserDistillationTrainer(Trainer):
     def __init__(
         self, 
-        teacher_model: SentenceEncoder,
         student_model: RoLaserModel,
+        teacher_model: SentenceEncoder,
         teacher_tokenizer: LaserTokenizer,
         *args,
         **kwargs
