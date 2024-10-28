@@ -31,7 +31,7 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         tgt_sents = [ row["target_sentence"] for row in features ]
 
         preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
-        teacher_tgt_ids = [ torch.tensor(self.teacher_tokenizer.spm_encoder.encode(s)) for s in preproc_tgt_sents ]
+        teacher_tgt_ids = [ torch.tensor(self.teacher_tokenizer.spm_encoder.encode(s), dtype=torch.int) for s in preproc_tgt_sents ]
         teacher_tgt_ids = pad_sequence(teacher_tgt_ids, batch_first=True, padding_value=self.teacher_padding_value)
 
         rt = return_tensors if return_tensors is not None else self.return_tensors
