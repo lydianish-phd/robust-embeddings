@@ -9,6 +9,7 @@ from laser_encoders.laser_tokenizer import (
 )
 from rolaser_model import RoLaserModel
 from torch.nn import MSELoss
+from torch.nn.utils.rnn import pad_sequence
 
 class DataCollatorForRoLaserDistillation(DefaultDataCollator):
     def __init__(
@@ -16,28 +17,29 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         teacher_tokenizer: LaserTokenizer, 
         student_tokenizer: XLMRobertaTokenizer, 
         max_length: int = 512,
+        teacher_padding_value: int = 1,
         return_tensors: str = "pt"
     ):
         super().__init__(return_tensors)
         self.teacher_tokenizer = teacher_tokenizer
         self.student_tokenizer = student_tokenizer
         self.max_length = max_length
+        self.teacher_padding_value = teacher_padding_value
 
     def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
         src_sents = [ row["source_sentence"] for row in features ]
         tgt_sents = [ row["target_sentence"] for row in features ]
 
-        teacher_tgt_pieces = self.teacher_tokenizer.tokenize_batch(tgt_sents)
-
-        # preproc_src_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in src_sents  ]
-        # preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
+        preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
+        teacher_tgt_ids = [ torch.tensor(self.teacher_tokenizer.spm_encoder.encode(s)) for s in preproc_tgt_sents ]
+        teacher_tgt_ids = pad_sequence(teacher_tgt_ids, batch_first=True, padding_value=self.teacher_padding_value)
 
         rt = return_tensors if return_tensors is not None else self.return_tensors
         student_src_ids_and_masks = self.student_tokenizer(src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
         student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
 
         return {
-            "teacher_tgt_pieces": teacher_tgt_pieces,
+            "teacher_tgt_ids": teacher_tgt_ids,
             "student_src_ids_and_masks": student_src_ids_and_masks,
             "student_tgt_ids_and_masks": student_tgt_ids_and_masks
         }
@@ -47,20 +49,25 @@ class RoLaserDistillationTrainer(Trainer):
         self, 
         teacher_model: SentenceEncoder,
         student_model: RoLaserModel,
+        teacher_tokenizer: LaserTokenizer,
         *args,
         **kwargs
     ):
         super().__init__(model=student_model, *args, **kwargs)
         self.teacher = teacher_model
         self.teacher.encoder.eval()
+        self.teacher_tokenizer = teacher_tokenizer
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):
         student_source_output = model(**inputs["student_src_ids_and_masks"]).pooler_output
         student_target_output = model(**inputs["student_tgt_ids_and_masks"]).pooler_output
         
+        # LASER model expects input as a list of tokenized strings
+        teacher_target_raw_input = self.teacher_tokenizer.spm_encoder.decode(inputs["teacher_tgt_ids"].tolist())
+        teacher_target_input = [" ".join(self.teacher_tokenizer.spm_encoder.encode_as_pieces(sent)) for sent in teacher_target_raw_input]
         with torch.no_grad():
-            teacher_target_output = torch.tensor(self.teacher.encode_sentences(inputs["teacher_tgt_pieces"]))
+            teacher_target_output = torch.tensor(self.teacher.encode_sentences(teacher_target_input))
         
         distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
 

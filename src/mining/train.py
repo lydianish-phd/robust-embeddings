@@ -140,7 +140,7 @@ if __name__=="__main__":
         save_steps=20_000,
         logging_steps=100,
         eval_steps=20_000,
-        label_names=['teacher_tgt_pieces'],
+        label_names=['teacher_tgt_ids'],
         seed=args.seed,
         resume_from_checkpoint=checkpoint_dir
     )
