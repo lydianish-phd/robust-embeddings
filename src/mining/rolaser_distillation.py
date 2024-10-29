@@ -9,7 +9,6 @@ from laser_encoders.laser_tokenizer import (
 )
 from rolaser_model import RoLaserModel
 from torch.nn import MSELoss
-from torch.nn.utils.rnn import pad_sequence
 
 class DataCollatorForRoLaserDistillation(DefaultDataCollator):
     def __init__(
@@ -31,19 +30,19 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         tgt_sents = [ row["target_sentence"] for row in features ]
 
         preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
-        teacher_tgt_ids = [ torch.tensor(self.teacher_tokenizer.spm_encoder.encode(s), dtype=torch.int) for s in preproc_tgt_sents ]
-        teacher_tgt_ids = pad_sequence(teacher_tgt_ids, batch_first=True, padding_value=self.teacher_padding_value)
-
+        teacher_tgt_ids = self.teacher_tokenizer.spm_encoder.encode(preproc_tgt_sents)
+        teacher_tgt_ids = _pad_and_truncate(teacher_tgt_ids, self.max_length, self.teacher_padding_value)
+        
         rt = return_tensors if return_tensors is not None else self.return_tensors
-        student_src_ids_and_masks = self.student_tokenizer(src_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
-        student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding=True, max_length=self.max_length, truncation=True, return_tensors=rt)
+        student_src_ids_and_masks = self.student_tokenizer(src_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
+        student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
 
         batch = {
-            "teacher_tgt_ids": teacher_tgt_ids.unsqueeze(0),
-            "student_src_ids": student_src_ids_and_masks["input_ids"].unsqueeze(0),
-            "student_src_masks": student_src_ids_and_masks["attention_mask"].unsqueeze(0),
-            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"].unsqueeze(0),
-            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"].unsqueeze(0)
+            "teacher_tgt_ids": teacher_tgt_ids,
+            "student_src_ids": student_src_ids_and_masks["input_ids"],
+            "student_src_masks": student_src_ids_and_masks["attention_mask"],
+            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
+            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
         }
         print(batch["teacher_tgt_ids"].shape, batch["student_src_ids"].shape, batch["student_src_masks"].shape)
         return batch
@@ -113,3 +112,9 @@ def _preprocess_sentence(text, tokenizer):
         sentence_text = sentence_text.lower()
     return sentence_text
 
+def _pad_and_truncate(sentence_ids, max_length, pad_idx):
+    padded_tensor = torch.full((len(sentence_ids), max_length), pad_idx, dtype=torch.int)
+    for i, s in enumerate(sentence_ids):
+        max_seq_len = min(max_length, len(s))
+        padded_tensor[i,:max_seq_len] = torch.tensor(s, dtype=torch.int)[:max_seq_len]
+    return padded_tensor
