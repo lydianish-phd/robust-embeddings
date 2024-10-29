@@ -56,7 +56,7 @@ class RoLaserModel(XLMRobertaModel):
     def __init__(self, config, *model_args, **kwargs):
         super().__init__(config, *model_args, **kwargs)
         self.pooler = RoLaserPooler(config)
-        self.post_init()
+        self._init_weights(self.pooler.dense)
     
     # Copied from transformers.models.xlm_roberta.modeling_xlm_roberta.XLMRobertaModel.forward
     # Adapted to use the RoLaserPooler which requires the attention mask

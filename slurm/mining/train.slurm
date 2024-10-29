@@ -8,11 +8,10 @@
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=0:20:00                # Time limit hrs:min:sec
+#SBATCH --time=100:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
-##SBATCH --array=0
 #SBATCH --exclusive
-#SBATCH --qos=qos_gpu-dev #qos_gpu-t4
+#SBATCH --qos=qos_gpu-t4
 
 echo "### Running $SLURM_JOB_NAME ###"
 

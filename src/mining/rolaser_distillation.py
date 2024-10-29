@@ -37,15 +37,13 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
         student_src_ids_and_masks = self.student_tokenizer(src_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
         student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
 
-        batch = {
+        return {
             "teacher_tgt_ids": teacher_tgt_ids,
             "student_src_ids": student_src_ids_and_masks["input_ids"],
             "student_src_masks": student_src_ids_and_masks["attention_mask"],
             "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
             "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
         }
-        print(batch["teacher_tgt_ids"].shape, batch["student_src_ids"].shape, batch["student_src_masks"].shape)
-        return batch
 
 class RoLaserDistillationTrainer(Trainer):
     def __init__(
@@ -70,9 +68,9 @@ class RoLaserDistillationTrainer(Trainer):
         teacher_target_raw_input = self.teacher_tokenizer.spm_encoder.decode(inputs["teacher_tgt_ids"].tolist())
         teacher_target_input = [" ".join(self.teacher_tokenizer.spm_encoder.encode_as_pieces(sent)) for sent in teacher_target_raw_input]
         with torch.no_grad():
-            teacher_target_output = torch.tensor(self.teacher.encode_sentences(teacher_target_input))
+            teacher_target_output = self._prepare_inputs(torch.tensor(self.teacher.encode_sentences(teacher_target_input)))
         
-        distillation_loss = self.loss_function(teacher_target_output.sentence_embeddings, student_source_output.sentence_embeddings) + self.loss_function(teacher_target_output.sentence_embeddings, student_target_output.sentence_embeddings)
+        distillation_loss = self.loss_function(teacher_target_output, student_source_output) + self.loss_function(teacher_target_output, student_target_output)
 
         outputs = {
             "student_source_embeddings": student_source_output,
