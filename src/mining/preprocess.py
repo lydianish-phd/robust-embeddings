@@ -1,42 +1,64 @@
 import os, argparse
-from sonar.models.sonar_text.loader import load_sonar_tokenizer
+from transformers import XLMRobertaTokenizer, XLMRobertaTokenizerFast
+from laser_encoders.laser_tokenizer import LaserTokenizer
+from laser_encoders.models import SentenceEncoder
+from laser_encoders import initialize_tokenizer, initialize_encoder
 from datasets import load_dataset
 import torch
 
-def _tokenize_and_pad(tokenizer, sentence, max_length, pad_idx):
-    tensor = tokenizer(sentence)
-    padding_length = max_length - tensor.size(0)
-    if padding_length <= 0:
-        return tensor[:max_length]
-    padding = torch.full(torch.Size([padding_length]), fill_value=pad_idx)
-    padded_tensor = torch.cat((tensor, padding), dim=0)
-    return padded_tensor[:max_length]
+def tokenize_and_embed_inputs(
+        examples, 
+        teacher_model: SentenceEncoder,
+        teacher_tokenizer: LaserTokenizer, 
+        student_tokenizer: XLMRobertaTokenizer, 
+        max_length: int = 512,
+    ):
+    teacher_target_input = teacher_tokenizer.tokenize_batch(examples["target_sentence"])
+    teacher_tgt_embeds = torch.tensor(teacher_model.encode_sentences(teacher_target_input))
 
-def tokenize_inputs(examples, tokenizer, max_seq_len=512):
-    pad_idx = tokenizer.vocab_info.pad_idx
-    src_sentence_ids = []
-    for source_lang, sentence in zip(examples["source_lang"], examples["source_sentence"]):
-        src_tokenizer = tokenizer.create_encoder(lang=source_lang)
-        src_sentence_ids.append(_tokenize_and_pad(src_tokenizer,sentence,max_seq_len,pad_idx))
-    
-    tgt_sentence_ids = []
-    for target_lang, sentence in zip(examples["target_lang"], examples["target_sentence"]):
-        tgt_tokenizer = tokenizer.create_encoder(lang=target_lang)
-        tgt_sentence_ids.append(_tokenize_and_pad(tgt_tokenizer,sentence,max_seq_len,pad_idx))
+    student_src_ids_and_masks = student_tokenizer(
+        examples["source_sentence"], 
+        padding="max_length", 
+        max_length=max_length, 
+        truncation=True, 
+        return_tensors="pt"
+    )
+    student_tgt_ids_and_masks = student_tokenizer(
+        examples["target_sentence"], 
+        padding="max_length", 
+        max_length=max_length, 
+        truncation=True, 
+        return_tensors="pt"
+    )   
     
     model_inputs = {
-        "src_sentence_ids": src_sentence_ids,
-        "tgt_sentence_ids": tgt_sentence_ids
+        "teacher_tgt_embeds": teacher_tgt_embeds,
+        "student_src_ids": student_src_ids_and_masks["input_ids"],
+        "student_src_masks": student_src_ids_and_masks["attention_mask"],
+        "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
+        "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
     }
     return model_inputs
 
-def tokenize_data(data, tokenizer, max_seq_len, num_proc):
+def preprocess_data(
+        data, 
+        teacher_model,
+        teacher_tokenizer, 
+        student_tokenizer, 
+        max_length, 
+        num_proc
+    ):
     return data.map(
-            tokenize_inputs,
+            tokenize_and_embed_inputs,
             batched=True,
             batch_size=20_000,
-            fn_kwargs={"tokenizer": tokenizer, "max_seq_len": max_seq_len},
-            remove_columns=["source_lang", "source_sentence", "target_lang", "target_sentence"],
+            fn_kwargs={
+                "teacher_model": teacher_model, 
+                "teacher_tokenizer": teacher_tokenizer, 
+                "student_tokenizer": student_tokenizer, 
+                "max_length": max_length
+            },
+            remove_columns=["source_sentence", "target_sentence"],
             num_proc=num_proc
         )
 
@@ -59,8 +81,8 @@ if __name__=="__main__":
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
     monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
-    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rosonar")
-    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rosonar")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rolaser")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rolaser")
 
     all_metadata = {
         "en-fr": {
@@ -90,10 +112,20 @@ if __name__=="__main__":
         }
     }
 
-    print("Loading tokenizer...")
+    print("Defining initialisation checkpoint...")
 
-    tokenizer = load_sonar_tokenizer("text_sonar_basic_encoder")
-    max_seq_len = 512
+    xlm_checkpoint = "cardiffnlp/twitter-xlm-roberta-base"
+    xlm_checkpoint_path = os.path.join(os.environ["MODELS"], xlm_checkpoint)
+
+    print("Loading teacher model...")
+
+    teacher_model = initialize_encoder(lang="english")
+    
+    print("Loading tokenizers...")
+
+    teacher_tokenizer = initialize_tokenizer(lang="english")
+    student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
+    max_length = 512
     num_shards = {
         "train": 1000,
         "valid": 32
@@ -104,7 +136,7 @@ if __name__=="__main__":
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
         data = load_dataset("json", data_files=data_files)
         print(f"Tokenizing {lang_pair} dataset...")
-        tokenized_data = tokenize_data(data, tokenizer, max_seq_len, num_proc=args.num_processes)
+        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, num_proc=args.num_processes)
         print(f"Writing {lang_pair} dataset to disk...")
         write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], num_shards=num_shards)
     

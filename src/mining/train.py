@@ -76,8 +76,8 @@ if __name__=="__main__":
         data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
         data[lang_pair] = data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
-    all_train_data = interleave_datasets([data["train"] for data in data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
-    all_valid_data = interleave_datasets([data["valid"] for data in data.values()], seed=args.seed)
+    all_train_data = interleave_datasets([data["train"] for data in data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
+    all_valid_data = interleave_datasets([data["valid"] for data in data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Defining initialisation checkpoint...")
 
@@ -98,18 +98,18 @@ if __name__=="__main__":
     student_model_config = RoLaserConfig.from_pretrained(xlm_checkpoint_path, output_size=1024, pooling="max")
     student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config, ignore_mismatched_sizes=True) #ignore the pooling layer from the checkpoint
 
-    print("Instantiating data collator...")
+    # print("Instantiating data collator...")
 
-    max_seq_len = 512
+    # max_seq_len = 512
 
-    data_collator = DataCollatorForRoLaserDistillation(
-        teacher_tokenizer=teacher_tokenizer, 
-        student_tokenizer=student_tokenizer, 
-        max_length=max_seq_len,
-        teacher_padding_value=teacher_model.pad_index,
-        return_tensors="pt"
-    )
-    data_collator = accelerator.prepare(data_collator)
+    # data_collator = DataCollatorForRoLaserDistillation(
+    #     teacher_tokenizer=teacher_tokenizer, 
+    #     student_tokenizer=student_tokenizer, 
+    #     max_length=max_seq_len,
+    #     teacher_padding_value=teacher_model.pad_index,
+    #     return_tensors="pt"
+    # )
+    # data_collator = accelerator.prepare(data_collator)
 
     print("Training student model...")
 
@@ -131,7 +131,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=2_270_671, # steps needed to exhaust all fr data first = 1 epoch
+        max_steps=10_267_792, # steps needed to exhaust all en-fr data
         warmup_steps=10_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
@@ -153,7 +153,7 @@ if __name__=="__main__":
         args=training_args,
         train_dataset=all_train_data,
         eval_dataset=all_valid_data,
-        data_collator=data_collator,
+        # data_collator=data_collator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 

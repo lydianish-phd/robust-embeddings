@@ -19,7 +19,6 @@ from transformers import (
     EarlyStoppingCallback
 )
 from accelerate import Accelerator
-import torch
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -74,8 +73,8 @@ if __name__=="__main__":
         tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
         tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed)
-    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed)
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
+    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
 
@@ -116,7 +115,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=70_958, # steps needed to exhaust all fr data first = 1 epoch
+        max_steps=320_868, # steps needed to exhaust all en-fr data
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
@@ -126,7 +125,7 @@ if __name__=="__main__":
         save_steps=10_000,
         logging_steps=100,
         eval_steps=10_000,
-        label_names=['tgt_sentence_ids', 'tgt_seq_lens', 'tgt_batch_seq_len'],
+        label_names=["tgt_sentence_ids", "tgt_seq_lens", "tgt_batch_seq_len"],
         seed=args.seed,
         resume_from_checkpoint=checkpoint_dir
     )
