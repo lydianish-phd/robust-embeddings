@@ -127,13 +127,13 @@ if __name__=="__main__":
     student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
     max_length = 512
     num_shards = {
-        "train": 1000,
-        "valid": 32
+        "train": 1, #1000,
+        "valid": 1 #32
     }
 
-    for lang_pair, metadata in all_metadata.items():
+    for lang_pair, metadata in list(all_metadata.items())[:1]:
         print(f"Loading {lang_pair} dataset...")
-        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
+        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-0.jsonl" for split in ["train", "valid"] }
         data = load_dataset("json", data_files=data_files)
         print(f"Tokenizing {lang_pair} dataset...")
         tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, num_proc=args.num_processes)

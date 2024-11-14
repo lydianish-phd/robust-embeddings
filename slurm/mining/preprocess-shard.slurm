@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=40	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=20:00:00
+#SBATCH --time=0:20:00
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
 
 echo "### Running $SLURM_JOB_NAME ###"
@@ -22,6 +22,6 @@ set -e
 
 NUM_PROC=1 #$((SLURM_CPUS_PER_TASK / 2))
 
-python $HOME/robust-embeddings/src/mining/preprocess.py --num-processes $NUM_PROC
+python $HOME/robust-embeddings/src/mining/preprocess_shard.py --num-processes $NUM_PROC
 
 echo "Done..."
