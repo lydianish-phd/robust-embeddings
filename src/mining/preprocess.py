@@ -74,6 +74,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--split", help="dataset split", type=str, choices=["train", "valid"], default="train")
     parser.add_argument("--shard", help="shard number", type=int, default=0)
+    parser.add_argument("--num_proc", help="number of processes", type=int, default=1)
     args = parser.parse_args()
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
@@ -129,7 +130,7 @@ if __name__=="__main__":
         data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
         data = load_dataset("json", data_files=data_files)
         print(f"Tokenizing {lang_pair} dataset...")
-        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length)
+        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, args.num_proc)
         print(f"Writing {lang_pair} dataset to disk...")
         write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard)
 
