@@ -51,7 +51,7 @@ def preprocess_data(
     return data.map(
             tokenize_and_embed_inputs,
             batched=True,
-            batch_size=20_000,
+            batch_size=8192,
             fn_kwargs={
                 "teacher_model": teacher_model, 
                 "teacher_tokenizer": teacher_tokenizer, 
@@ -62,21 +62,18 @@ def preprocess_data(
             num_proc=num_proc
         )
 
-def write_to_jsonl(data, output_dir_prefix, lang_pair, num_shards):
+def write_to_jsonl(data, output_dir_prefix, lang_pair, shard):
     for split, split_dataset in data.items():
         output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
         os.makedirs(output_dir, exist_ok=True)
-        for i in range(num_shards[split]):
-            split_dataset.shard(
-                num_shards=num_shards[split],
-                index=i, contiguous=True
-            ).to_json(
-                f"{output_dir}/{split}.{lang_pair}-{i}.jsonl"
-            )
+        split_dataset.to_json(
+            f"{output_dir}/{split}.{lang_pair}-{shard}.jsonl"
+        )
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--num-processes", help="number of processes", type=int, default=8)
+    parser.add_argument("--split", help="dataset split", type=str, choices=["train", "valid"], default="train")
+    parser.add_argument("--shard", help="shard number", type=int, default=0)
     args = parser.parse_args()
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
@@ -126,17 +123,13 @@ if __name__=="__main__":
     teacher_tokenizer = initialize_tokenizer(lang="english")
     student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
     max_length = 512
-    num_shards = {
-        "train": 1000,
-        "valid": 32
-    }
 
     for lang_pair, metadata in all_metadata.items():
         print(f"Loading {lang_pair} dataset...")
-        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
+        data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
         data = load_dataset("json", data_files=data_files)
         print(f"Tokenizing {lang_pair} dataset...")
-        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, num_proc=args.num_processes)
+        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length)
         print(f"Writing {lang_pair} dataset to disk...")
-        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], num_shards=num_shards)
-    
+        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard)
+
