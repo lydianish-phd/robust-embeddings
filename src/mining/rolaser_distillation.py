@@ -50,15 +50,15 @@ class RoLaserDistillationTrainer(Trainer):
     def __init__(
         self, 
         student_model: RoLaserModel,
-        teacher_model: SentenceEncoder,
-        teacher_tokenizer: LaserTokenizer,
+        # teacher_model: SentenceEncoder,
+        # teacher_tokenizer: LaserTokenizer,
         *args,
         **kwargs
     ):
         super().__init__(model=student_model, *args, **kwargs)
-        self.teacher = teacher_model
-        self.teacher.encoder.eval()
-        self.teacher_tokenizer = teacher_tokenizer
+        # self.teacher = teacher_model
+        # self.teacher.encoder.eval()
+        # self.teacher_tokenizer = teacher_tokenizer
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):

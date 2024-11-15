@@ -86,12 +86,12 @@ if __name__=="__main__":
 
     print("Loading tokenizers...")
 
-    teacher_tokenizer = initialize_tokenizer(lang="english")
+    # teacher_tokenizer = initialize_tokenizer(lang="english")
     student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
 
-    print("Loading teacher model...")
+    # print("Loading teacher model...")
 
-    teacher_model = accelerator.prepare(initialize_encoder(lang="english"))
+    # teacher_model = accelerator.prepare(initialize_encoder(lang="english"))
 
     print("Initializing student model...")
 
@@ -148,8 +148,8 @@ if __name__=="__main__":
 
     trainer = RoLaserDistillationTrainer(
         student_model=student_model,
-        teacher_model=teacher_model,
-        teacher_tokenizer=teacher_tokenizer,
+        # teacher_model=teacher_model,
+        # teacher_tokenizer=teacher_tokenizer,
         args=training_args,
         train_dataset=all_train_data,
         eval_dataset=all_valid_data,
