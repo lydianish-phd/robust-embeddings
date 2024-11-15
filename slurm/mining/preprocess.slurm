@@ -14,6 +14,8 @@
 
 echo "### Running $SLURM_JOB_NAME ###"
 
+module purge
+
 source $HOME/.bashrc 
 source $HOME/.bash_profile
 
