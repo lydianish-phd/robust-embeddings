@@ -123,7 +123,7 @@ if __name__=="__main__":
         save_steps=20_000,
         logging_steps=100,
         eval_steps=20_000,
-        label_names=['teacher_tgt_ids'],
+        label_names=['teacher_tgt_embeds'],
         seed=args.seed,
         resume_from_checkpoint=checkpoint_dir
     )
@@ -134,7 +134,7 @@ if __name__=="__main__":
         train_dataset=all_train_data,
         eval_dataset=all_valid_data,
         data_collator=data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
 
     resume_from_checkpoint = args.resume_last and os.path.exists(checkpoint_dir) and len(os.listdir(checkpoint_dir)) > 0
