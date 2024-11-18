@@ -1,48 +1,20 @@
-import os
 from transformers import DefaultDataCollator, Trainer, XLMRobertaTokenizer
 from typing import Any, Dict, List
 import torch
-from laser_encoders.models import SentenceEncoder
-from laser_encoders.laser_tokenizer import (
-    LaserTokenizer,
-    NON_PRINT_CHARS
-)
 from rolaser_model import RoLaserModel
 from torch.nn import MSELoss
 
 class DataCollatorForRoLaserDistillation(DefaultDataCollator):
-    def __init__(
-        self, 
-        teacher_tokenizer: LaserTokenizer, 
-        student_tokenizer: XLMRobertaTokenizer, 
-        max_length: int = 512,
-        teacher_padding_value: int = 1,
-        return_tensors: str = "pt"
-    ):
-        super().__init__(return_tensors)
-        self.teacher_tokenizer = teacher_tokenizer
-        self.student_tokenizer = student_tokenizer
-        self.max_length = max_length
-        self.teacher_padding_value = teacher_padding_value
+    def __init__(self):
+        super().__init__(return_tensors="pt")
 
     def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
-        src_sents = [ row["source_sentence"] for row in features ]
-        tgt_sents = [ row["target_sentence"] for row in features ]
-
-        preproc_tgt_sents = [ _preprocess_sentence(s, self.teacher_tokenizer) for s in tgt_sents  ]
-        teacher_tgt_ids = self.teacher_tokenizer.spm_encoder.encode(preproc_tgt_sents)
-        teacher_tgt_ids = _pad_and_truncate(teacher_tgt_ids, self.max_length, self.teacher_padding_value)
-        
-        rt = return_tensors if return_tensors is not None else self.return_tensors
-        student_src_ids_and_masks = self.student_tokenizer(src_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
-        student_tgt_ids_and_masks = self.student_tokenizer(tgt_sents, padding="max_length", max_length=self.max_length, truncation=True, return_tensors=rt)
-
         batch = {
-            "teacher_tgt_ids": teacher_tgt_ids,
-            "student_src_ids": student_src_ids_and_masks["input_ids"],
-            "student_src_masks": student_src_ids_and_masks["attention_mask"],
-            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
-            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
+            "teacher_tgt_embeds": torch.tensor([ row["teacher_tgt_embeds"] for row in features ]),
+            "student_src_ids": torch.tensor([ row["student_src_ids"] for row in features ], dtype=torch.int),
+            "student_src_masks": torch.tensor([ row["student_src_masks"] for row in features ], dtype=torch.int),
+            "student_tgt_ids": torch.tensor([ row["student_tgt_ids"] for row in features ], dtype=torch.int),
+            "student_tgt_masks": torch.tensor([ row["student_tgt_masks"] for row in features ], dtype=torch.int)
         }
         return batch
 
@@ -50,26 +22,22 @@ class RoLaserDistillationTrainer(Trainer):
     def __init__(
         self, 
         student_model: RoLaserModel,
-        # teacher_model: SentenceEncoder,
-        # teacher_tokenizer: LaserTokenizer,
         *args,
         **kwargs
     ):
         super().__init__(model=student_model, *args, **kwargs)
-        # self.teacher = teacher_model
-        # self.teacher.encoder.eval()
-        # self.teacher_tokenizer = teacher_tokenizer
+
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):
         student_source_output = model(
             input_ids=inputs["student_src_ids"], 
             attention_mask=inputs["student_src_masks"]
-            ).pooler_output
+        ).pooler_output
         student_target_output = model(
             input_ids=inputs["student_tgt_ids"], 
             attention_mask=inputs["student_tgt_masks"]
-            ).pooler_output
+        ).pooler_output
         
         distillation_loss = (
             self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
@@ -102,21 +70,3 @@ def compute_metrics(eval_pred):
     predictions, labels = eval_pred
     loss = MSELoss(reduction="sum")(predictions, labels)
     return { "loss": loss }
-
-def _preprocess_sentence(text, tokenizer):
-    # Copied from laser_encoders.laser_tokenizer.LaserTokenizer.tokenize
-    sentence_text = "".join([c if c not in NON_PRINT_CHARS else " " for c in text])
-    if tokenizer.normalize_punct:
-        sentence_text = tokenizer.moses_punct_normalizer.normalize(sentence_text)
-    if tokenizer.descape:
-        sentence_text = tokenizer.moses_detokenizer.unescape_xml(text=sentence_text)
-    if tokenizer.lower_case:
-        sentence_text = sentence_text.lower()
-    return sentence_text
-
-def _pad_and_truncate(sentence_ids, max_length, pad_idx):
-    padded_tensor = torch.full((len(sentence_ids), max_length), pad_idx, dtype=torch.int)
-    for i, s in enumerate(sentence_ids):
-        max_seq_len = min(max_length, len(s))
-        padded_tensor[i,:max_seq_len] = torch.tensor(s, dtype=torch.int)[:max_seq_len]
-    return padded_tensor

@@ -1,9 +1,5 @@
 import os, argparse
 
-from laser_encoders import (
-    initialize_encoder, 
-    initialize_tokenizer
-)
 from rolaser_model import (
     RoLaserConfig,
     RoLaserModel
@@ -86,30 +82,16 @@ if __name__=="__main__":
 
     print("Loading tokenizers...")
 
-    # teacher_tokenizer = initialize_tokenizer(lang="english")
     student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
-
-    # print("Loading teacher model...")
-
-    # teacher_model = accelerator.prepare(initialize_encoder(lang="english"))
 
     print("Initializing student model...")
 
     student_model_config = RoLaserConfig.from_pretrained(xlm_checkpoint_path, output_size=1024, pooling="max")
     student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config, ignore_mismatched_sizes=True) #ignore the pooling layer from the checkpoint
 
-    # print("Instantiating data collator...")
+    print("Instantiating data collator...")
 
-    # max_seq_len = 512
-
-    # data_collator = DataCollatorForRoLaserDistillation(
-    #     teacher_tokenizer=teacher_tokenizer, 
-    #     student_tokenizer=student_tokenizer, 
-    #     max_length=max_seq_len,
-    #     teacher_padding_value=teacher_model.pad_index,
-    #     return_tensors="pt"
-    # )
-    # data_collator = accelerator.prepare(data_collator)
+    data_collator = accelerator.prepare(DataCollatorForRoLaserDistillation())
 
     print("Training student model...")
 
@@ -148,12 +130,10 @@ if __name__=="__main__":
 
     trainer = RoLaserDistillationTrainer(
         student_model=student_model,
-        # teacher_model=teacher_model,
-        # teacher_tokenizer=teacher_tokenizer,
         args=training_args,
         train_dataset=all_train_data,
         eval_dataset=all_valid_data,
-        # data_collator=data_collator,
+        data_collator=data_collator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=3)],
     )
 
