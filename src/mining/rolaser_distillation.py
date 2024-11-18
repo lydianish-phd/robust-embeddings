@@ -30,14 +30,20 @@ class RoLaserDistillationTrainer(Trainer):
         self.loss_function = MSELoss(reduction="sum")
 
     def compute_loss(self, model, inputs, return_outputs=False):
-        student_source_output = model(
-            input_ids=inputs["student_src_ids"], 
-            attention_mask=inputs["student_src_masks"]
-        ).pooler_output
-        student_target_output = model(
-            input_ids=inputs["student_tgt_ids"], 
-            attention_mask=inputs["student_tgt_masks"]
-        ).pooler_output
+        batch_size = inputs["student_src_ids"].shape[0]
+        student_inputs = torch.cat([inputs["student_src_ids"], inputs["student_tgt_ids"]], dim=0)
+        student_masks = torch.cat([inputs["student_src_masks"], inputs["student_tgt_masks"]], dim=0)
+        student_outputs = model(input_ids=student_inputs, attention_mask=student_masks).pooler_output
+        student_source_output, student_target_output = torch.split(student_outputs, batch_size, dim=0)
+        
+        # student_source_output = model(
+        #     input_ids=inputs["student_src_ids"], 
+        #     attention_mask=inputs["student_src_masks"]
+        # ).pooler_output
+        # student_target_output = model(
+        #     input_ids=inputs["student_tgt_ids"], 
+        #     attention_mask=inputs["student_tgt_masks"]
+        # ).pooler_output
         
         distillation_loss = (
             self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
