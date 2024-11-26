@@ -100,8 +100,8 @@ if __name__=="__main__":
     
     training_args = TrainingArguments(
         output_dir=checkpoint_dir,
-        log_level="info",
         bf16=True,
+        log_level="info",
         logging_dir=f"{args.output_dir}/tensorboard",
         logging_strategy="steps",
         eval_strategy="steps",
