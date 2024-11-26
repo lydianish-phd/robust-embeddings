@@ -2,7 +2,6 @@
 
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@h100
-##SBATCH --partition=gpu_p6
 #SBATCH -C h100
 #SBATCH --nodes=4		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
@@ -26,7 +25,7 @@ source $HOME/.bash_profile
 
 set -e
 
-DATA_CONFIG=1
+DATA_CONFIG=0
 
 MODEL[0]="rosonar"
 UGC_EN[0]=True
