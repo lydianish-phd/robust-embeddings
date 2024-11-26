@@ -2,9 +2,8 @@
 
 #SBATCH --job-name=train      # Job name
 #SBATCH --account=rnh@h100
-#SBATCH --partition=gpu_p6
 #SBATCH -C h100
-#SBATCH --nodes=2		# node count
+#SBATCH --nodes=4		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
 #SBATCH --gres=gpu:4        # numper of GPUs per node
 #SBATCH --cpus-per-task=96	# number of cores per task (8x8 = 64 cores, or all the cores)
@@ -18,11 +17,12 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 
-source $HOME/.bashrc 
-source $HOME/.bash_profile
-
 # Use pytorch-gpu/py3/2.3.1 which has pytorch 2.2.2 and accelerate
 module load arch/h100 pytorch-gpu/py3/2.3.1 libsndfile/1.0.28 intel-oneapi-mkl/2024.1
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+
 set -e
 
 DATA_CONFIG=0
