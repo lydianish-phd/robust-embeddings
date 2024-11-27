@@ -62,6 +62,7 @@ export LAUNCHER="accelerate launch \
     --machine_rank \$SLURM_PROCID \
     --num_processes $NUM_PROCESSES \
     --num_machines $SLURM_NNODES \
+    --mixed_precision fp16 \
     "
 # Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
 
