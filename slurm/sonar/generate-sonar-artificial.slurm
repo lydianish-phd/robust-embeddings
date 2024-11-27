@@ -24,7 +24,7 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047k
 
 MODEL[0]=sonar
 MODEL_DIR[0]=""
@@ -55,7 +55,7 @@ TGT_LANG[4]=rus_Cyrl
 
 PROBAS="0.1 0.2 0.3 0.4 0.5"
 
-for i in {1..2}
+for i in {0..0}
 do
     echo "Model: ${MODEL[$i]}"
 
