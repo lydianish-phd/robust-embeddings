@@ -6,6 +6,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to experiment directory", type=str)
     parser.add_argument("-c", "--corpus", type=str)
+    parser.add_argument("--corpus-part", type=str)
     parser.add_argument("-l", "--lang-pair", type=str)
     parser.add_argument("--src-dir", type=str)
     parser.add_argument("--src-file-name", type=str)
@@ -31,7 +32,7 @@ if __name__ == "__main__":
         print("- seed:", seed)
         for proba in args.probas:
             print("\t - proba:", proba)
-            src_file = os.path.join(args.src_dir, str(seed), str(proba), "ugc", args.src_file_name)
+            src_file = os.path.join(args.src_dir, str(seed), str(proba), "ugc", args.corpus_part, args.src_file_name)
             for model in args.models:
                 print("\t\t - model:", model)
                 model_output_dir = os.path.join(args.input_dir, "outputs", model, args.corpus, args.lang_pair, str(seed), str(proba))
