@@ -26,6 +26,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047f
 MODELS="rosonar" # rosonar_std"
 
 CORPUS=rocsmt_artificial
+CORPUS_PART=test
 DATA_DIR=$DATASETS/rocsmt
 SRC_DIR=$DATA_DIR/artificial
 REF_DIR=$DATA_DIR/test
@@ -54,6 +55,7 @@ python $HOME/robust-embeddings/src/sonar/evaluate-artificial.py \
     -i $EXPERIMENT_DIR \
     -c $CORPUS \
     -l ${LANG_PAIR[$SLURM_ARRAY_TASK_ID]} \
+    --corpus-part $CORPUS_PART \
     --src-dir $SRC_DIR \
     --src-file-name norm.en_mix_all.test \
     --sys-file-name norm.en_mix_all.test.out \
