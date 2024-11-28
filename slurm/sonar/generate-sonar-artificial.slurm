@@ -70,7 +70,7 @@ do
         do
             echo -e "\t\t - proba: $PROBA"
             
-            INPUT_FILE=$INPUT_DIR/$SEED/$PROBA/ugc/norm.en_mix_all.test
+            INPUT_FILE=$INPUT_DIR/$SEED/$PROBA/ugc/test/norm.en_mix_all.test
             OUTPUT_DIR=$OUTPUT_DIR_PREFIX/$SEED/$PROBA
 
             python $HOME/robust-embeddings/src/sonar/generate-sonar.py \
