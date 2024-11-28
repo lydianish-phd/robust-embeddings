@@ -202,7 +202,8 @@ do
             -i $INPUT_FILE \
             -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
             -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-            -o $OUTPUT_DIR -m ${MODEL_NAME[$i]}
+            -o $OUTPUT_DIR \
+            -m ${MODEL_NAME[$i]}
 
         if [ "$SLURM_ARRAY_TASK_ID" -eq 22 ] # for evaluating against normalised reference
         then
