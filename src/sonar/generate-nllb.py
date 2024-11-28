@@ -43,7 +43,7 @@ if __name__ == "__main__":
         outputs += tokenizer.batch_decode(output_tokens, skip_special_tokens=True)
 
     print("Writing output sentences...")
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         for output in outputs:
             f.write(output + "\n")
     
