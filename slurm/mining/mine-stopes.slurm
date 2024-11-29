@@ -42,7 +42,7 @@ PARTITION=$SLURM_JOB_PARTITION
 
 export HYDRA_FULL_ERROR=1
 
-cd $SCRATCH/stopes/stopes/pipelines/bitext/
+cd $WORK/stopes/stopes/pipelines/bitext/
 
 python global_mining_pipeline.py \
     output_dir=$OUTPUT_DIR \
