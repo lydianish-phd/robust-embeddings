@@ -1,21 +1,26 @@
 #!/bin/bash
 
-#SBATCH --job-name=mine      # Job name
-#SBATCH --ntasks=1                    # A single task (process)
-#SBATCH --nodes=1                # node count
-#SBATCH --partition=almanach          # Name of the partition
-#SBATCH --account=almanach        # GPU nodes are only available in gpu partition
-#SBATCH --gres=gpu:rtx8000:1        # GPU nodes are only available in gpu partition
+#SBATCH --job-name=train      # Job name
+#SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2
+#SBATCH --nodes=1		# node count
+#SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
+#SBATCH --gres=gpu:8        # numper of GPUs per node
+#SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=2:00:00               # Time limit hrs:min:sec
-#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
+#SBATCH --time=100:00:00                # Time limit hrs:min:sec
+#SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
+#SBATCH --exclusive
+#SBATCH --qos=qos_gpu-t4
 
 echo "### Running $SLURM_JOB_NAME ###"
 
-source $HOME/.bashrc
+module purge
+
+source $HOME/.bashrc 
 source $HOME/.bash_profile
 
-source activate stopes_env
+module load pytorch-gpu/py3/1.13.0
 
 set -e
 
@@ -31,9 +36,9 @@ VOCAB_DIR=$SCRATCH/LASER/models
 
 MAX_LINES_PER_SHARD=1000 #8000000
 TMP_DIR=/scratch/lnishimw/tmp/slurm
-CPUS_PER_TASK=4
+CPUS_PER_TASK=24
 CONSTRAINT=""
-PARTITION=gpu
+PARTITION=$SLURM_JOB_PARTITION
 
 export HYDRA_FULL_ERROR=1
 
