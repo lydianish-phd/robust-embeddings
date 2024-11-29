@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=train      # Job name
+#SBATCH --job-name=mine      # Job name
 #SBATCH --account=rnh@v100
 #SBATCH --partition=gpu_p2
 #SBATCH --nodes=1		# node count
