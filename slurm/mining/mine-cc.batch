@@ -50,9 +50,11 @@ python global_mining_pipeline.py \
     local_tmp_dir=$TMP_DIR \
     max_shard_size=$MAX_LINES_PER_SHARD \
     train_index.config.num_cpu=$CPUS_PER_TASK \
-    populate_index.config.num_cpu=$CPUS_PER_TASK \
     train_index.config.constraint=$CONSTRAINT \
+    populate_index.config.num_cpu=$CPUS_PER_TASK \
     calculate_distances.config.constraint=$CONSTRAINT \
+    mine_indexes.config.num_cpu=$CPUS_PER_TASK \
+    mine_sentences.config.num_cpu=$CPUS_PER_TASK \
     launcher.partition=$PARTITION 
 
 echo "Done..."
