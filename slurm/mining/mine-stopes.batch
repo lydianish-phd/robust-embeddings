@@ -1,0 +1,60 @@
+#!/bin/bash
+
+#SBATCH --job-name=mine      # Job name
+#SBATCH --ntasks=1                    # A single task (process)
+#SBATCH --nodes=1                # node count
+#SBATCH --partition=almanach          # Name of the partition
+#SBATCH --account=almanach        # GPU nodes are only available in gpu partition
+#SBATCH --gres=gpu:rtx8000:1        # GPU nodes are only available in gpu partition
+#SBATCH --hint=nomultithread       # we get physical cores not logical
+#SBATCH --time=2:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
+
+echo "### Running $SLURM_JOB_NAME ###"
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+
+source activate stopes_env
+
+set -e
+
+BASE_DIR=$DATASETS/rosonar/monolingual #community-oscar/data/2024-33
+DATA_DIR=$BASE_DIR/cleaned-mtnt #cleaned
+OUTPUT_DIR=$BASE_DIR/mined-mtnt #mined
+
+SRC_LANG=eng
+TGT_LANG=fra
+
+MODEL_DIR=$SCRATCH/LASER/models
+VOCAB_DIR=$SCRATCH/LASER/models
+
+MAX_LINES_PER_SHARD=1000 #8000000
+TMP_DIR=/scratch/lnishimw/tmp/slurm
+CPUS_PER_TASK=4
+CONSTRAINT=""
+PARTITION=gpu
+
+export HYDRA_FULL_ERROR=1
+
+cd $SCRATCH/stopes/stopes/pipelines/bitext/
+
+python global_mining_pipeline.py \
+    output_dir=$OUTPUT_DIR \
+    src_lang=$SRC_LANG tgt_lang=$TGT_LANG \
+    +data=oscar_cc \
+    data.data_shard_dir=$DATA_DIR \
+    embed_text=laser2 \
+    model_dir=$MODEL_DIR \
+    vocab_dir=$VOCAB_DIR \
+    local_tmp_dir=$TMP_DIR \
+    max_shard_size=$MAX_LINES_PER_SHARD \
+    train_index.config.num_cpu=$CPUS_PER_TASK \
+    train_index.config.constraint=$CONSTRAINT \
+    populate_index.config.num_cpu=$CPUS_PER_TASK \
+    calculate_distances.config.constraint=$CONSTRAINT \
+    mine_indexes.config.num_cpu=$CPUS_PER_TASK \
+    mine_sentences.config.num_cpu=$CPUS_PER_TASK \
+    launcher.partition=$PARTITION 
+
+echo "Done..."
