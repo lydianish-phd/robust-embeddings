@@ -5,7 +5,7 @@
 #SBATCH --partition=gpu_p2
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
-#SBATCH --gres=gpu:8        # numper of GPUs per node
+#SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=100:00:00                # Time limit hrs:min:sec
@@ -20,7 +20,7 @@ module purge
 source $HOME/.bashrc 
 source $HOME/.bash_profile
 
-module load pytorch-gpu/py3/1.13.0
+module load pytorch-gpu/py3/1.12.1
 
 set -e
 
