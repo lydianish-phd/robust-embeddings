@@ -30,10 +30,10 @@ MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-100000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-260000"
 
 MODEL[2]=rosonar_std
-MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-100000"
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-260000"
 
 # Multilingual
 
@@ -183,7 +183,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {0..0}
+for i in {1..2}
 do
     echo "Model: ${MODEL[$i]}"
 
