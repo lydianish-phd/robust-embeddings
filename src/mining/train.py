@@ -1,9 +1,6 @@
 import os, argparse
 
-from rolaser_model import (
-    RoLaserConfig,
-    RoLaserModel
-)
+from rolaser_sentence_encoder import RoLaserSentenceEncoder
 from rolaser_distillation import (
     DataCollatorForRoLaserDistillation,
     RoLaserDistillationTrainer,
@@ -16,7 +13,6 @@ from datasets import (
 from transformers import (
     TrainingArguments,
     EarlyStoppingCallback,
-    XLMRobertaTokenizerFast
 )
 from accelerate import Accelerator
 
@@ -80,14 +76,9 @@ if __name__=="__main__":
     xlm_checkpoint = "cardiffnlp/twitter-xlm-roberta-base"
     xlm_checkpoint_path = os.path.join(os.environ["MODELS"], xlm_checkpoint)
 
-    print("Loading tokenizers...")
-
-    student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
-
     print("Initializing student model...")
 
-    student_model_config = RoLaserConfig.from_pretrained(xlm_checkpoint_path, output_size=1024, pooling="max")
-    student_model = RoLaserModel.from_pretrained(xlm_checkpoint_path, config=student_model_config, ignore_mismatched_sizes=True) #ignore the pooling layer from the checkpoint
+    student_model = RoLaserSentenceEncoder(xlm_checkpoint_path)
 
     print("Instantiating data collator...")
 

@@ -26,12 +26,12 @@ set -e
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="050f"
+EXPERIMENT_NUM="050g"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_$EXPERIMENT_NUM
 
 SEED=42
 ACCUMULATION_STEPS=1 
-LEARNING_RATE=2e-5 # from Reimers and Gurevych (2020)
+LEARNING_RATE=1e-4 # from Reimers and Gurevych (2020)
 LR_SCHEDULER=constant_with_warmup
 
 echo "Setting the accelerate config..."
@@ -67,7 +67,7 @@ export LAUNCHER="accelerate launch \
 # Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
 
 export PROGRAM="\
-    $HOME/robust-embeddings/src/mining/train2.py \
+    $HOME/robust-embeddings/src/mining/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
     --learning-rate $LEARNING_RATE \

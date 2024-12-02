@@ -1,7 +1,7 @@
-from transformers import DefaultDataCollator, Trainer, XLMRobertaTokenizer
+from transformers import DefaultDataCollator, Trainer
 from typing import Any, Dict, List
 import torch
-from rolaser_model import RoLaserModel
+from rolaser_sentence_encoder import RoLaserSentenceEncoder
 from torch.nn import MSELoss
 
 class DataCollatorForRoLaserDistillation(DefaultDataCollator):
@@ -21,7 +21,7 @@ class DataCollatorForRoLaserDistillation(DefaultDataCollator):
 class RoLaserDistillationTrainer(Trainer):
     def __init__(
         self, 
-        student_model: RoLaserModel,
+        student_model: RoLaserSentenceEncoder,
         *args,
         **kwargs
     ):
@@ -33,7 +33,12 @@ class RoLaserDistillationTrainer(Trainer):
         batch_size = inputs["student_src_ids"].shape[0]
         student_ids = torch.cat([inputs["student_src_ids"], inputs["student_tgt_ids"]], dim=0)
         student_masks = torch.cat([inputs["student_src_masks"], inputs["student_tgt_masks"]], dim=0)
-        student_outputs = model(input_ids=student_ids, attention_mask=student_masks).pooler_output
+        student_outputs = model(
+            {
+                "input_ids": student_ids,
+                "attention_mask": student_masks
+            }
+        )["sentence_embedding"]
         student_source_output, student_target_output = torch.split(student_outputs, batch_size, dim=0)
         
         distillation_loss = (
