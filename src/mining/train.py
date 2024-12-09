@@ -8,13 +8,34 @@ from rolaser_distillation import (
 )
 from datasets import (
     load_dataset,
-    interleave_datasets
+    interleave_datasets,
+    IterableDataset
 )
 from transformers import (
     TrainingArguments,
     EarlyStoppingCallback,
 )
 from accelerate import Accelerator
+
+class CustomIterableDataset(IterableDataset):
+    def __init__(
+        self,
+        dataset: IterableDataset,
+        samples: int
+    ):
+        super().__init__(
+            dataset._ex_iterable, 
+            dataset._info, 
+            dataset._split, 
+            dataset._formatting, 
+            dataset._shuffling, 
+            dataset._distributed, 
+            dataset._token_per_repo_id
+        )
+        self.samples = samples
+
+    def __len__(self):
+        return self.samples
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -32,44 +53,45 @@ if __name__=="__main__":
 
     print("Loading datasets...")
 
-    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rolaser")
-    monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rolaser")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rolaser")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rolaser")
 
     all_metadata = {
         "en-fr": {
-            "input_dir_prefix": f"{bilingual_data_dir}/eng-fra/",
+            "input_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra/",
             "lang_pair": "eng_Latn-fra_Latn"
         },
         "fr": {
-            "input_dir_prefix": f"{monolingual_data_dir}/fra/",
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/fra/",
             "lang_pair": "fra_Latn-fra_Latn"
         },
         "en_1": {
-            "input_dir_prefix": f"{monolingual_data_dir}/eng/part1/",
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1/",
             "lang_pair": "eng_Latn-eng_Latn"
         },
         "en_2": {
-            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2/",
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2/",
             "lang_pair": "eng_Latn-eng_Latn"
         },
         "en_2_ugc": {
-            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2_ugc/",
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc/",
             "lang_pair": "eng_Latn-eng_Latn"
         }
     }
 
-    data = {}
+    tokenized_data = {}
     for lang_pair, metadata in all_metadata.items():
         if lang_pair == "en_2" and args.ugc_en:
             continue
         elif lang_pair == "en_2_ugc" and not args.ugc_en:
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
-        data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
-        data[lang_pair] = data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
+        tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
+        tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
-    all_train_data = interleave_datasets([data["train"] for data in data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
-    all_valid_data = interleave_datasets([data["valid"] for data in data.values()], seed=args.seed, stopping_strategy="all_exhausted")
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
+    # tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=260000*2048) # samples needed to exhaust all data
+    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Defining initialisation checkpoint...")
 
@@ -105,7 +127,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=10_267_792, # steps needed to exhaust all en-fr data
+        max_steps=10_267_792, # num_train_epochs=10,
         warmup_steps=10_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
@@ -123,8 +145,8 @@ if __name__=="__main__":
     trainer = RoLaserDistillationTrainer(
         student_model=student_model,
         args=training_args,
-        train_dataset=all_train_data,
-        eval_dataset=all_valid_data,
+        train_dataset=tokenized_train_data,
+        eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
     )
