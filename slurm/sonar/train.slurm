@@ -12,6 +12,7 @@
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --exclusive
 #SBATCH --qos=qos_gpu_h100-t4
+#SBATCH --array=0-1
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -25,7 +26,7 @@ source $HOME/.bash_profile
 
 set -e
 
-DATA_CONFIG=0
+DATA_CONFIG=$SLURM_ARRAY_TASK_ID
 
 MODEL[0]="rosonar"
 UGC_EN[0]=True

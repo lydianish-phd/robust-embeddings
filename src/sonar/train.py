@@ -7,18 +7,39 @@ from sonar.models.sonar_text.loader import (
 from rosonar_distillation import (
     DataCollatorForRoSonarDistillation,
     RoSonarDistillationTrainer,
+    load_student_encoder_from_checkpoint,
     compute_metrics,
-    load_student_encoder_from_checkpoint
 )
 from datasets import (
     load_dataset,
-    interleave_datasets
+    interleave_datasets,
+    IterableDataset
 )
 from transformers import (
     TrainingArguments,
     EarlyStoppingCallback
 )
 from accelerate import Accelerator
+
+class CustomIterableDataset(IterableDataset):
+    def __init__(
+        self,
+        dataset: IterableDataset,
+        samples: int
+    ):
+        super().__init__(
+            dataset._ex_iterable, 
+            dataset._info, 
+            dataset._split, 
+            dataset._formatting, 
+            dataset._shuffling, 
+            dataset._distributed, 
+            dataset._token_per_repo_id
+        )
+        self.samples = samples
+
+    def __len__(self):
+        return self.samples
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -74,6 +95,7 @@ if __name__=="__main__":
         tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
+    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=260000*2048) # samples needed to exhaust all data
     tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
@@ -116,7 +138,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=320_868, # steps needed to exhaust all en-fr data
+        num_train_epochs=10,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
