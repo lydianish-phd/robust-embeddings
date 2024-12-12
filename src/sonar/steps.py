@@ -1,54 +1,58 @@
-import os
+import os, argparse
 from torch.utils.data import DataLoader
-
 from datasets import (
     load_dataset,
     interleave_datasets
 )
 
-seed = 42
+if __name__=="__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
+    args = parser.parse_args()
 
-print("Loading datasets...")
+    print("Loading datasets...")
 
-bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized")
-monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rosonar")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rosonar")
 
-data_en_fr_files = {
-    "train": f"{bilingual_data_dir}/eng-fra/train.eng_Latn-fra_Latn_chunks/train.eng_Latn-fra_Latn-*.jsonl"
-}
-data_en_fr = load_dataset("json", data_files=data_en_fr_files, streaming=True)
+    all_metadata = {
+        "en-fr": {
+            "input_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra/",
+            "lang_pair": "eng_Latn-fra_Latn"
+        },
+        "fr": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/fra/",
+            "lang_pair": "fra_Latn-fra_Latn"
+        },
+        "en_1": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        },
+        "en_2": {
+            "input_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2/",
+            "lang_pair": "eng_Latn-eng_Latn"
+        }
+    }
 
-data_fr_files = {
-    "train": f"{monolingual_data_dir}/fra/train.fra_Latn-fra_Latn_chunks/train.fra_Latn-fra_Latn-*.jsonl"
-}
-data_fr = load_dataset("json", data_files=data_fr_files, streaming=True)
+    tokenized_data = {}
+    for lang_pair, metadata in all_metadata.items():
+        data_files = { "train": f"{metadata['input_dir_prefix']}/train.{metadata['lang_pair']}_chunks/train.{metadata['lang_pair']}-*.jsonl" }
+        tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
+        tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
 
-data_en_files = {
-    "train": f"{monolingual_data_dir}/eng/part1/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl"
-}
-data_en = load_dataset("json", data_files=data_en_files, streaming=True)
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
 
-data_en_2_files = {
-    "train": f"{monolingual_data_dir}/eng/part2/train.eng_Latn-eng_Latn_chunks/train.eng_Latn-eng_Latn-*.jsonl"
-}
-data_en_2 = load_dataset("json", data_files=data_en_2_files, streaming=True)
+    data_loader = DataLoader(tokenized_train_data, batch_size=2048, num_workers=args.dataloader_workers)
 
-strategy = "first_exhausted"
-all_train_data = interleave_datasets([data_en_fr["train"], data_fr["train"], data_en["train"], data_en_2["train"]], probabilities=[4/8, 2/8, 1/8, 1/8], seed=seed, stopping_strategy=strategy)
+    # Initialize counters
+    n_steps = 0
 
-print("Interleaving strategy", strategy)
+    # Loop through the DataLoader
+    for batch in data_loader:
+        n_steps += 1
+        if n_steps % 1000 == 0:
+            print(f"Processed {n_steps} steps...")
 
-data_loader = DataLoader(all_train_data, batch_size=256, num_workers=16)
-
-# Initialize counters
-total_elements = 0
-
-# Loop through the DataLoader
-for batch in data_loader:
-    # Count the elements in the current batch
-    total_elements += len(batch['src_sentence_ids'])
-    if total_elements % 256**2 == 0:
-        print(f"Processed {total_elements} elements")
-
-# Print total counts
-print(f"Total elements: {total_elements}")
+    # Print total counts
+    print(f"Total steps for an effective batch size of 2048: {n_steps}")

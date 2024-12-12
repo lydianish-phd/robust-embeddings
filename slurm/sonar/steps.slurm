@@ -1,11 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=evaluate      # Job name
+#SBATCH --job-name=steps      # Job name
 #SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2	# Partition name
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
-#SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
+#SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
@@ -22,7 +23,7 @@ source $HOME/.bash_profile
 
 set -e
 
-python $HOME/robust-embeddings/src/sonar/steps.py
+python $HOME/robust-embeddings/src/sonar/steps.py --dataloader-workers $SLURM_CPUS_PER_TASK 
 
 echo "Done..."
 

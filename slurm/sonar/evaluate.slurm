@@ -24,7 +24,7 @@ set -e
 
 SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047k
 MODELS="nllb1b sonar nllb600m"
 # MODELS="rosonar" # rosonar_std"
 
@@ -194,10 +194,10 @@ do
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
 done
 
-# python $HOME/robust-embeddings/src/sonar/evaluate.py \
-#     --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
-#     --sys-files "${SYS_FILES[@]}" \
-#     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
+python $HOME/robust-embeddings/src/sonar/evaluate.py \
+    --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --sys-files "${SYS_FILES[@]}" \
+    --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
 
 python $HOME/robust-embeddings/src/sonar/stats.py \
     -i "${SYS_FILES[@]}" \
