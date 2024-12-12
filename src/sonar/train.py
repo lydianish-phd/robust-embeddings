@@ -160,7 +160,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=5)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=10)],
     )
 
     resume_from_checkpoint = args.resume_last and os.path.exists(checkpoint_dir) and len(os.listdir(checkpoint_dir)) > 0
