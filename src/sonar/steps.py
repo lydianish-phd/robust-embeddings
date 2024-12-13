@@ -13,10 +13,14 @@ def get_dynamic_batch_size(fallback_batch_size=16, factor=256):
         total_memory = torch.cuda.get_device_properties(gpu_index).total_memory
         # Estimate a batch size based on GPU memory (e.g., 256 samples per GB of memory)
         batch_size = int(total_memory / (1024**3) * factor)
-        return max(batch_size, fallback_batch_size)  # Ensure batch size isn't too small
     else:
         # Default batch size for CPU
-        return fallback_batch_size
+        batch_size = fallback_batch_size
+    
+    # Ensure batch size is a factor of 8
+    batch_size = max(batch_size, fallback_batch_size)  # Avoid being too small
+    batch_size = (batch_size // 8) * 8  # Round down to the nearest multiple of 8
+    return batch_size
 
 
 if __name__=="__main__":
