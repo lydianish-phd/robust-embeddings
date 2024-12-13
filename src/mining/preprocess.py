@@ -117,11 +117,11 @@ if __name__=="__main__":
 
     print("Loading teacher model...")
 
-    teacher_model = initialize_encoder(lang="english")
+    teacher_model = initialize_encoder(laser="laser2")
     
     print("Loading tokenizers...")
 
-    teacher_tokenizer = initialize_tokenizer(lang="english")
+    teacher_tokenizer = initialize_tokenizer(laser="laser2")
     student_tokenizer = XLMRobertaTokenizerFast.from_pretrained(xlm_checkpoint_path)
     max_length = 512
 
