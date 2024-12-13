@@ -4,28 +4,11 @@ from datasets import (
     load_dataset,
     interleave_datasets
 )
-import torch
-
-# Function to determine batch size based on available GPU memory
-def get_dynamic_batch_size(fallback_batch_size=16, factor=256):
-    if torch.cuda.is_available():
-        gpu_index = torch.cuda.current_device()
-        total_memory = torch.cuda.get_device_properties(gpu_index).total_memory
-        # Estimate a batch size based on GPU memory (e.g., 256 samples per GB of memory)
-        batch_size = int(total_memory / (1024**3) * factor)
-    else:
-        # Default batch size for CPU
-        batch_size = fallback_batch_size
-    
-    # Ensure batch size is a factor of 8
-    batch_size = max(batch_size, fallback_batch_size)  # Avoid being too small
-    batch_size = (batch_size // 8) * 8  # Round down to the nearest multiple of 8
-    return batch_size
-
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--batch-size", help="batch size", type=int, default=2048)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
     args = parser.parse_args()
 
@@ -61,10 +44,9 @@ if __name__=="__main__":
 
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
 
-    batch_size = get_dynamic_batch_size()
-    print(f"Using batch size of {batch_size}")
+    print(f"Using batch size of {args.batch_size}")
     
-    data_loader = DataLoader(tokenized_train_data, batch_size=batch_size, num_workers=args.dataloader_workers, pin_memory=True)
+    data_loader = DataLoader(tokenized_train_data, batch_size=args.batch_size, num_workers=args.dataloader_workers, pin_memory=True)
 
     # Initialize counters
     n_steps = 0
@@ -72,8 +54,8 @@ if __name__=="__main__":
     # Loop through the DataLoader
     for batch in data_loader:
         n_steps += 1
-        if n_steps % 1000 == 0:
+        if n_steps % 100 == 0:
             print(f"Processed {n_steps} steps...")
 
     # Print total counts
-    print(f"Total steps for a batch size of {batch_size}: {n_steps}")
+    print(f"Total steps for a batch size of {args.batch_size}: {n_steps}")
