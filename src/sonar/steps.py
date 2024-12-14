@@ -8,7 +8,7 @@ from datasets import (
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--batch-size", help="batch size", type=int, default=2048)
+    parser.add_argument("--batch-size", help="batch size", type=int, default=8192)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
     args = parser.parse_args()
 
@@ -50,12 +50,17 @@ if __name__=="__main__":
 
     # Initialize counters
     n_steps = 0
+    incomplete_batch_sizes = []
 
     # Loop through the DataLoader
     for batch in data_loader:
+        current_batch_size = len(batch)
+        if current_batch_size < args.batch_size:
+            incomplete_batch_sizes.append(current_batch_size)
         n_steps += 1
         if n_steps % 100 == 0:
             print(f"Processed {n_steps} steps...")
 
     # Print total counts
     print(f"Total steps for a batch size of {args.batch_size}: {n_steps}")
+    print(f"Incomplete batch sizes: {incomplete_batch_sizes}")
