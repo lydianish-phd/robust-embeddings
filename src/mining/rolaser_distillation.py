@@ -41,10 +41,13 @@ class RoLaserDistillationTrainer(Trainer):
         )["sentence_embedding"]
         student_source_output, student_target_output = torch.split(student_outputs, batch_size, dim=0)
         
-        distillation_loss = (
-            self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
-            self.loss_function(inputs["teacher_tgt_embeds"], student_target_output)
-        )
+        # distillation_loss = (
+        #     self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
+        #     self.loss_function(inputs["teacher_tgt_embeds"], student_target_output)
+        # )
+
+        teacher_target_embeddings = torch.cat([inputs["teacher_tgt_embeds"], inputs["teacher_tgt_embeds"]], dim=0)
+        distillation_loss = self.loss_function(teacher_target_embeddings, student_outputs)
 
         outputs = {
             "student_source_embeddings": student_source_output,
