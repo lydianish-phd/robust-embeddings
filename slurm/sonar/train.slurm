@@ -77,7 +77,7 @@ export LAUNCHER="accelerate launch \
 # Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
 
 export PROGRAM="\
-    $HOME/robust-embeddings/src/sonar/train.py \
+    $HOME/robust-embeddings/src/sonar/train2.py \
     -o $EXPERIMENT_DIR \
     --model-name ${MODEL[$DATA_CONFIG]} \
     --seed $SEED \
