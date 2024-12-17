@@ -47,6 +47,8 @@ if __name__=="__main__":
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
     parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
+    parser.add_argument("--single-mse-loss", help="use single MSE loss for distillation", type=bool, default=False)
+    parser.add_argument("--pooling-mode", help="pooling mode for student model", type=str, default="mean")
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -100,7 +102,7 @@ if __name__=="__main__":
 
     print("Initializing student model...")
 
-    student_model = RoLaserSentenceEncoder(xlm_checkpoint_path)
+    student_model = RoLaserSentenceEncoder(xlm_checkpoint_path, pooling_mode=args.pooling_mode)
 
     print("Instantiating data collator...")
 
@@ -144,6 +146,7 @@ if __name__=="__main__":
 
     trainer = RoLaserDistillationTrainer(
         student_model=student_model,
+        single_mse_loss=args.single_mse_loss,
         args=training_args,
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,

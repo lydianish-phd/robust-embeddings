@@ -22,12 +22,14 @@ class RoLaserDistillationTrainer(Trainer):
     def __init__(
         self, 
         student_model: RoLaserSentenceEncoder,
+        single_mse_loss: bool = False,
         *args,
         **kwargs
     ):
         super().__init__(model=student_model, *args, **kwargs)
 
         self.loss_function = MSELoss(reduction="sum")
+        self.single_mse_loss = single_mse_loss
 
     def compute_loss(self, model, inputs, return_outputs=False):
         batch_size = inputs["student_src_ids"].shape[0]
@@ -41,13 +43,14 @@ class RoLaserDistillationTrainer(Trainer):
         )["sentence_embedding"]
         student_source_output, student_target_output = torch.split(student_outputs, batch_size, dim=0)
         
-        # distillation_loss = (
-        #     self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
-        #     self.loss_function(inputs["teacher_tgt_embeds"], student_target_output)
-        # )
-
-        teacher_target_embeddings = torch.cat([inputs["teacher_tgt_embeds"], inputs["teacher_tgt_embeds"]], dim=0)
-        distillation_loss = self.loss_function(teacher_target_embeddings, student_outputs)
+        if self.single_mse_loss:
+            teacher_target_embeddings = torch.cat([inputs["teacher_tgt_embeds"], inputs["teacher_tgt_embeds"]], dim=0)
+            distillation_loss = self.loss_function(teacher_target_embeddings, student_outputs)
+        else:
+            distillation_loss = (
+                self.loss_function(inputs["teacher_tgt_embeds"], student_source_output) + 
+                self.loss_function(inputs["teacher_tgt_embeds"], student_target_output)
+            )
 
         outputs = {
             "student_source_embeddings": student_source_output,
