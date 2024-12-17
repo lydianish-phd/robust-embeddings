@@ -50,11 +50,13 @@ if __name__=="__main__":
 
     # Initialize counters
     n_steps = 0
+    n_samples = 0
     incomplete_batch_sizes = []
 
     # Loop through the DataLoader
     for batch in data_loader:
         current_batch_size = len(batch)
+        n_samples += current_batch_size
         if current_batch_size < args.batch_size:
             incomplete_batch_sizes.append(current_batch_size)
         n_steps += 1
@@ -63,4 +65,5 @@ if __name__=="__main__":
 
     # Print total counts
     print(f"Total steps for a batch size of {args.batch_size}: {n_steps}")
-    print(f"Incomplete batch sizes: {incomplete_batch_sizes}")
+    print(f"Total samples: {n_samples}")
+    print(f"Incomplete batches: num = {len(incomplete_batch_sizes)}, sum of samples = {sum(incomplete_batch_sizes)}")  
