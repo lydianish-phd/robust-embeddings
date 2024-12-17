@@ -95,7 +95,7 @@ if __name__=="__main__":
         tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
-    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=260000*2048) # samples needed to exhaust all data
+    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=320982*2048) # samples needed to exhaust all data
     tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
