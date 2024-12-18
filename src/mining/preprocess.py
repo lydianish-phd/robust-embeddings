@@ -126,6 +126,11 @@ if __name__=="__main__":
     max_length = 512
 
     for lang_pair, metadata in all_metadata.items():
+        output_file = f"{metadata['output_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl"
+        if os.path.exists(output_file):
+            print(f"Skipping {lang_pair} dataset...")
+            continue
+
         print(f"Loading {lang_pair} dataset...")
         data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
         data = load_dataset("json", data_files=data_files)
