@@ -8,11 +8,10 @@
 #SBATCH --gres=gpu:8        # numper of GPUs per node
 #SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
-#SBATCH --time=24:00:00                # Time limit hrs:min:sec
+#SBATCH --time=100:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
 #SBATCH --exclusive
 #SBATCH --qos=qos_gpu-t4
-#SBATCH --array=0-1
 
 echo "### Running $SLURM_JOB_NAME ###"
 
@@ -27,17 +26,13 @@ set -e
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM[0]="050m"
-EXPERIMENT_NUM[1]="050n"
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_${EXPERIMENT_NUM[$SLURM_ARRAY_TASK_ID]}
+EXPERIMENT_NUM="050o"
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/mining/experiment_$EXPERIMENT_NUM
 
 SEED=42
 ACCUMULATION_STEPS=1 
 LEARNING_RATE=1e-4
 LR_SCHEDULER=inverse_sqrt
-POOLING="max"
-LOSS[0]=""
-LOSS[1]="--single-mse-loss"
 
 echo "Setting the accelerate config..."
 
@@ -72,15 +67,13 @@ export LAUNCHER="accelerate launch \
 # Note: it is important to escape `$SLURM_PROCID` since we want the srun on each node to evaluate this variable
 
 export PROGRAM="\
-    $HOME/robust-embeddings/src/mining/train2.py \
+    $HOME/robust-embeddings/src/mining/train.py \
     -o $EXPERIMENT_DIR \
     --seed $SEED \
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    --dataloader-workers $SLURM_CPUS_PER_TASK \
-    --pooling $POOLING \
-    ${LOSS[$SLURM_ARRAY_TASK_ID]}
+    --dataloader-workers $SLURM_CPUS_PER_TASK
     "
 
 export CMD="$LAUNCHER $PROGRAM"
