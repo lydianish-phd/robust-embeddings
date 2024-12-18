@@ -55,7 +55,7 @@ if __name__=="__main__":
 
     # Loop through the DataLoader
     for batch in data_loader:
-        current_batch_size = len(batch)
+        current_batch_size = len(batch["src_sentence_ids"])
         n_samples += current_batch_size
         if current_batch_size < args.batch_size:
             incomplete_batch_sizes.append(current_batch_size)
