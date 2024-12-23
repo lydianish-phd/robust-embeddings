@@ -84,7 +84,7 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
                 optimizer=self.optimizer,
                 num_warmup_steps=new_warmup_steps,
                 timescale=new_timescale,
-                last_epoch=-1 # Start fresh every epoch
+                last_epoch=state.epoch # Start fresh every epoch
             )
 
             print("after", self.optimizer.state_dict())
