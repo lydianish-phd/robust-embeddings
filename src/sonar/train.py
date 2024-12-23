@@ -1,4 +1,4 @@
-import os, argparse, math
+import os, argparse
 
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
@@ -53,7 +53,7 @@ class CustomIterableDataset(IterableDataset):
         return self.samples
 
 class ResetInverseSrqtSchedulerCallback(TrainerCallback):
-    def __init__(self, optimizer, num_warmup_steps, timescale=None):
+    def __init__(self, optimizer, num_steps_per_epoch, num_warmup_steps, timescale=None):
         """
         Args:
             optimizer: The optimizer instance used in the Trainer.
@@ -61,31 +61,37 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
             timescale: Timescale for the inverse square root decay. Defaults to num_warmup_steps.
         """
         self.optimizer = optimizer
+        self.num_steps_per_epoch = num_steps_per_epoch
         self.num_warmup_steps = num_warmup_steps
         self.timescale = timescale if timescale else num_warmup_steps
         self.scheduler = None
 
     def on_epoch_begin(self, args, state, control, **kwargs):
         """
-        Reset the scheduler and optimizer at the beginning of each epoch.
+        Reset the scheduler at the beginning of each epoch.
         """
         if state.epoch > 0:
-            print(f"Resetting learning rate scheduler at the start of epoch {math.ceil(state.epoch) + 1}")
-            
-            self.optimizer = AdamW(student_model.parameters(), lr=args.learning_rate, betas=(0.9, 0.98), eps=1e-6)
+            print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
+            # Reinitialize the optimizer
+            # self.optimizer = AdamW(
+            #     kwargs["model"].parameters(), 
+            #     lr=args.learning_rate, 
+            #     betas=(args.adam_beta1, args.adam_beta2), 
+            #     eps=args.adam_epsilon
+            # )
             # Reset the learning rate for each parameter group in the optimizer
             # for param_group in self.optimizer.param_groups:
             #     param_group['lr'] = args.learning_rate
 
             # Reinitialize the scheduler
+            new_warmup_steps = round(state.epoch) * self.num_steps_per_epoch + self.num_warmup_steps
+
             self.scheduler = get_inverse_sqrt_schedule(
                 optimizer=self.optimizer,
-                num_warmup_steps=self.num_warmup_steps,
+                num_warmup_steps=new_warmup_steps,
                 timescale=self.timescale,
                 last_epoch=-1 # Start fresh every epoch
             )
-
-            print(self.scheduler)
 
     def on_step_end(self, args, state, control, **kwargs):
         """
