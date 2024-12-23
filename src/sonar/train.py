@@ -1,5 +1,7 @@
 import os, argparse
 
+from transformers.trainer_callback import TrainerControl, TrainerState
+
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
     load_sonar_tokenizer,
@@ -72,22 +74,14 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         if state.epoch > 0:
             print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
             self.optimizer = kwargs["optimizer"]
-            
-            # # Reset the learning rate for each parameter group in the optimizer
-            # for param_group in self.optimizer.param_groups:
-            #     param_group['lr'] = args.learning_rate
-
-            # Reinitialize the scheduler
             new_warmup_steps = round(state.epoch) * self.num_steps_per_epoch + self.num_warmup_steps
             new_timescale = round(state.epoch) * self.num_steps_per_epoch + self.timescale
             self.scheduler = get_inverse_sqrt_schedule(
                 optimizer=self.optimizer,
                 num_warmup_steps=new_warmup_steps,
                 timescale=new_timescale,
-                last_epoch=state.epoch # Start fresh every epoch
+                last_epoch=state.epoch
             )
-
-            print("after", self.optimizer.state_dict())
 
     def on_step_end(self, args, state, control, **kwargs):
         """
@@ -95,6 +89,10 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         """
         if self.scheduler:
             self.scheduler.step()
+
+    def on_log(self, args, state, control, **kwargs):
+        print("log", kwargs["optimizer"].state_dict())
+        print("last lr", self.scheduler.get_last_lr())
 
 
 if __name__=="__main__":
