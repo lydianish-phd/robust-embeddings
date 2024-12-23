@@ -17,16 +17,27 @@ from datasets import (
 )
 from transformers import (
     TrainingArguments,
-    EarlyStoppingCallback
+    EarlyStoppingCallback,
+    TrainerCallback,
+    get_inverse_sqrt_schedule,
+    AdamW
 )
 from accelerate import Accelerator
 
+STEPS_PER_EPOCH = 330_000
+EFFECTIVE_BATCH_SIZE = 2048
+SAMPLES_PER_EPOCH = STEPS_PER_EPOCH * EFFECTIVE_BATCH_SIZE
 class CustomIterableDataset(IterableDataset):
     def __init__(
         self,
         dataset: IterableDataset,
         samples: int
     ):
+        """
+        Args:
+            dataset: The dataset to wrap.
+            samples: The number of samples to yield from the dataset
+        """
         super().__init__(
             dataset._ex_iterable, 
             dataset._info, 
@@ -40,6 +51,44 @@ class CustomIterableDataset(IterableDataset):
 
     def __len__(self):
         return self.samples
+
+from transformers import TrainerCallback, get_inverse_sqrt_schedule_with_warmup
+
+class ResetInverseSrqtSchedulerCallback(TrainerCallback):
+    def __init__(self, optimizer, num_warmup_steps):
+        """
+        Args:
+            optimizer: The optimizer instance used in the Trainer.
+            num_warmup_steps: Number of steps for the warm-up phase.
+        """
+        self.optimizer = optimizer
+        self.num_warmup_steps = num_warmup_steps
+        self.scheduler = None
+
+    def on_epoch_end(self, args, state, control, **kwargs):
+        """
+        Reset the scheduler at the end of each epoch.
+        """
+        print(f"Resetting learning rate scheduler at the end of epoch {state.epoch + 1}")
+        
+        # Reset the learning rate for each parameter group in the optimizer
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = args.learning_rate
+
+        # Reinitialize the scheduler
+        self.scheduler = get_inverse_sqrt_schedule(
+            optimizer=self.optimizer,
+            num_warmup_steps=self.num_warmup_steps,
+            last_epoch=state.epoch
+        )
+
+    def on_step_end(self, args, state, control, **kwargs):
+        """
+        Step the scheduler after each batch.
+        """
+        if self.scheduler:
+            self.scheduler.step()
+
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -95,7 +144,7 @@ if __name__=="__main__":
         tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
-    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=320982*2048) # samples needed to exhaust all data
+    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=SAMPLES_PER_EPOCH) # samples needed to exhaust all data
     tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
@@ -139,12 +188,12 @@ if __name__=="__main__":
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
         num_train_epochs=10,
-        warmup_steps=8_000,
+        # warmup_steps=8_000,
         learning_rate=args.learning_rate,
-        lr_scheduler_type=args.lr_scheduler_type,
-        adam_beta1=0.9,
-        adam_beta2=0.98,
-        adam_epsilon=1e-6,
+        # lr_scheduler_type=args.lr_scheduler_type,
+        # adam_beta1=0.9,
+        # adam_beta2=0.98,
+        # adam_epsilon=1e-6,
         save_steps=10_000,
         logging_steps=100,
         eval_steps=10_000,
@@ -153,6 +202,8 @@ if __name__=="__main__":
         resume_from_checkpoint=checkpoint_dir
     )
 
+    optimizer = AdamW(student_model.parameters(), lr=args.learning_rate, betas=(0.9, 0.98), eps=1e-6)
+
     trainer = RoSonarDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,
@@ -160,7 +211,11 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=10)],
+        optimizers=(optimizer, None),
+        callbacks=[
+            EarlyStoppingCallback(early_stopping_patience=10),
+            ResetInverseSrqtSchedulerCallback(optimizer, num_warmup_steps=8_000)
+        ]
     )
 
     resume_from_checkpoint = args.resume_last and os.path.exists(checkpoint_dir) and len(os.listdir(checkpoint_dir)) > 0
