@@ -52,8 +52,6 @@ class CustomIterableDataset(IterableDataset):
     def __len__(self):
         return self.samples
 
-from transformers import TrainerCallback, get_inverse_sqrt_schedule_with_warmup
-
 class ResetInverseSrqtSchedulerCallback(TrainerCallback):
     def __init__(self, optimizer, num_warmup_steps):
         """
