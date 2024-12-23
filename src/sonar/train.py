@@ -72,9 +72,10 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         if state.epoch > 0:
             print(f"Resetting learning rate scheduler at the start of epoch {math.ceil(state.epoch) + 1}")
             
+            self.optimizer = AdamW(student_model.parameters(), lr=args.learning_rate, betas=(0.9, 0.98), eps=1e-6)
             # Reset the learning rate for each parameter group in the optimizer
-            for param_group in self.optimizer.param_groups:
-                param_group['lr'] = args.learning_rate
+            # for param_group in self.optimizer.param_groups:
+            #     param_group['lr'] = args.learning_rate
 
             # Reinitialize the scheduler
             self.scheduler = get_inverse_sqrt_schedule(
@@ -84,11 +85,7 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
                 last_epoch=-1 # Start fresh every epoch
             )
 
-            # Set the optimizer and scheduler for the Trainer
-            control.optimizer = self.optimizer
-            control.lr_scheduler = self.scheduler
-        
-        return control
+            print(self.scheduler)
 
     def on_step_end(self, args, state, control, **kwargs):
         """
