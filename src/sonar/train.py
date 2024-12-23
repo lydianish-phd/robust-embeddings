@@ -70,19 +70,20 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         """
         Reset the scheduler at the beginning of each epoch.
         """
-        print("before", self.optimizer.state_dict())
+        print("before", kwargs["optimizer"].state_dict())
         if state.epoch > 0:
             print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
+            
             # Reinitialize the optimizer
-            # self.optimizer = AdamW(
-            #     kwargs["model"].parameters(), 
-            #     lr=args.learning_rate, 
-            #     betas=(args.adam_beta1, args.adam_beta2), 
-            #     eps=args.adam_epsilon
-            # )
+            self.optimizer = AdamW(
+                kwargs["model"].parameters(), 
+                lr=args.learning_rate, 
+                betas=(args.adam_beta1, args.adam_beta2), 
+                eps=args.adam_epsilon
+            )
             # Reset the learning rate for each parameter group in the optimizer
-            for param_group in self.optimizer.param_groups:
-                param_group['lr'] = args.learning_rate
+            # for param_group in self.optimizer.param_groups:
+            #     param_group['lr'] = args.learning_rate
 
             # Reinitialize the scheduler
             new_warmup_steps = round(state.epoch) * self.num_steps_per_epoch + self.num_warmup_steps
@@ -101,6 +102,7 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         Step the scheduler after each batch.
         """
         if self.scheduler:
+            print("Using scheduler")
             self.scheduler.step()
 
 
