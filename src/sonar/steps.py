@@ -40,7 +40,6 @@ if __name__=="__main__":
     for lang_pair, metadata in all_metadata.items():
         data_files = { "train": f"{metadata['input_dir_prefix']}/train.{metadata['lang_pair']}_chunks/train.{metadata['lang_pair']}-*.jsonl" }
         tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
-        tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
 
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
 
