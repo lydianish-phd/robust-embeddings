@@ -53,14 +53,13 @@ class CustomIterableDataset(IterableDataset):
         return self.samples
 
 class ResetInverseSrqtSchedulerCallback(TrainerCallback):
-    def __init__(self, optimizer, num_steps_per_epoch, num_warmup_steps, timescale=None):
+    def __init__(self, num_steps_per_epoch, num_warmup_steps, timescale=None):
         """
         Args:
-            optimizer: The optimizer instance used in the Trainer.
             num_warmup_steps: Number of steps for the warm-up phase.
             timescale: Timescale for the inverse square root decay. Defaults to num_warmup_steps.
         """
-        self.optimizer = optimizer
+        self.optimizer = None
         self.num_steps_per_epoch = num_steps_per_epoch
         self.num_warmup_steps = num_warmup_steps
         self.timescale = timescale if timescale else num_warmup_steps
@@ -70,18 +69,11 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         """
         Reset the scheduler at the beginning of each epoch.
         """
-        print("before", kwargs["optimizer"].state_dict())
         if state.epoch > 0:
             print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
+            self.optimizer = kwargs["optimizer"]
             
-            # Reinitialize the optimizer
-            self.optimizer = AdamW(
-                kwargs["model"].parameters(), 
-                lr=args.learning_rate, 
-                betas=(args.adam_beta1, args.adam_beta2), 
-                eps=args.adam_epsilon
-            )
-            # Reset the learning rate for each parameter group in the optimizer
+            # # Reset the learning rate for each parameter group in the optimizer
             # for param_group in self.optimizer.param_groups:
             #     param_group['lr'] = args.learning_rate
 
@@ -102,7 +94,6 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         Step the scheduler after each batch.
         """
         if self.scheduler:
-            print("Using scheduler")
             self.scheduler.step()
 
 
@@ -218,8 +209,6 @@ if __name__=="__main__":
         resume_from_checkpoint=checkpoint_dir
     )
 
-    optimizer = AdamW(student_model.parameters(), lr=args.learning_rate, betas=(0.9, 0.98), eps=1e-6)
-
     trainer = RoSonarDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,
@@ -229,7 +218,7 @@ if __name__=="__main__":
         data_collator=data_collator,
         callbacks=[
             EarlyStoppingCallback(early_stopping_patience=10),
-            ResetInverseSrqtSchedulerCallback(optimizer, num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
+            ResetInverseSrqtSchedulerCallback(num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
         ]
     )
 
