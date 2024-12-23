@@ -1,4 +1,4 @@
-import os, argparse
+import os, argparse, math
 
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
@@ -53,32 +53,42 @@ class CustomIterableDataset(IterableDataset):
         return self.samples
 
 class ResetInverseSrqtSchedulerCallback(TrainerCallback):
-    def __init__(self, optimizer, num_warmup_steps):
+    def __init__(self, optimizer, num_warmup_steps, timescale=None):
         """
         Args:
             optimizer: The optimizer instance used in the Trainer.
             num_warmup_steps: Number of steps for the warm-up phase.
+            timescale: Timescale for the inverse square root decay. Defaults to num_warmup_steps.
         """
         self.optimizer = optimizer
         self.num_warmup_steps = num_warmup_steps
+        self.timescale = timescale if timescale else num_warmup_steps
         self.scheduler = None
 
     def on_epoch_begin(self, args, state, control, **kwargs):
         """
-        Reset the scheduler at the beginning of each epoch.
+        Reset the scheduler and optimizer at the beginning of each epoch.
         """
-        print(f"Resetting learning rate scheduler at the end of epoch {state.epoch + 1}")
-        
-        # Reset the learning rate for each parameter group in the optimizer
-        for param_group in self.optimizer.param_groups:
-            param_group['lr'] = args.learning_rate
+        if state.epoch > 0:
+            print(f"Resetting learning rate scheduler at the start of epoch {math.ceil(state.epoch) + 1}")
+            
+            # Reset the learning rate for each parameter group in the optimizer
+            for param_group in self.optimizer.param_groups:
+                param_group['lr'] = args.learning_rate
 
-        # Reinitialize the scheduler
-        self.scheduler = get_inverse_sqrt_schedule(
-            optimizer=self.optimizer,
-            num_warmup_steps=self.num_warmup_steps,
-            last_epoch=-1 # Start fresh every epoch
-        )
+            # Reinitialize the scheduler
+            self.scheduler = get_inverse_sqrt_schedule(
+                optimizer=self.optimizer,
+                num_warmup_steps=self.num_warmup_steps,
+                timescale=self.timescale,
+                last_epoch=-1 # Start fresh every epoch
+            )
+
+            # Set the optimizer and scheduler for the Trainer
+            control.optimizer = self.optimizer
+            control.lr_scheduler = self.scheduler
+        
+        return control
 
     def on_step_end(self, args, state, control, **kwargs):
         """
