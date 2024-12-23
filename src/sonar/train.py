@@ -70,6 +70,7 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         """
         Reset the scheduler at the beginning of each epoch.
         """
+        print("before", self.optimizer.state_dict())
         if state.epoch > 0:
             print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
             # Reinitialize the optimizer
@@ -80,18 +81,20 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
             #     eps=args.adam_epsilon
             # )
             # Reset the learning rate for each parameter group in the optimizer
-            # for param_group in self.optimizer.param_groups:
-            #     param_group['lr'] = args.learning_rate
+            for param_group in self.optimizer.param_groups:
+                param_group['lr'] = args.learning_rate
 
             # Reinitialize the scheduler
             new_warmup_steps = round(state.epoch) * self.num_steps_per_epoch + self.num_warmup_steps
-
+            new_timescale = round(state.epoch) * self.num_steps_per_epoch + self.timescale
             self.scheduler = get_inverse_sqrt_schedule(
                 optimizer=self.optimizer,
                 num_warmup_steps=new_warmup_steps,
-                timescale=self.timescale,
+                timescale=new_timescale,
                 last_epoch=-1 # Start fresh every epoch
             )
+
+            print("after", self.optimizer.state_dict())
 
     def on_step_end(self, args, state, control, **kwargs):
         """
