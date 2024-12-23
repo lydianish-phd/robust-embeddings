@@ -224,7 +224,7 @@ if __name__=="__main__":
         data_collator=data_collator,
         callbacks=[
             EarlyStoppingCallback(early_stopping_patience=10),
-            ResetInverseSrqtSchedulerCallback(optimizer, num_warmup_steps=8_000)
+            ResetInverseSrqtSchedulerCallback(optimizer, num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
         ]
     )
 
