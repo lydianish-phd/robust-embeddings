@@ -54,6 +54,13 @@ class CustomIterableDataset(IterableDataset):
     def __len__(self):
         return self.samples
 
+class ResetAtEpochRestartCallback(TrainerCallback):
+    def on_epoch_begin(self, args, state, control, **kwargs):
+        # Reset optimizer and scheduler
+        print(f"Resetting optimizer and scheduler at the start of epoch {round(state.epoch) + 1}")
+        kwargs['trainer'].create_optimizer()
+        kwargs['trainer'].create_scheduler(len(kwargs['trainer'].get_train_dataloader()))
+
 class ResetInverseSrqtSchedulerCallback(TrainerCallback):
     def __init__(self, num_steps_per_epoch, num_warmup_steps, timescale=None):
         """
@@ -90,9 +97,9 @@ class ResetInverseSrqtSchedulerCallback(TrainerCallback):
         if self.scheduler:
             self.scheduler.step()
 
-    def on_log(self, args, state, control, **kwargs):
-        print("log", kwargs["optimizer"].state_dict())
+    def on_log(self, args, state, control, logs=None, **kwargs):
         print("last lr", self.scheduler.get_last_lr())
+        print("logs", logs)
 
 
 if __name__=="__main__":
@@ -146,7 +153,7 @@ if __name__=="__main__":
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
         tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
-        tokenized_data[lang_pair] = tokenized_data[lang_pair].shuffle(seed=args.seed, buffer_size=10_000)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
     tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=SAMPLES_PER_EPOCH) # samples needed to exhaust all data
@@ -192,7 +199,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        num_train_epochs=10,
+        num_train_epochs=2,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
@@ -207,6 +214,9 @@ if __name__=="__main__":
         resume_from_checkpoint=checkpoint_dir
     )
 
+    # for epoch in range(1):
+    #     training_args.max_steps = (epoch + 1) * STEPS_PER_EPOCH 
+        
     trainer = RoSonarDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,
@@ -216,7 +226,8 @@ if __name__=="__main__":
         data_collator=data_collator,
         callbacks=[
             EarlyStoppingCallback(early_stopping_patience=10),
-            ResetInverseSrqtSchedulerCallback(num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
+            # ResetAtEpochRestartCallback(),
+            # ResetInverseSrqtSchedulerCallback(num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
         ]
     )
 
