@@ -29,6 +29,8 @@ from accelerate import Accelerator
 STEPS_PER_EPOCH = 320_000
 EFFECTIVE_BATCH_SIZE = 2048
 SAMPLES_PER_EPOCH = STEPS_PER_EPOCH * EFFECTIVE_BATCH_SIZE
+DATA_SEED_OFFSET = 100
+
 class CustomIterableDataset(IterableDataset):
     def __init__(
         self,
@@ -154,11 +156,11 @@ if __name__=="__main__":
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
         tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
-        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed, buffer_size=10_000)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=10_000)
     
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed, stopping_strategy="all_exhausted")
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
     tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=SAMPLES_PER_EPOCH) # samples needed to exhaust all data
-    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed, stopping_strategy="all_exhausted")
+    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
 
