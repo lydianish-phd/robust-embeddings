@@ -185,7 +185,6 @@ if __name__=="__main__":
 
     if args.lr_scheduler_type == "cosine_with_restarts":
         lr_scheduler_kwargs = {
-            "num_training_steps": STEPS_PER_EPOCH * args.epochs,
             "num_cycles": args.epochs
         }
     else:
