@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=train      # Job name
-#SBATCH --account=rnh@h100
+#SBATCH --account=ncm@h100
 #SBATCH -C h100
 #SBATCH --nodes=4		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node # IMPORTANT - only 1 task per dist per node!
@@ -36,13 +36,14 @@ UGC_EN[1]=False
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="047l"
+EXPERIMENT_NUM="047n"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 
 SEED=42
 ACCUMULATION_STEPS=$((64 / SLURM_NNODES))
 LEARNING_RATE=7e-3
-LR_SCHEDULER=constant_with_warmup #inverse_sqrt
+LR_SCHEDULER=cosine_with_restarts
+EPOCHS=2
 
 echo "Setting the accelerate config..."
 
@@ -84,6 +85,7 @@ export PROGRAM="\
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
+    --epochs $EPOCHS \
     --ugc-en ${UGC_EN[$DATA_CONFIG]} \
     --dataloader-workers $SLURM_CPUS_PER_TASK
     "
