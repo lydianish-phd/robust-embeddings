@@ -44,17 +44,17 @@ python global_mining_pipeline.py \
     src_lang=$SRC_LANG tgt_lang=$TGT_LANG \
     +data=oscar_cc \
     data.data_shard_dir=$DATA_DIR \
-    embed_text=laser2 \
-    model_dir=$MODEL_DIR \
-    vocab_dir=$VOCAB_DIR \
+    embed_text=rolaser2 \
     local_tmp_dir=$TMP_DIR \
     max_shard_size=$MAX_LINES_PER_SHARD \
     train_index.config.num_cpu=$CPUS_PER_TASK \
-    train_index.config.constraint=$CONSTRAINT \
+    train_index.config.constraint=$CONhelSTRAINT \
     populate_index.config.num_cpu=$CPUS_PER_TASK \
     calculate_distances.config.constraint=$CONSTRAINT \
     mine_indexes.config.num_cpu=$CPUS_PER_TASK \
     mine_sentences.config.num_cpu=$CPUS_PER_TASK \
-    launcher.partition=$PARTITION 
+    launcher.partition=$PARTITION \
+    # model_dir=$MODEL_DIR \
+    # vocab_dir=$VOCAB_DIR \
 
 echo "Done..."

@@ -1,6 +1,6 @@
 import os, argparse
 
-from transformers.trainer_callback import TrainerControl, TrainerState
+from litdata import StreamingDataset, StreamingDataLoader
 
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
@@ -55,54 +55,6 @@ class CustomIterableDataset(IterableDataset):
 
     def __len__(self):
         return self.samples
-
-class ResetAtEpochRestartCallback(TrainerCallback):
-    def on_epoch_begin(self, args, state, control, **kwargs):
-        # Reset optimizer and scheduler
-        print(f"Resetting optimizer and scheduler at the start of epoch {round(state.epoch) + 1}")
-        kwargs['trainer'].create_optimizer()
-        kwargs['trainer'].create_scheduler(len(kwargs['trainer'].get_train_dataloader()))
-
-class ResetInverseSrqtSchedulerCallback(TrainerCallback):
-    def __init__(self, num_steps_per_epoch, num_warmup_steps, timescale=None):
-        """
-        Args:
-            num_warmup_steps: Number of steps for the warm-up phase.
-            timescale: Timescale for the inverse square root decay. Defaults to num_warmup_steps.
-        """
-        self.optimizer = None
-        self.num_steps_per_epoch = num_steps_per_epoch
-        self.num_warmup_steps = num_warmup_steps
-        self.timescale = timescale if timescale else num_warmup_steps
-        self.scheduler = None
-
-    def on_epoch_begin(self, args, state, control, **kwargs):
-        """
-        Reset the scheduler at the beginning of each epoch.
-        """
-        if state.epoch > 0:
-            print(f"Resetting learning rate scheduler at the start of epoch {round(state.epoch) + 1}")
-            self.optimizer = kwargs["optimizer"]
-            new_warmup_steps = round(state.epoch) * self.num_steps_per_epoch + self.num_warmup_steps
-            new_timescale = round(state.epoch) * self.num_steps_per_epoch + self.timescale
-            self.scheduler = get_inverse_sqrt_schedule(
-                optimizer=self.optimizer,
-                num_warmup_steps=new_warmup_steps,
-                timescale=new_timescale,
-                last_epoch=state.epoch
-            )
-
-    def on_step_end(self, args, state, control, **kwargs):
-        """
-        Step the scheduler after each batch.
-        """
-        if self.scheduler:
-            self.scheduler.step()
-
-    def on_log(self, args, state, control, logs=None, **kwargs):
-        print("last lr", self.scheduler.get_last_lr())
-        print("logs", logs)
-
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -235,11 +187,7 @@ if __name__=="__main__":
         train_dataset=tokenized_train_data,
         eval_dataset=tokenized_valid_data,
         data_collator=data_collator,
-        callbacks=[
-            EarlyStoppingCallback(early_stopping_patience=10),
-            # ResetAtEpochRestartCallback(),
-            # ResetInverseSrqtSchedulerCallback(num_steps_per_epoch=STEPS_PER_EPOCH, num_warmup_steps=8_000)
-        ]
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=10)]
     )
 
     resume_from_checkpoint = args.resume_last and os.path.exists(checkpoint_dir) and len(os.listdir(checkpoint_dir)) > 0
