@@ -15,7 +15,6 @@ from rosonar_distillation import (
 from datasets import (
     load_dataset,
     interleave_datasets,
-    IterableDataset
 )
 from transformers import (
     TrainingArguments,
@@ -23,39 +22,10 @@ from transformers import (
 )
 from accelerate import Accelerator
 
-STEPS_PER_EPOCH = 320_000
+STEPS_PER_EPOCH = 320_868 # approximated from the training data
 EFFECTIVE_BATCH_SIZE = 2048
 SAMPLES_PER_EPOCH = STEPS_PER_EPOCH * EFFECTIVE_BATCH_SIZE
 DATA_SEED_OFFSET = 100
-
-class CustomIterableDataset(IterableDataset):
-    def __init__(
-        self,
-        dataset: IterableDataset,
-        samples: int
-    ):
-        """
-        Args:
-            dataset: The dataset to wrap.
-            samples: The number of samples to yield from the dataset
-        """
-        super().__init__(
-            dataset._ex_iterable, 
-            dataset._info, 
-            dataset._split, 
-            dataset._formatting, 
-            dataset._shuffling, 
-            dataset._distributed, 
-            dataset._token_per_repo_id
-        )
-        self.samples = samples
-
-    def __len__(self):
-        return self.samples
-    
-    def set_epoch(self, epoch: int):
-        super().set_epoch(epoch)
-        self.load_state_dict(self._prepared_ex_iterable._init_state_dict())
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -112,7 +82,6 @@ if __name__=="__main__":
         tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
-    tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=SAMPLES_PER_EPOCH) # samples needed to exhaust all data
     tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
 
     print("Loading tokenizer...")
@@ -163,7 +132,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        num_train_epochs=args.epochs,
+        max_steps=SAMPLES_PER_EPOCH * args.epochs,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
@@ -179,9 +148,6 @@ if __name__=="__main__":
         resume_from_checkpoint=checkpoint_dir
     )
 
-    # for epoch in range(1):
-    #     training_args.max_steps = (epoch + 1) * STEPS_PER_EPOCH 
-        
     trainer = RoSonarDistillationTrainer(
         student_model=student_model,
         teacher_model=teacher_model,

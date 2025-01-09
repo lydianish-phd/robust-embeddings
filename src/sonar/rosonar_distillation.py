@@ -1,5 +1,8 @@
 import os
 from transformers import DefaultDataCollator, Trainer
+from transformers.trainer_utils import seed_worker
+from datasets import Dataset, IterableDataset
+from torch.utils.data import DataLoader
 from fairseq2.models.nllb.tokenizer import NllbTokenizer
 from fairseq2.models.sequence import SequenceBatch, PaddingMask
 from sonar.models.sonar_text.builder import sonar_text_encoder_archs, create_sonar_text_encoder_model
@@ -81,6 +84,38 @@ class RoSonarDistillationTrainer(Trainer):
             return (loss, None, None)
 
         return (loss, logits, labels)
+    
+    def get_train_dataloader(self) -> DataLoader:
+        if self.train_dataset is None:
+            raise ValueError("Trainer: training requires a train_dataset.")
+
+        train_dataset = self.train_dataset
+        data_collator = self.data_collator
+        if isinstance(train_dataset, Dataset):
+            train_dataset = self._remove_unused_columns(train_dataset, description="training")
+        else:
+            data_collator = self._get_collator_with_removed_columns(data_collator, description="training")
+
+        dataloader_params = {
+            "batch_size": self._train_batch_size,
+            "collate_fn": data_collator,
+            "num_workers": self.args.dataloader_num_workers,
+            "pin_memory": self.args.dataloader_pin_memory,
+            "persistent_workers": self.args.dataloader_persistent_workers,
+        }
+        
+        if isinstance(train_dataset, IterableDataset):
+            return self.accelerator.prepare(StreamingDataLoader(train_dataset, **dataloader_params))
+
+        dataloader_params["sampler"] = self._get_train_sampler()
+        dataloader_params["drop_last"] = self.args.dataloader_drop_last
+        dataloader_params["worker_init_fn"] = seed_worker
+        dataloader_params["prefetch_factor"] = self.args.dataloader_prefetch_factor
+
+        return self.accelerator.prepare(DataLoader(train_dataset, **dataloader_params))
+
+class StreamingDataLoader(DataLoader):
+    pass # TODO: Implement this class, including the __iter__ method
     
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
