@@ -19,10 +19,7 @@ from datasets import (
 )
 from transformers import (
     TrainingArguments,
-    EarlyStoppingCallback,
-    TrainerCallback,
-    get_inverse_sqrt_schedule,
-    AdamW
+    EarlyStoppingCallback
 )
 from accelerate import Accelerator
 
@@ -55,6 +52,10 @@ class CustomIterableDataset(IterableDataset):
 
     def __len__(self):
         return self.samples
+    
+    def set_epoch(self, epoch: int):
+        super().set_epoch(epoch)
+        self.load_state_dict(self._prepared_ex_iterable._init_state_dict())
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -157,6 +158,7 @@ if __name__=="__main__":
         report_to="tensorboard",
         push_to_hub=False,
         dataloader_num_workers=args.dataloader_workers,
+        dataloader_drop_last=True,
         per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,

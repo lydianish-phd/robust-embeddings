@@ -6,6 +6,7 @@
 #SBATCH --partition=almanach          # Name of the partition
 #SBATCH --account=almanach        # GPU nodes are only available in gpu partition
 #SBATCH --gres=gpu:h100:1        # GPU nodes are only available in gpu partition
+#SBATCH --mem=128G                 # Memory per node in GB needed for a job. Also see --mem-per-cpu
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=48:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/scratch/lnishimw/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
@@ -32,4 +33,4 @@ python $LASER/source/mteb_tasks.py \
     --encoder $MODEL_PATH \
     --huggingface \
     --output-dir $OUTPUT_DIR \
-    --ugc-tasks
+    --mining-tasks
