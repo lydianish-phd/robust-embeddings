@@ -135,8 +135,6 @@ if __name__=="__main__":
         if os.path.exists(output_file):
             print(f"Skipping {lang_pair} dataset...")
             continue
-        # replace output file extension with parquet
-        output_file = output_file.replace(".jsonl", f".{args.filetype}")
 
         print(f"Loading {lang_pair} dataset...")
         data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
