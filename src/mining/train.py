@@ -88,8 +88,8 @@ if __name__=="__main__":
             continue
         elif lang_pair == "en_2_ugc" and not args.ugc_en:
             continue
-        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.jsonl" for split in ["train", "valid"] }
-        tokenized_data[lang_pair] = load_dataset("json", data_files=data_files, streaming=True)
+        data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.parquet" for split in ["train", "valid"] }
+        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=True)
         tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=10_000)
     
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
