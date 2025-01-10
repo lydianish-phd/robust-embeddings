@@ -1,6 +1,6 @@
 import os, argparse
 from datasets import load_dataset
-from .preprocess import write_to_file
+from preprocess import write_to_file
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -43,8 +43,9 @@ if __name__=="__main__":
 
     for lang_pair, metadata in all_metadata.items():
         input_file = f"{metadata['output_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl"
-        if os.path.exists(input_file):
-            print(f"Binarizing {lang_pair} dataset...")
-            data = load_dataset("json", data_files={args.split: input_file})
-            write_to_file(data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard, filetype="parquet")
+        if not os.path.exists(input_file):
+            print(f"Skipping {lang_pair} dataset...")            
+        print(f"Binarizing {lang_pair} dataset...")
+        data = load_dataset("json", data_files={args.split: input_file})
+        write_to_file(data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard, filetype="parquet")
 
