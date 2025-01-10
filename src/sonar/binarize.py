@@ -1,17 +1,6 @@
 import os, argparse
 from datasets import load_dataset
-
-def write_to_file(data, output_dir_prefix, lang_pair, shard, filetype="jsonl"):
-    for split, split_dataset in data.items():
-        output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
-        os.makedirs(output_dir, exist_ok=True)
-        if filetype == "parquet":
-            split_dataset.to_parquet(
-                f"{output_dir}/{split}.{lang_pair}-{shard}.parquet"
-            )
-        split_dataset.to_json(
-            f"{output_dir}/{split}.{lang_pair}-{shard}.jsonl"
-        )
+from .preprocess import write_to_file
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
