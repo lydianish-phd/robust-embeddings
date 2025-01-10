@@ -62,10 +62,14 @@ def preprocess_data(
             num_proc=num_proc
         )
 
-def write_to_jsonl(data, output_dir_prefix, lang_pair, shard):
+def write_to_file(data, output_dir_prefix, lang_pair, shard, filetype="jsonl"):
     for split, split_dataset in data.items():
         output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
         os.makedirs(output_dir, exist_ok=True)
+        if filetype == "parquet":
+            split_dataset.to_parquet(
+                f"{output_dir}/{split}.{lang_pair}-{shard}.parquet"
+            )
         split_dataset.to_json(
             f"{output_dir}/{split}.{lang_pair}-{shard}.jsonl"
         )
@@ -75,6 +79,7 @@ if __name__=="__main__":
     parser.add_argument("--split", help="dataset split", type=str, choices=["train", "valid"], default="train")
     parser.add_argument("--shard", help="shard number", type=int, default=0)
     parser.add_argument("--num_proc", help="number of processes", type=int, default=1)
+    parser.add_argument("--filetype", help="filetype to save tokenized data", type=str, choices=["jsonl", "parquet"], default="jsonl")
     args = parser.parse_args()
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
@@ -130,6 +135,8 @@ if __name__=="__main__":
         if os.path.exists(output_file):
             print(f"Skipping {lang_pair} dataset...")
             continue
+        # replace output file extension with parquet
+        output_file = output_file.replace(".jsonl", f".{args.filetype}")
 
         print(f"Loading {lang_pair} dataset...")
         data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
@@ -137,5 +144,5 @@ if __name__=="__main__":
         print(f"Tokenizing {lang_pair} dataset...")
         tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, args.num_proc)
         print(f"Writing {lang_pair} dataset to disk...")
-        write_to_jsonl(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard)
+        write_to_file(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard, filetype=args.filetype)
 
