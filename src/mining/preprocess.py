@@ -62,24 +62,24 @@ def preprocess_data(
             num_proc=num_proc
         )
 
-def write_to_file(data, output_dir_prefix, lang_pair, shard, filetype="jsonl"):
+def write_to_file(data, output_dir_prefix, lang_pair, shard, filetype="parquet"):
     for split, split_dataset in data.items():
         output_dir = f"{output_dir_prefix}/{split}.{lang_pair}_chunks"
         os.makedirs(output_dir, exist_ok=True)
-        if filetype == "parquet":
-            split_dataset.to_parquet(
-                f"{output_dir}/{split}.{lang_pair}-{shard}.parquet"
+        if filetype == "jsonl":
+            split_dataset.to_json(
+                f"{output_dir}/{split}.{lang_pair}-{shard}.jsonl"
             )
-        split_dataset.to_json(
-            f"{output_dir}/{split}.{lang_pair}-{shard}.jsonl"
+        split_dataset.to_parquet(
+            f"{output_dir}/{split}.{lang_pair}-{shard}.parquet"
         )
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--split", help="dataset split", type=str, choices=["train", "valid"], default="train")
     parser.add_argument("--shard", help="shard number", type=int, default=0)
-    parser.add_argument("--num_proc", help="number of processes", type=int, default=1)
-    parser.add_argument("--filetype", help="filetype to save tokenized data", type=str, choices=["jsonl", "parquet"], default="jsonl")
+    parser.add_argument("--num-processes", help="number of processes", type=int, default=1)
+    parser.add_argument("--filetype", help="filetype to save tokenized data", type=str, choices=["jsonl", "parquet"], default="parquet")
     args = parser.parse_args()
 
     bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
@@ -131,7 +131,7 @@ if __name__=="__main__":
     max_length = 512
 
     for lang_pair, metadata in all_metadata.items():
-        output_file = f"{metadata['output_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl"
+        output_file = f"{metadata['output_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.{args.filetype}"
         if os.path.exists(output_file):
             print(f"Skipping {lang_pair} dataset...")
             continue
@@ -140,7 +140,7 @@ if __name__=="__main__":
         data_files = { args.split: f"{metadata['input_dir_prefix']}/{args.split}.{metadata['lang_pair']}_chunks/{args.split}.{metadata['lang_pair']}-{args.shard}.jsonl" }
         data = load_dataset("json", data_files=data_files)
         print(f"Tokenizing {lang_pair} dataset...")
-        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, args.num_proc)
+        tokenized_data = preprocess_data(data, teacher_model, teacher_tokenizer, student_tokenizer, max_length, args.num_processes)
         print(f"Writing {lang_pair} dataset to disk...")
         write_to_file(tokenized_data, output_dir_prefix=metadata["output_dir_prefix"], lang_pair=metadata["lang_pair"], shard=args.shard, filetype=args.filetype)
 
