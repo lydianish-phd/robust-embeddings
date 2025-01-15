@@ -126,7 +126,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=SAMPLES_PER_EPOCH * args.epochs,
+        num_train_epochs=args.epochs,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
