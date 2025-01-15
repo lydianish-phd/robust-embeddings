@@ -1,20 +1,37 @@
-from transformers import DefaultDataCollator, Trainer
+from transformers import DefaultDataCollator, Trainer, XLMRobertaTokenizerFast
 from typing import Any, Dict, List
 import torch
 from rolaser_sentence_encoder import RoLaserSentenceEncoder
 from torch.nn import MSELoss
 
 class DataCollatorForRoLaserDistillation(DefaultDataCollator):
-    def __init__(self):
+    def __init__(self, student_tokenizer: XLMRobertaTokenizerFast, max_length: int = 514):
         super().__init__(return_tensors="pt")
+        self.student_tokenizer = student_tokenizer
+        self.max_length = max_length
 
-    def __call__(self, features: List[Dict[str, Any]], return_tensors=None) -> Dict[str, Any]:
+    def __call__(self, features: List[Dict[str, Any]], return_tensors="pt") -> Dict[str, Any]:
+        student_src_ids_and_masks = self.student_tokenizer(
+            [ row["source_sentence"] for row in features ], 
+            padding="max_length", 
+            max_length=self.max_length, 
+            truncation=True, 
+            return_tensors=return_tensors
+        )
+        student_tgt_ids_and_masks = self.student_tokenizer(
+            [ row["target_sentence"] for row in features ], 
+            padding="max_length", 
+            max_length=self.max_length, 
+            truncation=True, 
+            return_tensors=return_tensors
+        )
+    
         batch = {
             "teacher_tgt_embeds": torch.tensor([ row["teacher_tgt_embeds"] for row in features ]),
-            "student_src_ids": torch.tensor([ row["student_src_ids"] for row in features ], dtype=torch.int),
-            "student_src_masks": torch.tensor([ row["student_src_masks"] for row in features ], dtype=torch.int),
-            "student_tgt_ids": torch.tensor([ row["student_tgt_ids"] for row in features ], dtype=torch.int),
-            "student_tgt_masks": torch.tensor([ row["student_tgt_masks"] for row in features ], dtype=torch.int)
+            "student_src_ids": student_src_ids_and_masks["input_ids"],
+            "student_src_masks": student_src_ids_and_masks["attention_mask"],
+            "student_tgt_ids": student_tgt_ids_and_masks["input_ids"],
+            "student_tgt_masks": student_tgt_ids_and_masks["attention_mask"]
         }
         return batch
 

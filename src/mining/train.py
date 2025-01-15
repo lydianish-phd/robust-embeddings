@@ -87,7 +87,7 @@ if __name__=="__main__":
 
     print("Instantiating data collator...")
 
-    data_collator = accelerator.prepare(DataCollatorForRoLaserDistillation())
+    data_collator = accelerator.prepare(DataCollatorForRoLaserDistillation(student_tokenizer=student_model.tokenizer, max_length=student_model.max_seq_length))
 
     print("Training student model...")
 
@@ -106,6 +106,7 @@ if __name__=="__main__":
         report_to="tensorboard",
         push_to_hub=False,
         dataloader_num_workers=args.dataloader_workers,
+        dataloader_drop_last=True,
         per_device_train_batch_size=8,
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,

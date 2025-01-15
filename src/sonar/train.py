@@ -23,9 +23,6 @@ from transformers import (
 )
 from accelerate import Accelerator
 
-STEPS_PER_EPOCH = 320_868 # approximated from the training data
-EFFECTIVE_BATCH_SIZE = 2048
-SAMPLES_PER_EPOCH = STEPS_PER_EPOCH * EFFECTIVE_BATCH_SIZE
 DATA_SEED_OFFSET = 100
 
 if __name__=="__main__":
