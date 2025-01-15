@@ -6,6 +6,8 @@ from laser_encoders import initialize_tokenizer, initialize_encoder
 from datasets import load_dataset
 import torch
 
+# TODO: save only the embeddings of the target sentences to disk
+
 def tokenize_and_embed_inputs(
         examples, 
         teacher_model: SentenceEncoder,
@@ -15,7 +17,7 @@ def tokenize_and_embed_inputs(
     ):
     teacher_target_input = teacher_tokenizer.tokenize_batch(examples["target_sentence"])
     teacher_tgt_embeds = torch.tensor(teacher_model.encode_sentences(teacher_target_input))
-
+    
     student_src_ids_and_masks = student_tokenizer(
         examples["source_sentence"], 
         padding="max_length", 

@@ -36,14 +36,14 @@ UGC_EN[1]=False
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="047n"
+EXPERIMENT_NUM="047q"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 
 SEED=42
 ACCUMULATION_STEPS=$((64 / SLURM_NNODES))
 LEARNING_RATE=7e-3
-LR_SCHEDULER=cosine_with_restarts
-EPOCHS=2
+LR_SCHEDULER=inverse_sqrt
+EPOCHS=10
 
 echo "Setting the accelerate config..."
 

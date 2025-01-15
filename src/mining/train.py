@@ -9,7 +9,7 @@ from rolaser_distillation import (
 from datasets import (
     load_dataset,
     interleave_datasets,
-    IterableDataset
+    concatenate_datasets,
 )
 from transformers import (
     TrainingArguments,
@@ -18,25 +18,6 @@ from transformers import (
 from accelerate import Accelerator
 
 DATA_SEED_OFFSET = 100
-class CustomIterableDataset(IterableDataset):
-    def __init__(
-        self,
-        dataset: IterableDataset,
-        samples: int
-    ):
-        super().__init__(
-            dataset._ex_iterable, 
-            dataset._info, 
-            dataset._split, 
-            dataset._formatting, 
-            dataset._shuffling, 
-            dataset._distributed, 
-            dataset._token_per_repo_id
-        )
-        self.samples = samples
-
-    def __len__(self):
-        return self.samples
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -92,9 +73,8 @@ if __name__=="__main__":
         tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=True)
         tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=10_000)
     
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
-    # tokenized_train_data = CustomIterableDataset(tokenized_train_data, samples=260000*2048) # samples needed to exhaust all data
-    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="first_exhausted")
+    tokenized_valid_data = concatenate_datasets([data["valid"] for data in tokenized_data.values()])
 
     print("Defining initialisation checkpoint...")
 
@@ -130,7 +110,7 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        max_steps=10_267_792, # num_train_epochs=10,
+        max_steps=3_000_000, # "first exhausted" is approximately at 2_270_671 steps
         warmup_steps=10_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,

@@ -15,6 +15,7 @@ from rosonar_distillation import (
 from datasets import (
     load_dataset,
     interleave_datasets,
+    concatenate_datasets
 )
 from transformers import (
     TrainingArguments,
@@ -78,11 +79,11 @@ if __name__=="__main__":
         elif lang_pair == "en_2_ugc" and not args.ugc_en:
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.parquet" for split in ["train", "valid"] }
-        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=True)
-        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=10_000)
+        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"] #.shuffle(seed=args.seed+DATA_SEED_OFFSET)
     
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
-    tokenized_valid_data = interleave_datasets([data["valid"] for data in tokenized_data.values()], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="first_exhausted")
+    tokenized_valid_data = concatenate_datasets([data["valid"] for data in tokenized_data.values()])
 
     print("Loading tokenizer...")
 
@@ -107,13 +108,6 @@ if __name__=="__main__":
     checkpoint_dir = f"{args.output_dir}/models/{args.model_name}"
     tensorboard_dir = f"{args.output_dir}/tensorboard/{args.model_name}"
 
-    if args.lr_scheduler_type == "cosine_with_restarts":
-        lr_scheduler_kwargs = {
-            "num_cycles": args.epochs
-        }
-    else:
-        lr_scheduler_kwargs = {}
-
     training_args = TrainingArguments(
         output_dir=checkpoint_dir,
         bf16=True,
@@ -136,7 +130,6 @@ if __name__=="__main__":
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
-        lr_scheduler_kwargs=lr_scheduler_kwargs,
         adam_beta1=0.9,
         adam_beta2=0.98,
         adam_epsilon=1e-6,
