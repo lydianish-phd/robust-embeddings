@@ -12,7 +12,7 @@
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/mining/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-999
 
-echo "### Running $SLURM_JOB_NAME ###"
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 
