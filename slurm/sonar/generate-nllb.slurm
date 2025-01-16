@@ -33,7 +33,7 @@ MODEL[1]=nllb1b
 MODEL_NAME[1]=facebook/nllb-200-distilled-1.3B
 
 MODEL[2]=nllb3b
-MODEL_NAME[2]=facebook/nllb-200-distilled-3.3B
+MODEL_NAME[2]=facebook/nllb-200-3.3B
 
 # Multilingual
 
