@@ -62,28 +62,28 @@ if __name__=="__main__":
 
     all_metadata = {
         "en-fr": {
-            "input_dir_prefix": f"{bilingual_data_dir}/eng-fra/",
-            "output_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra/",
+            "input_dir_prefix": f"{bilingual_data_dir}/eng-fra",
+            "output_dir_prefix": f"{tokenized_bilingual_data_dir}/eng-fra",
             "lang_pair": "eng_Latn-fra_Latn"
         },
         "fr": {
-            "input_dir_prefix": f"{monolingual_data_dir}/fra/",
-            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/fra/",
+            "input_dir_prefix": f"{monolingual_data_dir}/fra",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/fra",
             "lang_pair": "fra_Latn-fra_Latn"
         },
         "en_1": {
-            "input_dir_prefix": f"{monolingual_data_dir}/eng/part1/",
-            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1/",
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part1",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part1",
             "lang_pair": "eng_Latn-eng_Latn"
         },
         "en_2": {
             "input_dir_prefix": f"{monolingual_data_dir}/eng/part2/",
-            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2/",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2",
             "lang_pair": "eng_Latn-eng_Latn"
         },
         "en_2_ugc": {
-            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2_ugc/",
-            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc/",
+            "input_dir_prefix": f"{monolingual_data_dir}/eng/part2_ugc",
+            "output_dir_prefix": f"{tokenized_monolingual_data_dir}/eng/part2_ugc",
             "lang_pair": "eng_Latn-eng_Latn"
         }
     }
