@@ -24,6 +24,7 @@ from transformers import (
 from accelerate import Accelerator
 
 DATA_SEED_OFFSET = 100
+STEPS_PER_EPOCH = 320_000
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -37,6 +38,9 @@ if __name__=="__main__":
     parser.add_argument("--epochs", type=int, default=2)
     parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
+    parser.add_argument("--ignore-data-skip", help="whether to resume training from beginning of data (simulating new epoch)", type=bool, default=False)
+    # add current epoch argument
+    parser.add_argument("--current-epoch", help="current epoch number", type=int, default=0)
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -76,10 +80,13 @@ if __name__=="__main__":
         elif lang_pair == "en_2_ugc" and not args.ugc_en:
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.parquet" for split in ["train", "valid"] }
-        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files)
-        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"] #.shuffle(seed=args.seed+DATA_SEED_OFFSET)
+        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=args.ignore_data_skip)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"] 
+        if args.ignore_data_skip:
+            tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET+args.current_epoch, buffer_size=10_000)
     
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="first_exhausted")
+    stopping_strategy = "all_exhausted" if args.ignore_data_skip else "first_exhausted"
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy=stopping_strategy)
     tokenized_valid_data = concatenate_datasets([data["valid"] for data in tokenized_data.values()])
 
     print("Loading tokenizer...")
@@ -124,6 +131,8 @@ if __name__=="__main__":
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
         num_train_epochs=args.epochs,
+        max_steps=STEPS_PER_EPOCH*args.epochs if args.ignore_data_skip else -1,
+        ignore_data_skip=args.ignore_data_skip,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
