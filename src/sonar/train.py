@@ -80,13 +80,10 @@ if __name__=="__main__":
         elif lang_pair == "en_2_ugc" and not args.ugc_en:
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.parquet" for split in ["train", "valid"] }
-        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=args.ignore_data_skip)
-        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"] 
-        if args.ignore_data_skip:
-            tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET+args.current_epoch, buffer_size=10_000)
-    
-    stopping_strategy = "all_exhausted" if args.ignore_data_skip else "first_exhausted"
-    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy=stopping_strategy)
+        tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=True)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET+args.current_epoch, buffer_size=10_000)
+
+    tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
     tokenized_valid_data = concatenate_datasets([data["valid"] for data in tokenized_data.values()])
 
     print("Loading tokenizer...")
@@ -131,7 +128,7 @@ if __name__=="__main__":
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
         num_train_epochs=args.epochs,
-        max_steps=STEPS_PER_EPOCH*args.epochs if args.ignore_data_skip else -1,
+        max_steps=STEPS_PER_EPOCH*args.epochs,
         ignore_data_skip=args.ignore_data_skip,
         warmup_steps=8_000,
         learning_rate=args.learning_rate,
