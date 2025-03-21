@@ -24,7 +24,7 @@ from transformers import (
 from accelerate import Accelerator
 
 DATA_SEED_OFFSET = 100
-STEPS_PER_EPOCH = 160_000
+MAX_STEPS = 1_000_000
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
@@ -32,15 +32,12 @@ if __name__=="__main__":
     parser.add_argument("--model-name", help="name of the model to train", type=str, default="rosonar")
     parser.add_argument("--resume-last", help="whether to resume training from last checkpoint", type=bool, default=True)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--accumulation-steps", type=int, default=32)
-    parser.add_argument("--learning-rate", type=float, default=5e-4)
+    parser.add_argument("--accumulation-steps", type=int, default=64)
+    parser.add_argument("--learning-rate", type=float, default=7e-3)
     parser.add_argument("--lr-scheduler-type", type=str, default="inverse_sqrt")
-    parser.add_argument("--epochs", type=int, default=2)
+    parser.add_argument("--max-steps", type=int, default=MAX_STEPS)
     parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
-    parser.add_argument("--ignore-data-skip", help="whether to resume training from beginning of data (simulating new epoch)", type=bool, default=False)
-    # add current epoch argument
-    parser.add_argument("--current-epoch", help="current epoch number", type=int, default=0)
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -81,7 +78,7 @@ if __name__=="__main__":
             continue
         data_files = { split: f"{metadata['input_dir_prefix']}/{split}.{metadata['lang_pair']}_chunks/{split}.{metadata['lang_pair']}-*.parquet" for split in ["train", "valid"] }
         tokenized_data[lang_pair] = load_dataset("parquet", data_files=data_files, streaming=True)
-        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET+args.current_epoch, buffer_size=100_000)
+        tokenized_data[lang_pair]["train"] = tokenized_data[lang_pair]["train"].shuffle(seed=args.seed+DATA_SEED_OFFSET, buffer_size=100_000)
 
     tokenized_train_data = interleave_datasets([data["train"] for data in tokenized_data.values()], probabilities=[4/8, 2/8, 1/8, 1/8], seed=args.seed+DATA_SEED_OFFSET, stopping_strategy="all_exhausted")
     tokenized_valid_data = concatenate_datasets([data["valid"] for data in tokenized_data.values()])
@@ -127,10 +124,8 @@ if __name__=="__main__":
         gradient_accumulation_steps=args.accumulation_steps,
         eval_accumulation_steps=args.accumulation_steps,
         remove_unused_columns=False,
-        num_train_epochs=args.epochs,
-        max_steps=STEPS_PER_EPOCH*args.epochs,
-        ignore_data_skip=args.ignore_data_skip,
-        warmup_steps=11_000,
+        max_steps=args.max_steps,
+        warmup_steps=8_000,
         learning_rate=args.learning_rate,
         lr_scheduler_type=args.lr_scheduler_type,
         adam_beta1=0.9,

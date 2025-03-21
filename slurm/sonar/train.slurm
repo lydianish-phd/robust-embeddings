@@ -12,7 +12,7 @@
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --exclusive
 #SBATCH --qos=qos_gpu_h100-t4
-#SBATCH --array=0 #-1
+#SBATCH --array=0-1
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -36,16 +36,14 @@ UGC_EN[1]=False
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="047q"
+EXPERIMENT_NUM="047r"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 
 SEED=42
-ACCUMULATION_STEPS=32
-LEARNING_RATE=1.4e-2
+ACCUMULATION_STEPS=$((64 / SLURM_NNODES))
+LEARNING_RATE=7e-3
 LR_SCHEDULER=inverse_sqrt
-EPOCHS=10
-IGNORE_DATA_SKIP=False
-CURRENT_EPOCH=0
+MAX_STEPS=1000000
 
 echo "Setting the accelerate config..."
 
@@ -87,11 +85,9 @@ export PROGRAM="\
     --learning-rate $LEARNING_RATE \
     --accumulation-steps $ACCUMULATION_STEPS \
     --lr-scheduler-type $LR_SCHEDULER \
-    --epochs $EPOCHS \
+    --max-steps $MAX_STEPS \
     --ugc-en ${UGC_EN[$DATA_CONFIG]} \
     --dataloader-workers $SLURM_CPUS_PER_TASK \
-    --ignore-data-skip $IGNORE_DATA_SKIP \
-    --current-epoch $CURRENT_EPOCH \
     "
 
 export CMD="$LAUNCHER $PROGRAM"
