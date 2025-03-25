@@ -1,7 +1,5 @@
 import os, argparse
 
-from litdata import StreamingDataset, StreamingDataLoader
-
 from sonar.models.sonar_text.loader import (
     load_sonar_text_encoder_model,
     load_sonar_tokenizer,
