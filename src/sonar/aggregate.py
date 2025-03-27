@@ -6,8 +6,7 @@ from utils import (
     SCORE_FILE_SUFFIX,
     MODEL_NAMES,
     COLUMN_NAME_SEPARATOR,
-    BLEU_ROUND_DECIMALS,
-    COMET_ROUND_DECIMALS,
+    ROUND_DECIMALS,
     ROCSMT_NORM_FILE_NAME,
     ROCSMT_RAW_FILE_NAME,
     FLORES_FILE_NAME,
@@ -52,6 +51,15 @@ def statistical_significance(scores, column_name_prefixes, p_value_threshold=0.0
         scores[signif_column_name] = p_values < p_value_threshold
     return scores
 
+def add_score(scores, column_name, score):
+    if column_name in scores:
+        scores[column_name].append(score)
+    else:
+        scores[column_name] = [score]
+
+def get_multilingual_table(scores_df):
+    return multilingual_delta(multilingual_average(scores_df).round(ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to experiment directory", type=str)
@@ -64,12 +72,16 @@ if __name__ == "__main__":
     bleu_scores = {
         "model": [ MODEL_NAMES[model] for model in args.models ]
     }
+    chrf_scores = {
+        "model": [ MODEL_NAMES[model] for model in args.models ]
+    }
     comet_scores = {
         "model": [ MODEL_NAMES[model] for model in args.models ]
     }
 
     print(f"Aggregating {args.table_name} scores...")
     
+
     for corpus in args.corpora:
         for lang_pair in args.lang_pairs:
             for model in args.models:
@@ -81,35 +93,36 @@ if __name__ == "__main__":
                         column_name = COLUMN_NAME_SEPARATOR.join([corpus, lang_pair, file_name])
                         with open(score_file) as f:
                             scores = json.load(f)
-                        if column_name in bleu_scores:
-                            bleu_scores[column_name].append(scores["bleu"])
-                        else:
-                            bleu_scores[column_name] = [scores["bleu"]]
-                        if column_name in comet_scores:
-                            comet_scores[column_name].append(scores["comet"])
-                        else:
-                            comet_scores[column_name] = [scores["comet"]]
+                        add_score(bleu_scores, column_name, scores["bleu"])
+                        add_score(chrf_scores, column_name, scores["chrf2"])
+                        add_score(comet_scores, column_name, scores["comet"])
 
     
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
+    chrf_score_file = os.path.join(scores_dir, f"chrf_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
+    chrf_scores_df = pd.DataFrame.from_dict(chrf_scores)
     comet_scores_df = pd.DataFrame.from_dict(comet_scores) 
     columns_to_multiply = comet_scores_df.columns[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)]
     comet_scores_df[columns_to_multiply] *= 100
     
+    
     if args.table_name == "multilingual":
-        bleu_scores_df = multilingual_delta(multilingual_average(bleu_scores_df).round(BLEU_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
-        comet_scores_df = multilingual_delta(multilingual_average(comet_scores_df).round(COMET_ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
+        bleu_scores_df = get_multilingual_table(bleu_scores_df)
+        chrf_scores_df = get_multilingual_table(chrf_scores_df)
+        comet_scores_df = get_multilingual_table(comet_scores_df)
 
     delta_column_prefixes = [ "delta" + COLUMN_NAME_SEPARATOR + corpus for corpus in args.corpora ]
     bleu_scores_df = statistical_significance(bleu_scores_df, delta_column_prefixes, 0.05)
+    chrf_scores_df = statistical_significance(chrf_scores_df, delta_column_prefixes, 0.05)
     comet_scores_df = statistical_significance(comet_scores_df, delta_column_prefixes, 0.05)
 
-    bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
-    comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
+    bleu_scores_df.round(ROUND_DECIMALS).to_csv(bleu_score_file)
+    chrf_scores_df.round(ROUND_DECIMALS).to_csv(chrf_score_file)
+    comet_scores_df.round(ROUND_DECIMALS).to_csv(comet_score_file)
 

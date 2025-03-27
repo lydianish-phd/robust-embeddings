@@ -1,5 +1,5 @@
 import os, argparse, json
-from sacrebleu.metrics import BLEU
+from sacrebleu.metrics import BLEU, CHRF
 from comet import download_model, load_from_checkpoint
 
 if __name__ == "__main__":
@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     print("Loading metric models...")
     bleu_model = BLEU(tokenize="ja-mecab") if args.ref_file.endswith("en-ja.ja") else BLEU()
+    chrf_model = CHRF(word_order=2) # chrf++
     comet_model_path = download_model("Unbabel/wmt22-comet-da")
     comet_model = load_from_checkpoint(comet_model_path)
     
@@ -29,6 +30,7 @@ if __name__ == "__main__":
    
         scores = {
             "bleu": bleu_model.corpus_score(sys_data, [ref_data]).score,
+            "chrf2": chrf_model.corpus_score(sys_data, [ref_data]).score,
             "comet": comet_model.predict(data, batch_size=32, gpus=1)[1]
         }
 

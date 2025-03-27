@@ -24,6 +24,7 @@ MODEL_NAMES = {
 METRIC_NAMES = {
     "bleu": "BLEU",
     "comet": "COMET",
+    "chrf2": "chrF++",
 }
 
 STATS =  [
@@ -47,8 +48,7 @@ LANG_NAMES = {
     "jap_Japn": "Japanese"
 }
 
-BLEU_ROUND_DECIMALS = 2
-COMET_ROUND_DECIMALS = 2
+ROUND_DECIMALS = 2
 
 MULTILINGUAL_COLUMNS = [
     "model",
