@@ -199,9 +199,9 @@ python $HOME/robust-embeddings/src/sonar/evaluate.py \
     --sys-files "${SYS_FILES[@]}" \
     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
 
-python $HOME/robust-embeddings/src/sonar/stats.py \
-    -i "${SYS_FILES[@]}" \
-    -m $SPM_MODEL
+# python $HOME/robust-embeddings/src/sonar/stats.py \
+#     -i "${SYS_FILES[@]}" \
+#     -m $SPM_MODEL
 
 echo "Done..."
 
