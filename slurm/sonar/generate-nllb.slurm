@@ -45,7 +45,7 @@ MODEL_PATH[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m
 
 MODEL[4]=nllb600m_ft_syn_ugc
 MODEL_NAME[4]=facebook/nllb-200-distilled-600m
-MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-20000
+MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/synthetic/nllb600m/checkpoint-20000
 
 
 # Multilingual
