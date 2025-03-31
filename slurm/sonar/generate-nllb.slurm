@@ -29,19 +29,23 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047k
 
 MODEL[0]=nllb600m
 MODEL_NAME[0]=facebook/nllb-200-distilled-600m
+MODEL_PATH[0]=facebook/nllb-200-distilled-600m
 
 MODEL[1]=nllb1b
 MODEL_NAME[1]=facebook/nllb-200-distilled-1.3B
+MODEL_PATH[1]=facebook/nllb-200-distilled-1.3B
 
 MODEL[2]=nllb3b
 MODEL_NAME[2]=facebook/nllb-200-3.3B
+MODEL_PATH[2]=facebook/nllb-200-3.3B
 
 MODEL[3]=nllb600m_ft_nat_ugc
-MODEL_NAME[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m/checkpoint-30000
+MODEL_NAME[3]=facebook/nllb-200-distilled-600m
+MODEL_PATH[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m/checkpoint-30000
 
 MODEL[4]=nllb600m_ft_syn_ugc
-MODEL_NAME[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-20000
-
+MODEL_NAME[4]=facebook/nllb-200-distilled-600m
+MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-20000
 
 
 # Multilingual
@@ -215,7 +219,8 @@ do
             -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
             -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
             -o $OUTPUT_DIR \
-            -m ${MODEL_NAME[$i]}
+            -m ${MODEL_NAME[$i]} \
+            -p ${MODEL_PATH[$i]}
 
         if [ "$SLURM_ARRAY_TASK_ID" -eq 22 ] # for evaluating against normalised reference
         then

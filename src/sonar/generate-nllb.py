@@ -9,6 +9,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--tgt-lang", type=str)
     parser.add_argument("-o", "--output-dir", type=str)
     parser.add_argument("-m", "--model-name", type=str)
+    parser.add_argument("-p", "--model-path", type=str)
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
@@ -21,7 +22,7 @@ if __name__ == "__main__":
         src_lang=args.src_lang,
         tgt_lang=args.tgt_lang
     )
-    model = AutoModelForSeq2SeqLM.from_pretrained(args.model_name)
+    model = AutoModelForSeq2SeqLM.from_pretrained(args.model_path)
     model.to(torch.device("cuda"))
     
     print("Reading input sentences...")
