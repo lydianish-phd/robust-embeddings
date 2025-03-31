@@ -37,10 +37,10 @@ MODEL[2]=nllb3b
 MODEL_NAME[2]=facebook/nllb-200-3.3B
 
 MODEL[3]=nllb600m_ft_nat_ugc
-MODEL_NAME[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m/checkpoint-1000000
+MODEL_NAME[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m/checkpoint-30000
 
 MODEL[4]=nllb600m_ft_syn_ugc
-MODEL_NAME[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-1000000
+MODEL_NAME[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-20000
 
 
 
