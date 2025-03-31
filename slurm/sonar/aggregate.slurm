@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=aggregate      # Job name
-#SBATCH --account=rnh@cpu
+#SBATCH --account=ncm@cpu
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=10	# number of cores per task (4x10 = 40 cores, or all the cores)
@@ -83,19 +83,19 @@ then
         -s $SEEDS \
         -p $PROBAS
 else
-    # python $HOME/robust-embeddings/src/sonar/aggregate.py \
-    #     -i $EXPERIMENT_DIR \
-    #     -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
-    #     -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
-    #     -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-    #     -m ${MODELS[@]}
-
-    python $HOME/robust-embeddings/src/sonar/aggregate-stats.py \
+    python $HOME/robust-embeddings/src/sonar/aggregate.py \
         -i $EXPERIMENT_DIR \
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
         -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
         -m ${MODELS[@]}
+
+    # python $HOME/robust-embeddings/src/sonar/aggregate-stats.py \
+    #     -i $EXPERIMENT_DIR \
+    #     -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
+    #     -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
+    #     -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
+    #     -m ${MODELS[@]}
 fi
 
 echo "Done..."

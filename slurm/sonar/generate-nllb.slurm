@@ -1,23 +1,24 @@
 #!/bin/bash
 
 #SBATCH --job-name=generate      # Job name
-#SBATCH --account=rnh@a100
-#SBATCH --partition=gpu_p5
-#SBATCH -C a100
+#SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2
+##SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
-#SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
+#SBATCH --cpus-per-task=24	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:20:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0,13,16,18 #0-22
+#SBATCH --array=0-22
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 # Using anaconda-py3/2023.09 which has pytorch 2.2.2 but NO accelerate (otherwise fails to load NLLB pretrained model from HF)
-module load arch/a100 anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+# module load arch/a100 anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load pytorch-gpu/py3/2.0.0 #V100
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -34,6 +35,14 @@ MODEL_NAME[1]=facebook/nllb-200-distilled-1.3B
 
 MODEL[2]=nllb3b
 MODEL_NAME[2]=facebook/nllb-200-3.3B
+
+MODEL[3]=nllb600m_ft_nat_ugc
+MODEL_NAME[3]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/natural/nllb600m/checkpoint-1000000
+
+MODEL[4]=nllb600m_ft_syn_ugc
+MODEL_NAME[4]=$EXPERIMENTS/finetuning-ugc/experiment_052/models/sythetic/nllb600m/checkpoint-1000000
+
+
 
 # Multilingual
 
@@ -183,7 +192,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {0..1}
+for i in {3..4}
 do
     echo "Model: ${MODEL[$i]}"
 
