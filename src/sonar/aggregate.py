@@ -69,6 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--models", type=str, nargs="+")
     args = parser.parse_args()
 
+# TO DO: Remove redundant code by using a single object with the metrics as keys
     bleu_scores = {
         "model": [ MODEL_NAMES[model] for model in args.models ]
     }
@@ -102,7 +103,7 @@ if __name__ == "__main__":
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
     bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
-    chrf_score_file = os.path.join(scores_dir, f"chrf_{args.table_name}.csv")
+    chrf_score_file = os.path.join(scores_dir, f"chrf2_{args.table_name}.csv")
     comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
     bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
