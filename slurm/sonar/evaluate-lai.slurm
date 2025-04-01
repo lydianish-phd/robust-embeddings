@@ -44,14 +44,14 @@ SYS_FILES=("$OUTPUT_DIR/$SYS_FILE_SUFFIX")
 
 echo "Evaluating $MODEL baseline on $SRC_FILE"
 
-# python $HOME/robust-embeddings/src/sonar/evaluate.py \
-#     --src-file ${SRC_FILE} \
-#     --sys-files "${SYS_FILES[@]}" \
-#     --ref-file ${REF_FILE}
+python $HOME/robust-embeddings/src/sonar/evaluate.py \
+    --src-file ${SRC_FILE} \
+    --sys-files "${SYS_FILES[@]}" \
+    --ref-file ${REF_FILE}
 
-python $HOME/robust-embeddings/src/sonar/stats.py \
-    -i "${SYS_FILES[@]}" \
-    -m $SPM_MODEL
+# python $HOME/robust-embeddings/src/sonar/stats.py \
+#     -i "${SYS_FILES[@]}" \
+#     -m $SPM_MODEL
 
 echo "Done..."
 
