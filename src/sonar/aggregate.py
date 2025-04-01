@@ -4,7 +4,9 @@ import numpy as np
 from scipy.stats import ttest_1samp
 from utils import (
     SCORE_FILE_SUFFIX,
+    GPT_NORM_FILE_PREFIX,
     MODEL_NAMES,
+    METRIC_NAMES,
     COLUMN_NAME_SEPARATOR,
     ROUND_DECIMALS,
     ROCSMT_NORM_FILE_NAME,
@@ -60,6 +62,9 @@ def add_score(scores, column_name, score):
 def get_multilingual_table(scores_df):
     return multilingual_delta(multilingual_average(scores_df).round(ROUND_DECIMALS))[MULTILINGUAL_COLUMNS]
 
+def get_score_files(output_dir):
+    return [ f.path for f in os.scandir(output_dir) if (f.name.endswith(SCORE_FILE_SUFFIX) and not f.name.startswith(GPT_NORM_FILE_PREFIX)) ]
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-dir", help="path to experiment directory", type=str)
@@ -67,63 +72,50 @@ if __name__ == "__main__":
     parser.add_argument("-c", "--corpora", type=str, nargs="+")
     parser.add_argument("-l", "--lang-pairs", type=str, nargs="+")
     parser.add_argument("-m", "--models", type=str, nargs="+")
+    parser.add_argument("--metrics", type=str, nargs="+", default=METRIC_NAMES.keys())
     args = parser.parse_args()
 
 # TO DO: Remove redundant code by using a single object with the metrics as keys
-    bleu_scores = {
-        "model": [ MODEL_NAMES[model] for model in args.models ]
-    }
-    chrf_scores = {
-        "model": [ MODEL_NAMES[model] for model in args.models ]
-    }
-    comet_scores = {
-        "model": [ MODEL_NAMES[model] for model in args.models ]
-    }
+    
+    all_scores = { metric: { "model": [ MODEL_NAMES[model] for model in args.models ] } for metric in args.metrics }
 
     print(f"Aggregating {args.table_name} scores...")
-    
 
     for corpus in args.corpora:
         for lang_pair in args.lang_pairs:
             for model in args.models:
                 model_output_dir = os.path.join(args.input_dir, "outputs", model, corpus, lang_pair)
                 if os.path.isdir(model_output_dir):
-                    scores_files = [ f.path for f in os.scandir(model_output_dir) if f.name.endswith(SCORE_FILE_SUFFIX)]
+                    scores_files = get_score_files(model_output_dir)
                     for score_file in scores_files:
                         file_name = os.path.basename(score_file).removesuffix(SCORE_FILE_SUFFIX)
                         column_name = COLUMN_NAME_SEPARATOR.join([corpus, lang_pair, file_name])
                         with open(score_file) as f:
                             scores = json.load(f)
-                        add_score(bleu_scores, column_name, scores["bleu"])
-                        add_score(chrf_scores, column_name, scores["chrf2"])
-                        add_score(comet_scores, column_name, scores["comet"])
+                        for metric in args.metrics:
+                            if metric in scores:
+                                add_score(all_scores[metric], column_name, scores[metric])
 
     
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
-    bleu_score_file = os.path.join(scores_dir, f"bleu_{args.table_name}.csv")
-    chrf_score_file = os.path.join(scores_dir, f"chrf2_{args.table_name}.csv")
-    comet_score_file = os.path.join(scores_dir, f"comet_{args.table_name}.csv")
 
-    bleu_scores_df = pd.DataFrame.from_dict(bleu_scores)
-    chrf_scores_df = pd.DataFrame.from_dict(chrf_scores)
-    comet_scores_df = pd.DataFrame.from_dict(comet_scores) 
-    columns_to_multiply = comet_scores_df.columns[comet_scores_df.columns.str.contains(COLUMN_NAME_SEPARATOR)]
-    comet_scores_df[columns_to_multiply] *= 100
-    
+    score_files = { metric: os.path.join(scores_dir, f"{metric}_{args.table_name}.csv") for metric in args.metrics }
+
+    all_scores_df = { metric: pd.DataFrame.from_dict(all_scores[metric]) for metric in args.metrics }
+ 
+    if "comet" in args.metrics:
+        columns_to_multiply = all_scores_df["comet"].columns[all_scores_df["comet"].columns.str.contains(COLUMN_NAME_SEPARATOR)]
+        all_scores_df["comet"][columns_to_multiply] *= 100
+        
     
     if args.table_name == "multilingual":
-        bleu_scores_df = get_multilingual_table(bleu_scores_df)
-        chrf_scores_df = get_multilingual_table(chrf_scores_df)
-        comet_scores_df = get_multilingual_table(comet_scores_df)
+        for metric in args.metrics:
+            all_scores_df[metric] = get_multilingual_table(all_scores_df[metric])
 
     delta_column_prefixes = [ "delta" + COLUMN_NAME_SEPARATOR + corpus for corpus in args.corpora ]
-    bleu_scores_df = statistical_significance(bleu_scores_df, delta_column_prefixes, 0.05)
-    chrf_scores_df = statistical_significance(chrf_scores_df, delta_column_prefixes, 0.05)
-    comet_scores_df = statistical_significance(comet_scores_df, delta_column_prefixes, 0.05)
-
-    bleu_scores_df.round(ROUND_DECIMALS).to_csv(bleu_score_file)
-    chrf_scores_df.round(ROUND_DECIMALS).to_csv(chrf_score_file)
-    comet_scores_df.round(ROUND_DECIMALS).to_csv(comet_score_file)
-
+    
+    for metric in args.metrics:
+        all_scores_df[metric] = statistical_significance(all_scores_df[metric], delta_column_prefixes, 0.05)
+        all_scores_df[metric].round(ROUND_DECIMALS).to_csv(score_files[metric])

@@ -1,5 +1,6 @@
 SCORE_FILE_SUFFIX = ".out.json"
 STATS_FILE_PREFIX = "stats."
+GPT_NORM_FILE_PREFIX = "gpt."
 
 ROCSMT_CORPUS_NAME = "rocsmt"
 FLORES_CORPUS_NAME = "flores200"
