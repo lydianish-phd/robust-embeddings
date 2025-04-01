@@ -21,7 +21,7 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047k
 MODEL="lai"
 
 # Autoencode
