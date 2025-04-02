@@ -23,7 +23,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 
 BASE_EXPERIMENT_NUM=047
-CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}k
+CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}r
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$CURRENT_EXPERIMENT_NUM
 
 MODELS=(nllb1b sonar nllb600m) # rosonar rosonar_std)

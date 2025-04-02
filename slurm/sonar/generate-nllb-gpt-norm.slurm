@@ -24,7 +24,7 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047k
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 
 MODEL[0]=nllb600m
 MODEL_NAME[0]=facebook/nllb-200-distilled-600m
