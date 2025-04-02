@@ -2,6 +2,7 @@ import os, argparse, json
 import sentencepiece as spm
 import numpy as np
 import re
+from utils import STATS_FILE_SUFFIX, STATS_FILE_PREFIX
 
 def find_usernames_hashtags_urls(text):
     # Regular expression patterns
@@ -25,7 +26,7 @@ if __name__ == "__main__":
     
     for input_file in args.input_files:
         output_dir, filename = os.path.split(input_file)
-        output_file = os.path.join(output_dir, f"stats.{filename}.json")
+        output_file = os.path.join(output_dir, STATS_FILE_PREFIX + filename + STATS_FILE_SUFFIX)
 
         words = []
         types = set()

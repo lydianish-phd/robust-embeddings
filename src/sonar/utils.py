@@ -1,5 +1,6 @@
 SCORE_FILE_SUFFIX = ".out.json"
 STATS_FILE_PREFIX = "stats."
+STATS_FILE_SUFFIX = ".json"
 GPT_NORM_FILE_PREFIX = "gpt."
 
 ROCSMT_CORPUS_NAME = "rocsmt"
@@ -29,13 +30,19 @@ METRIC_NAMES = {
 }
 
 STATS =  [
+    "lines",
     "fertility",
     "types",
     "tokens",
     "ttr",
     "urls",
     "usernames",
-    "hashtags"
+    "hashtags",
+    "urls_per_line",
+    "usernames_per_line",
+    "hashtags_per_line",
+    "average_sentence_length",
+    "stddev_sentence_length"
 ]
 
 
