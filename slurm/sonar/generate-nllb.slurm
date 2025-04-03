@@ -199,7 +199,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {6..8}
+for i in {3..5}
 do
     echo "Model: ${MODEL[$i]}"
 
