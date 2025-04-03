@@ -25,7 +25,7 @@ if __name__ == "__main__":
         print(f"  - Processing {file}...")
         basedir, filename = os.path.split(file)
         stats_file = os.path.join(basedir, STATS_FILE_PREFIX + filename + STATS_FILE_SUFFIX)
-        corpus_name = basedir.replace(f"{os.environ["DATASETS"]}/", "").replace("/", COLUMN_NAME_SEPARATOR)
+        corpus_name = basedir.replace(f"{os.environ['DATASETS']}/", "").replace("/", COLUMN_NAME_SEPARATOR)
         with open(stats_file, "r", encoding="utf-8") as f:
             stats = json.load(f)
             stats["File"] = corpus_name + COLUMN_NAME_SEPARATOR + filename
