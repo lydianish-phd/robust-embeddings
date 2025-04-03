@@ -40,7 +40,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-files", type=str, required=True, help="Path to the input files", nargs="+")
     parser.add_argument("-m", "--spm-model", type=str, required=True, help="Path to the sentencepiece model")
-    parser.add_argument("-w", "--ttr-window-size", type=int, default=1000, help="Window size for TTR calculation")
+    parser.add_argument("-w", "--mattr-window-size", type=int, default=1000, help="Window size for Moving Average TTR calculation")
     args = parser.parse_args()
 
     sp = spm.SentencePieceProcessor(model_file=args.spm_model)
@@ -87,7 +87,7 @@ if __name__ == "__main__":
             "hashtags_per_line": len(hashtags) / n_lines,
             "average_sentence_length": np.mean(sentence_lengths),
             "stddev_sentence_length": np.std(sentence_lengths),
-            "mattr": compute_mattr(tokens, args.ttr_window_size),
+            "mattr": compute_mattr(tokens, args.mattr_window_size),
         }
         print(stats)
 

@@ -74,8 +74,6 @@ if __name__ == "__main__":
     parser.add_argument("-m", "--models", type=str, nargs="+")
     parser.add_argument("--metrics", type=str, nargs="+", default=METRIC_NAMES.keys())
     args = parser.parse_args()
-
-# TO DO: Remove redundant code by using a single object with the metrics as keys
     
     all_scores = { metric: { "model": [ MODEL_NAMES[model] for model in args.models ] } for metric in args.metrics }
 
@@ -96,7 +94,8 @@ if __name__ == "__main__":
                             if metric in scores:
                                 add_score(all_scores[metric], column_name, scores[metric])
 
-    
+    print("all_scores", all_scores)
+
     print("Writing aggregated score files...")
     scores_dir = os.path.join(args.input_dir, "scores")
     os.makedirs(scores_dir, exist_ok=True)
