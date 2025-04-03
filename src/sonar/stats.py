@@ -33,6 +33,8 @@ def compute_mattr(tokens, window_size):
         window = tokens[i : i + window_size]
         unique_types = len(set(window))
         ttr_values.append(unique_types / window_size)
+    
+    return np.mean(ttr_values)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
