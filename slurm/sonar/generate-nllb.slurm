@@ -51,10 +51,6 @@ MODEL[5]=nllb600m_ft_syn_en_fr
 MODEL_NAME[5]=facebook/nllb-200-distilled-600m
 MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
-MODEL[6]=nllb600m_ft_nat_en_fr_2
-MODEL_NAME[6]=facebook/nllb-200-distilled-600m
-MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best_2
-
 # Multilingual
 
 CORPUS[0]=rocsmt
@@ -203,7 +199,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {3..6}
+for i in {3..5}
 do
     echo "Model: ${MODEL[$i]}"
 
