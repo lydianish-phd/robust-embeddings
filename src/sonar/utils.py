@@ -47,6 +47,7 @@ STATS =  [
     "average_sentence_length",
     "stddev_sentence_length",
     "mattr",
+    "hdd",
 ]
 
 

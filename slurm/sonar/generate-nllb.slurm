@@ -41,15 +41,15 @@ MODEL_PATH[2]=facebook/nllb-200-3.3B
 
 MODEL[3]=nllb600m_ft_nat_en_fr
 MODEL_NAME[3]=facebook/nllb-200-distilled-600m
-MODEL_PATH[3]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[3]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best_3
 
 MODEL[4]=nllb600m_ft_nat_fr_en
 MODEL_NAME[4]=facebook/nllb-200-distilled-600m
-MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
+MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best_3
 
 MODEL[5]=nllb600m_ft_syn_en_fr
 MODEL_NAME[5]=facebook/nllb-200-distilled-600m
-MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052h/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best_3
 
 # Multilingual
 
@@ -199,7 +199,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {3..5}
+for i in {6..8}
 do
     echo "Model: ${MODEL[$i]}"
 

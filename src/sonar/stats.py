@@ -3,6 +3,7 @@ import sentencepiece as spm
 import numpy as np
 import re
 from utils import STATS_FILE_SUFFIX, STATS_FILE_PREFIX
+from lexical_diversity import lex_div as ld
 
 def find_usernames_hashtags_urls(text):
     # Regular expression patterns
@@ -16,25 +17,6 @@ def find_usernames_hashtags_urls(text):
         "hashtags": re.findall(hashtag_pattern, text)
     }
 
-def compute_mattr(tokens, window_size):
-    """
-    Computes the Moving Average Type-Token Ratio (MATTR) for a list of tokens.
-    
-    Args:
-        tokens (list of str): The tokenized text.
-        window_size (int): The number of tokens in each sliding window.
-    
-    Returns:
-        float: The MATTR score.
-    """
-    window_size = min(window_size, len(tokens))
-    ttr_values = []
-    for i in range(len(tokens) - window_size + 1):
-        window = tokens[i : i + window_size]
-        unique_types = len(set(window))
-        ttr_values.append(unique_types / window_size)
-    
-    return np.mean(ttr_values)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -87,7 +69,8 @@ if __name__ == "__main__":
             "hashtags_per_line": len(hashtags) / n_lines,
             "average_sentence_length": np.mean(sentence_lengths),
             "stddev_sentence_length": np.std(sentence_lengths),
-            "mattr": compute_mattr(tokens, args.mattr_window_size),
+            "mattr": ld.mattr(tokens, args.mattr_window_size),
+            "hdd": ld.hdd(tokens),
         }
         print(stats)
 
