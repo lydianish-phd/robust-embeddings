@@ -42,7 +42,8 @@ STATS =  [
     "usernames_per_line",
     "hashtags_per_line",
     "average_sentence_length",
-    "stddev_sentence_length"
+    "stddev_sentence_length",
+    "mattr",
 ]
 
 

@@ -16,10 +16,29 @@ def find_usernames_hashtags_urls(text):
         "hashtags": re.findall(hashtag_pattern, text)
     }
 
+def compute_mattr(tokens, window_size):
+    """
+    Computes the Moving Average Type-Token Ratio (MATTR) for a list of tokens.
+    
+    Args:
+        tokens (list of str): The tokenized text.
+        window_size (int): The number of tokens in each sliding window.
+    
+    Returns:
+        float: The MATTR score.
+    """
+    window_size = min(window_size, len(tokens))
+    ttr_values = []
+    for i in range(len(tokens) - window_size + 1):
+        window = tokens[i : i + window_size]
+        unique_types = len(set(window))
+        ttr_values.append(unique_types / window_size)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input-files", type=str, required=True, help="Path to the input files", nargs="+")
     parser.add_argument("-m", "--spm-model", type=str, required=True, help="Path to the sentencepiece model")
+    parser.add_argument("-w", "--ttr-window-size", type=int, default=1000, help="Window size for TTR calculation")
     args = parser.parse_args()
 
     sp = spm.SentencePieceProcessor(model_file=args.spm_model)
@@ -66,6 +85,7 @@ if __name__ == "__main__":
             "hashtags_per_line": len(hashtags) / n_lines,
             "average_sentence_length": np.mean(sentence_lengths),
             "stddev_sentence_length": np.std(sentence_lengths),
+            "mattr": compute_mattr(tokens, args.ttr_window_size),
         }
         print(stats)
 
