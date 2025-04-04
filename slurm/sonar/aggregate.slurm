@@ -26,7 +26,7 @@ BASE_EXPERIMENT_NUM=047
 CURRENT_EXPERIMENT_NUM=${BASE_EXPERIMENT_NUM}r
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$CURRENT_EXPERIMENT_NUM
 
-MODELS=(nllb1b sonar nllb600m nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr) # rosonar rosonar_std)
+MODELS=(nllb1b sonar nllb600m nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr nllb600m_ft_syn_plus_en_fr) # rosonar rosonar_std)
 
 # Multilingual
 TABLE_NAME[0]=multilingual

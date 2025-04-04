@@ -27,7 +27,7 @@ SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 # MODELS="nllb1b sonar nllb600m"
 # MODELS="rosonar rosonar_std"
-MODELS="nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr"
+MODELS="nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr nllb600m_ft_syn_plus_en_fr"
 
 # Multilingual
 
