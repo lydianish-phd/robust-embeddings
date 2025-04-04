@@ -9,7 +9,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=0:30:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=25-28
+#SBATCH --array=27-28
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -28,16 +28,6 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 MODEL="gpt4omini"
 
 # Autoencode
-
-DATA_DIR[25]=$DATASETS/rocsmt/test
-SRC_FILE[25]=ref.fr.test
-REF_FILE[25]=ref.fr.test
-SYS_FILE_PREFIX[25]=rocsmt/fra_Latn/gpt.ref.fr.test
-
-DATA_DIR[26]=$DATASETS/rocsmt/test
-SRC_FILE[26]=norm.en.test
-REF_FILE[26]=norm.en.test
-SYS_FILE_PREFIX[26]=rocsmt/eng_Latn/gpt.norm.en.test
 
 DATA_DIR[27]=$DATASETS/rocsmt/test
 SRC_FILE[27]=raw.en.test
