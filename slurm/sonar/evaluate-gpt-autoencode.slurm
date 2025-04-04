@@ -55,9 +55,9 @@ cp ${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/$GPT_FILE $OUTPUT_DIR/$GPT_FILE
 SYS_FILES+=("$OUTPUT_DIR/$GPT_FILE")
 
 python $HOME/robust-embeddings/src/sonar/evaluate.py \
-    --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
+    --src-file ${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
     --sys-files "${SYS_FILES[@]}" \
-    --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]}
+    --ref-file ${DATA_DIR[$SLURM_ARRAY_TASK_ID]}/${REF_FILE[$SLURM_ARRAY_TASK_ID]}
 
 # python $HOME/robust-embeddings/src/sonar/stats.py \
 #     -i "${SYS_FILES[@]}" \
