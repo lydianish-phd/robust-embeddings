@@ -30,33 +30,39 @@ MODEL="gpt4omini"
 # Autoencode
 
 DATA_DIR[25]=$DATASETS/rocsmt/test
-SRC_FILE[25]=${DATA_DIR[25]}/ref.fr.test
-REF_FILE[25]=${DATA_DIR[25]}/ref.fr.test
-SYS_FILE_SUFFIX[25]=rocsmt/fra_Latn/gpt.ref.fr.test
+SRC_FILE[25]=ref.fr.test
+REF_FILE[25]=ref.fr.test
+SYS_FILE_PREFIX[25]=rocsmt/fra_Latn/gpt.ref.fr.test
 
 DATA_DIR[26]=$DATASETS/rocsmt/test
-SRC_FILE[26]=${DATA_DIR[26]}/norm.en.test
-REF_FILE[26]=${DATA_DIR[26]}/norm.en.test
-SYS_FILE_SUFFIX[26]=rocsmt/eng_Latn/gpt.norm.en.test
+SRC_FILE[26]=norm.en.test
+REF_FILE[26]=norm.en.test
+SYS_FILE_PREFIX[26]=rocsmt/eng_Latn/gpt.norm.en.test
 
 DATA_DIR[27]=$DATASETS/rocsmt/test
-SRC_FILE[27]=${DATA_DIR[27]}/raw.en.test
-REF_FILE[27]=${DATA_DIR[27]}/raw.en.test
-SYS_FILE_SUFFIX[27]=rocsmt/eng_Latn/gpt.raw.en.test
+SRC_FILE[27]=raw.en.test
+REF_FILE[27]=raw.en.test
+SYS_FILE_PREFIX[27]=rocsmt/eng_Latn/gpt.raw.en.test
 
 DATA_DIR[28]=$DATASETS/rocsmt/test
-SRC_FILE[28]=${DATA_DIR[28]}/raw.en.test
-REF_FILE[28]=${DATA_DIR[28]}/norm.en.test
-SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/gpt.raw.en.test
+SRC_FILE[28]=raw.en.test
+REF_FILE[28]=norm.en.test
+SYS_FILE_PREFIX[28]=rocsmt/eng_Latn-eng_Latn
 
 SYS_FILES=()
 
 
 echo "Model: $MODEL"
 
-OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
-SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
+OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL/${SYS_FILE_PREFIX[$SLURM_ARRAY_TASK_ID]}
+GPT_FILE="gpt.${SRC_FILE[$SLURM_ARRAY_TASK_ID]}"
 
+echo "Copying $GPT_FILE to $OUTPUT_DIR"
+mkdir -p $OUTPUT_DIR
+cp $DATA_DIR[$SLURM_ARRAY_TASK_ID]/$GPT_FILE $OUTPUT_DIR/$GPT_FILE
+
+
+SYS_FILES+=("$OUTPUT_DIR/$GPT_FILE")
 
 python $HOME/robust-embeddings/src/sonar/evaluate.py \
     --src-file ${SRC_FILE[$SLURM_ARRAY_TASK_ID]} \
