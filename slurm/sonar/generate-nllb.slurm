@@ -27,6 +27,8 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 
+# Base models
+
 MODEL[0]=nllb600m
 MODEL_NAME[0]=facebook/nllb-200-distilled-600m
 MODEL_PATH[0]=facebook/nllb-200-distilled-600m
@@ -38,6 +40,8 @@ MODEL_PATH[1]=facebook/nllb-200-distilled-1.3B
 MODEL[2]=nllb3b
 MODEL_NAME[2]=facebook/nllb-200-3.3B
 MODEL_PATH[2]=facebook/nllb-200-3.3B
+
+# Fine-tuned models
 
 MODEL[3]=nllb600m_ft_nat_en_fr
 MODEL_NAME[3]=facebook/nllb-200-distilled-600m
@@ -54,10 +58,6 @@ MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic/eng_L
 MODEL[6]=nllb600m_ft_syn_plus_en_fr
 MODEL_NAME[6]=facebook/nllb-200-distilled-600m
 MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
-
-MODEL[7]=nllb600m_ft_syn_plus_en_fr_last
-MODEL_NAME[7]=facebook/nllb-200-distilled-600m
-MODEL_PATH[7]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_last
 
 # Multilingual
 
@@ -207,7 +207,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {7..7}
+for i in {3..6}
 do
     echo "Model: ${MODEL[$i]}"
 
