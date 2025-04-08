@@ -75,4 +75,4 @@ if __name__ == "__main__":
         print(stats)
 
         with open(output_file, "w") as f:
-            json.dump(stats, f)
+            json.dump(stats, f, indent=4)
