@@ -37,7 +37,7 @@ ALL_MODELS=(
     ${FINETUNED_MODELS[@]}
     ${FINETUNED_MODELS_BAL[@]}
     # ${FINETUNED_MODELS_PLUS[@]}
-    ${ROSONAR_MODELS[@]}
+    # ${ROSONAR_MODELS[@]}
 )
 
 # Multilingual
@@ -74,7 +74,7 @@ PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Copy baselines outputs
 
-for MODEL in ${ALL_MODELS[@]:0:3}
+for MODEL in ${ALL_MODELS[@]}
 do
     if [ ! -d $EXPERIMENT_DIR/outputs/$MODEL ]
     then
