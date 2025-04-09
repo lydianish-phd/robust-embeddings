@@ -55,9 +55,22 @@ MODEL[5]=nllb600m_ft_syn_en_fr
 MODEL_NAME[5]=facebook/nllb-200-distilled-600m
 MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
-MODEL[6]=nllb600m_ft_syn_plus_en_fr
+MODEL[6]=nllb600m_ft_nat_en_fr_bal
 MODEL_NAME[6]=facebook/nllb-200-distilled-600m
-MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[7]=nllb600m_ft_nat_fr_en_bal
+MODEL_NAME[7]=facebook/nllb-200-distilled-600m
+MODEL_PATH[7]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
+
+MODEL[8]=nllb600m_ft_syn_en_fr_bal
+MODEL_NAME[8]=facebook/nllb-200-distilled-600m
+MODEL_PATH[8]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[9]=nllb600m_ft_syn_plus_en_fr
+MODEL_NAME[9]=facebook/nllb-200-distilled-600m
+MODEL_PATH[9]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
 
 # Multilingual
 
