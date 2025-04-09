@@ -28,6 +28,7 @@ MODEL_NAMES = {
     "nllb600m_ft_nat_fr_en_bal": "NLLB-600M + FT fr-en_bal",
     "nllb600m_ft_syn_en_fr_bal": "NLLB-600M + FT en-fr_bal (syn)",
     "nllb600m_ft_syn_plus_en_fr": "NLLB-600M + FT en-fr (syn+)",
+    "nllb600m_ft_syn_plus_en_fr_bal": "NLLB-600M + FT en-fr_bal (syn+)",
     "gpt4omini": "GPT-4o-mini",
 }
 

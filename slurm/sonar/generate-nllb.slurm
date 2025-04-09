@@ -71,6 +71,9 @@ MODEL[9]=nllb600m_ft_syn_plus_en_fr
 MODEL_NAME[9]=facebook/nllb-200-distilled-600m
 MODEL_PATH[9]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
+MODEL[10]=nllb600m_ft_syn_plus_en_fr_bal
+MODEL_NAME[10]=facebook/nllb-200-distilled-600m
+MODEL_PATH[10]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
 # Multilingual
 

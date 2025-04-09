@@ -29,7 +29,7 @@ EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$CURRENT_EXPERIME
 BASE_MODELS=(nllb1b sonar nllb600m)
 FINETUNED_MODELS=(nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr)
 FINETUNED_MODELS_BAL=(nllb600m_ft_nat_en_fr_bal nllb600m_ft_nat_fr_en_bal nllb600m_ft_syn_en_fr_bal)
-FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
+FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr nllb600m_ft_syn_plus_en_fr_bal)
 ROSONAR_MODELS=(rosonar rosonar_std)
 
 ALL_MODELS=(
