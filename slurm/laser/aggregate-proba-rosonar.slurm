@@ -36,7 +36,7 @@ SRC_PATH=$HOME/robust-embeddings/src/laser
 
 python $SRC_PATH/aggregate_proba.py \
     -i $INPUT_DIR \
-    -m $ALL_MODELS \
+    -m ${ALL_MODELS[@]} \
     -c $CORPUS \
     --corpus-parts $CORPUS_PARTS \
     --metrics $METRICS \

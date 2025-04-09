@@ -73,7 +73,7 @@ python $HOME/robust-embeddings/src/sonar/evaluate-artificial.py \
     --src-file-name norm.en_mix_all.test \
     --sys-file-name norm.en_mix_all.test.out \
     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} \
-    -m $ALL_MODELS \
+    -m ${ALL_MODELS[@]} \
     -s $SEEDS \
     -p $PROBAS
 

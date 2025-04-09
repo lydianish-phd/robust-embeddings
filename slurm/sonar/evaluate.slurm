@@ -198,9 +198,9 @@ SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 SYS_FILES=()
 
 
-echo "Models: $ALL_MODELS"
+echo "Models: ${ALL_MODELS[@]}"
 
-for MODEL in $ALL_MODELS
+for MODEL in ${ALL_MODELS[@]}
 do
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")
