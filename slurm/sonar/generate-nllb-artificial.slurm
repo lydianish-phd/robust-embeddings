@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=5:00:00                # Time limit hrs:min:sec
+#SBATCH --time=20:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-4
 
@@ -26,11 +26,54 @@ set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 
+# Base models
+
 MODEL[0]=nllb600m
 MODEL_NAME[0]=facebook/nllb-200-distilled-600m
+MODEL_PATH[0]=facebook/nllb-200-distilled-600m
 
 MODEL[1]=nllb1b
 MODEL_NAME[1]=facebook/nllb-200-distilled-1.3B
+MODEL_PATH[1]=facebook/nllb-200-distilled-1.3B
+
+MODEL[2]=nllb3b
+MODEL_NAME[2]=facebook/nllb-200-3.3B
+MODEL_PATH[2]=facebook/nllb-200-3.3B
+
+# Fine-tuned models
+
+MODEL[3]=nllb600m_ft_nat_en_fr
+MODEL_NAME[3]=facebook/nllb-200-distilled-600m
+MODEL_PATH[3]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[4]=nllb600m_ft_nat_fr_en
+MODEL_NAME[4]=facebook/nllb-200-distilled-600m
+MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
+
+MODEL[5]=nllb600m_ft_syn_en_fr
+MODEL_NAME[5]=facebook/nllb-200-distilled-600m
+MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[6]=nllb600m_ft_nat_en_fr_bal
+MODEL_NAME[6]=facebook/nllb-200-distilled-600m
+MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[7]=nllb600m_ft_nat_fr_en_bal
+MODEL_NAME[7]=facebook/nllb-200-distilled-600m
+MODEL_PATH[7]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
+
+MODEL[8]=nllb600m_ft_syn_en_fr_bal
+MODEL_NAME[8]=facebook/nllb-200-distilled-600m
+MODEL_PATH[8]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[9]=nllb600m_ft_syn_plus_en_fr
+MODEL_NAME[9]=facebook/nllb-200-distilled-600m
+MODEL_PATH[9]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
+MODEL[10]=nllb600m_ft_syn_plus_en_fr_bal
+MODEL_NAME[10]=facebook/nllb-200-distilled-600m
+MODEL_PATH[10]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
@@ -54,7 +97,7 @@ PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Launch the generation of outputs
 
-for i in {0..1}
+for i in {3..8}
 do
     echo "Model: ${MODEL[$i]}"
 
@@ -75,7 +118,9 @@ do
                 -i $INPUT_FILE \
                 -s ${SRC_LANG[$SLURM_ARRAY_TASK_ID]} \
                 -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
-                -o $OUTPUT_DIR -m ${MODEL_NAME[$i]}
+                -o $OUTPUT_DIR \
+                -m ${MODEL_NAME[$i]} \
+                -p ${MODEL_PATH[$i]} \
         done
     done
 done
