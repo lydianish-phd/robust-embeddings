@@ -32,12 +32,12 @@ FINETUNED_MODELS_BAL=(nllb600m_ft_nat_en_fr_bal nllb600m_ft_nat_fr_en_bal nllb60
 FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
 ROSONAR_MODELS=(rosonar rosonar_std)
 
-MODELS=(
+ALL_MODELS=(
     ${BASE_MODELS[@]}
     ${FINETUNED_MODELS[@]}
     ${FINETUNED_MODELS_BAL[@]}
     # ${FINETUNED_MODELS_PLUS[@]}
-    # ${ROSONAR_MODELS[@]}
+    ${ROSONAR_MODELS[@]}
 )
 
 # Multilingual
@@ -74,7 +74,7 @@ PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Copy baselines outputs
 
-for MODEL in ${MODELS[@]:0:3}
+for MODEL in ${ALL_MODELS[@]:0:3}
 do
     if [ ! -d $EXPERIMENT_DIR/outputs/$MODEL ]
     then
@@ -91,7 +91,7 @@ then
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
         -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-        -m ${MODELS[@]} \
+        -m ${ALL_MODELS[@]} \
         -s $SEEDS \
         -p $PROBAS
 else
@@ -100,14 +100,14 @@ else
         -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
         -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
         -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-        -m ${MODELS[@]}
+        -m ${ALL_MODELS[@]}
 
     # python $HOME/robust-embeddings/src/sonar/aggregate-stats.py \
     #     -i $EXPERIMENT_DIR \
     #     -t ${TABLE_NAME[$SLURM_ARRAY_TASK_ID]} \
     #     -c ${CORPORA[$SLURM_ARRAY_TASK_ID]} \
     #     -l ${LANG_PAIRS[$SLURM_ARRAY_TASK_ID]} \
-    #     -m ${MODELS[@]}
+    #     -m ${ALL_MODELS[@]}
 fi
 
 echo "Done..."

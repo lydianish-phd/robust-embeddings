@@ -32,7 +32,7 @@ FINETUNED_MODELS_BAL=(nllb600m_ft_nat_en_fr_bal nllb600m_ft_nat_fr_en_bal nllb60
 FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
 ROSONAR_MODELS=(rosonar rosonar_std)
 
-MODELS=(
+ALL_MODELS=(
     # ${BASE_MODELS[@]}
     # ${FINETUNED_MODELS[@]}
     ${FINETUNED_MODELS_BAL[@]}
@@ -198,9 +198,9 @@ SYS_FILE_SUFFIX[28]=rocsmt/eng_Latn-eng_Latn/raw.en.test.out
 SYS_FILES=()
 
 
-echo "Models: $MODELS"
+echo "Models: $ALL_MODELS"
 
-for MODEL in $MODELS
+for MODEL in $ALL_MODELS
 do
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")

@@ -25,8 +25,7 @@ set -e
 SPM_MODEL=$MODELS/nllb600m/flores200sacrebleuspm
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
-MODELS="nllb600m"
-# MODELS="rosonar" # rosonar_std"
+ALL_MODELS="nllb600m"
 
 # Multilingual
 
@@ -97,9 +96,9 @@ SYS_FILE_SUFFIX[24]=foursquare/fra_Latn-eng_Latn/gpt.test.fr.out
 SYS_FILES=()
 
 
-echo "Models: $MODELS"
+echo "Models: $ALL_MODELS"
 
-for MODEL in $MODELS
+for MODEL in $ALL_MODELS
 do
     OUTPUT_DIR=$EXPERIMENT_DIR/outputs/$MODEL
     SYS_FILES+=("$OUTPUT_DIR/${SYS_FILE_SUFFIX[$SLURM_ARRAY_TASK_ID]}")

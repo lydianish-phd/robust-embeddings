@@ -22,7 +22,7 @@ source $HOME/.bash_python_exports
 
 EXPERIMENT_BASE_NUM="048"
 
-MODELS="LASER RoLASER-0.1 RoLASER-0.2 RoLASER-0.3"
+ALL_MODELS="LASER RoLASER-0.1 RoLASER-0.2 RoLASER-0.3"
 METRICS="xsimpp"
 SEEDS="1005 1006 1007 1008 1009"
 PROBAS="0.0 0.1 0.2 0.3 0.4 0.5"
@@ -36,7 +36,7 @@ SRC_PATH=$HOME/robust-embeddings/src/laser
 
 python $SRC_PATH/aggregate_proba.py \
     -i $INPUT_DIR \
-    -m $MODELS \
+    -m $ALL_MODELS \
     -c $CORPUS \
     --corpus-parts $CORPUS_PARTS \
     --metrics $METRICS \

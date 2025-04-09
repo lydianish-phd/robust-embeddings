@@ -23,7 +23,20 @@ source $HOME/.bash_profile
 set -e
 
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
-MODELS="rosonar" # rosonar_std"
+
+BASE_MODELS=(nllb1b sonar nllb600m)
+FINETUNED_MODELS=(nllb600m_ft_nat_en_fr nllb600m_ft_nat_fr_en nllb600m_ft_syn_en_fr)
+FINETUNED_MODELS_BAL=(nllb600m_ft_nat_en_fr_bal nllb600m_ft_nat_fr_en_bal nllb600m_ft_syn_en_fr_bal)
+FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
+ROSONAR_MODELS=(rosonar rosonar_std)
+
+ALL_MODELS=(
+    ${BASE_MODELS[@]}
+    ${FINETUNED_MODELS[@]}
+    ${FINETUNED_MODELS_BAL[@]}
+    # ${FINETUNED_MODELS_PLUS[@]}
+    ${ROSONAR_MODELS[@]}
+)
 
 CORPUS=rocsmt_artificial
 CORPUS_PART=test
@@ -60,7 +73,7 @@ python $HOME/robust-embeddings/src/sonar/evaluate-artificial.py \
     --src-file-name norm.en_mix_all.test \
     --sys-file-name norm.en_mix_all.test.out \
     --ref-file ${REF_FILE[$SLURM_ARRAY_TASK_ID]} \
-    -m $MODELS \
+    -m $ALL_MODELS \
     -s $SEEDS \
     -p $PROBAS
 
