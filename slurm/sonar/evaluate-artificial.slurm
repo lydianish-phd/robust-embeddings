@@ -2,6 +2,7 @@
 
 #SBATCH --job-name=evaluate      # Job name
 #SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
