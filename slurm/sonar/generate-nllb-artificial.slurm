@@ -121,7 +121,7 @@ do
                 -t ${TGT_LANG[$SLURM_ARRAY_TASK_ID]} \
                 -o $OUTPUT_DIR \
                 -m ${MODEL_NAME[$i]} \
-                -p ${MODEL_PATH[$i]} \
+                -p ${MODEL_PATH[$i]}
         done
     done
 done
