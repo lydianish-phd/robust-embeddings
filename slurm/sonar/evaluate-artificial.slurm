@@ -31,11 +31,11 @@ FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
 ROSONAR_MODELS=(rosonar rosonar_std)
 
 ALL_MODELS=(
-    ${BASE_MODELS[@]}
+    # ${BASE_MODELS[@]}
     ${FINETUNED_MODELS[@]}
-    ${FINETUNED_MODELS_BAL[@]}
+    # ${FINETUNED_MODELS_BAL[@]}
     # ${FINETUNED_MODELS_PLUS[@]}
-    ${ROSONAR_MODELS[@]}
+    # ${ROSONAR_MODELS[@]}
 )
 
 CORPUS=rocsmt_artificial
