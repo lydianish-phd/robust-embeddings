@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --job-name=generate      # Job name
-#SBATCH --account=rnh@a100
-#SBATCH --partition=gpu_p5
-#SBATCH -C a100
+#SBATCH --account=rnh@v100
+#SBATCH --partition=gpu_p2
+##SBATCH -C a100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks-per-node=1               # number of tasks per node
 #SBATCH --gres=gpu:1        # numper of GPUs per node
@@ -17,7 +17,8 @@ echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
 module purge
 # Using anaconda-py3/2023.09 which has pytorch 2.2.2 but NO accelerate (otherwise fails to load NLLB pretrained model from HF)
-module load arch/a100 anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+# module load arch/a100 anaconda-py3/2023.09 libsndfile/1.0.28 intel-oneapi-tbb/2021.9
+module load pytorch-gpu/py3/2.0.0 #V100
 
 source $HOME/.bashrc 
 source $HOME/.bash_profile
@@ -97,7 +98,7 @@ PROBAS="0.1 0.2 0.3 0.4 0.5"
 
 # Launch the generation of outputs
 
-for i in {3..8}
+for i in {3..5}
 do
     echo "Model: ${MODEL[$i]}"
 
