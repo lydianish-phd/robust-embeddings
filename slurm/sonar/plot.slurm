@@ -23,7 +23,7 @@ source $HOME/.bash_profile
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
 SCORES_DIR=$EXPERIMENT_DIR/scores
 
-METRICS="bleu comet"
+METRICS="bleu comet chrf2"
 
 python $HOME/robust-embeddings/src/sonar/plot-proba.py \
     -d $SCORES_DIR \
