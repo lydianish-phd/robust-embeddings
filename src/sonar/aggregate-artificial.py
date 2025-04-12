@@ -5,8 +5,7 @@ from utils import (
     SCORE_FILE_SUFFIX,
     MODEL_NAMES,
     COLUMN_NAME_SEPARATOR,
-    BLEU_ROUND_DECIMALS,
-    COMET_ROUND_DECIMALS
+    ROUND_DECIMALS,
 )
 
 if __name__ == "__main__":
@@ -83,6 +82,6 @@ if __name__ == "__main__":
     bleu_scores_df["avg"] = bleu_scores_df[np.array(score_columns)].mean(axis=1)
     comet_scores_df["avg"] = comet_scores_df[np.array(score_columns)].mean(axis=1)
 
-    bleu_scores_df.round(BLEU_ROUND_DECIMALS).to_csv(bleu_score_file)
-    comet_scores_df.round(COMET_ROUND_DECIMALS).to_csv(comet_score_file)
+    bleu_scores_df.round(ROUND_DECIMALS).to_csv(bleu_score_file)
+    comet_scores_df.round(ROUND_DECIMALS).to_csv(comet_score_file)
         
