@@ -32,7 +32,7 @@ FINETUNED_MODELS_PLUS=(nllb600m_ft_syn_plus_en_fr)
 ROSONAR_MODELS=(rosonar rosonar_std)
 
 ALL_MODELS=(
-    # ${BASE_MODELS[@]}
+    ${BASE_MODELS[@]}
     ${FINETUNED_MODELS[@]}
     # ${FINETUNED_MODELS_BAL[@]}
     # ${FINETUNED_MODELS_PLUS[@]}
@@ -61,7 +61,8 @@ REF_FILE[4]=$REF_DIR/ref.ru.test
 LANG_PAIR[4]=eng_Latn-rus_Cyrl
 
 SEEDS="1000 1001 1002 1003 1004"
-PROBAS="0.1 0.2 0.3 0.4 0.5"
+# PROBAS="0.1 0.2 0.3 0.4 0.5"
+PROBAS="0.05 0.15 0.25"
 
 # Launch the evaluation of outputs
     

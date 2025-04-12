@@ -70,7 +70,8 @@ TABLE_NAME[5]=artificial
 CORPORA[5]="rocsmt_artificial"
 LANG_PAIRS[5]="eng_Latn-ces_Latn eng_Latn-deu_Latn eng_Latn-fra_Latn eng_Latn-rus_Cyrl eng_Latn-ukr_Cyrl"
 SEEDS="1000 1001 1002 1003 1004"
-PROBAS="0.1 0.2 0.3 0.4 0.5"
+#PROBAS="0.1 0.2 0.3 0.4 0.5"
+PROBAS="0.05 0.1 0.15 0.2 0.25"
 
 # Copy baselines outputs
 

@@ -53,9 +53,10 @@ TGT_LANG[3]=ukr_Cyrl
 SRC_LANG[4]=eng_Latn
 TGT_LANG[4]=rus_Cyrl
 
-PROBAS="0.1 0.2 0.3 0.4 0.5"
+#PROBAS="0.1 0.2 0.3 0.4 0.5"
+PROBAS="0.05 0.15 0.25"
 
-for i in {1..2}
+for i in {0..0}
 do
     echo "Model: ${MODEL[$i]}"
 
