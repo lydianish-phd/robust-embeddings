@@ -149,7 +149,7 @@ def _get_student_encoder_from_sonar(sonar_model):
     return encoder
 
 
-def load_student_encoder_from_checkpoint(checkpoint_path_or_model, init="rosonar"):
+def load_student_encoder_from_checkpoint(checkpoint_path_or_model="", init=""):
     student_config = _get_nllb_student_model_config() if init == "nllb" else _get_student_model_config()
     student_model = create_sonar_text_encoder_model(student_config) # random init
     if init == "rosonar": # initialize from rosonar checkpoint
