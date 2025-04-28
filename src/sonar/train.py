@@ -36,6 +36,7 @@ if __name__=="__main__":
     parser.add_argument("--max-steps", type=int, default=MAX_STEPS)
     parser.add_argument("--ugc-en", help="use artificial UGC English in training data", type=bool, default=True)
     parser.add_argument("--dataloader-workers", help="number of workers for data loading", type=int, default=8)
+    parser.add_argument("--init", help="which checkpoint for student model initialisation", type=str, default="sonar", choices=["sonar", "nllb"])
     args = parser.parse_args()
 
     accelerator = Accelerator()
@@ -96,8 +97,11 @@ if __name__=="__main__":
 
     print("Initializing student model...")
 
-    nllb_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
-    student_model = load_student_encoder_from_checkpoint(nllb_checkpoint_path)
+    if args.init == "nllb":
+        nllb_checkpoint_path = os.path.join(os.environ["MODELS"], "nllb600m/nllb200densedst600mcheckpoint")
+        student_model = load_student_encoder_from_checkpoint(nllb_checkpoint_path, init=args.init)
+    else:
+        student_model = load_student_encoder_from_checkpoint(teacher_model, init="sonar")
 
     print("Training student model...")
 

@@ -4,6 +4,7 @@ from fairseq2.models.nllb.tokenizer import NllbTokenizer
 from fairseq2.models.sequence import SequenceBatch, PaddingMask
 from sonar.models.sonar_text.builder import sonar_text_encoder_archs, create_sonar_text_encoder_model
 from sonar.models.sonar_text.loader import convert_sonar_text_encoder_checkpoint
+from sonar.models.sonar_text.model import SonarTextTransformerEncoderModel
 from typing import Any, Dict, List
 import torch
 from torch.nn import MSELoss, Embedding
@@ -87,13 +88,17 @@ def compute_metrics(eval_pred):
     loss = MSELoss(reduction="sum")(predictions, labels)
     return { "loss": loss }
 
-def _get_student_model_config():
+def _get_student_model_config(ffn_inner_dim=1024*8):
     cfg = sonar_text_encoder_archs.get_config("basic")
+    cfg.vocab_info.pad_idx = 0
     cfg.num_encoder_layers = cfg.num_decoder_layers = 12
-    cfg.ffn_inner_dim = 4096
+    cfg.ffn_inner_dim = ffn_inner_dim
     return cfg
 
-def _get_nllb_checkpoint_encoder(checkpoint_file, student_config):
+def _get_nllb_student_model_config():
+    return _get_student_model_config(ffn_inner_dim=1024*4)
+
+def _get_student_encoder_from_nllb_checkpoint(checkpoint_file, student_config):
     nllb_checkpoint = torch.load(checkpoint_file)
     nllb_checkpoint_encoder = {
         "state_dict": {},
@@ -105,7 +110,7 @@ def _get_nllb_checkpoint_encoder(checkpoint_file, student_config):
             nllb_checkpoint_encoder["state_dict"][key[len(prefix):]] = value
     return convert_sonar_text_encoder_checkpoint(nllb_checkpoint_encoder, student_config)
 
-def _get_rosonar_checkpoint_encoder(checkpoint_dir):
+def _get_student_encoder_from_rosonar_checkpoint(checkpoint_dir):
     checkpoint_file = f"{checkpoint_dir}/model.safetensors"
     encoder = { 
         "model": {}
@@ -114,13 +119,48 @@ def _get_rosonar_checkpoint_encoder(checkpoint_dir):
         for k in f.keys():
             encoder["model"][k] = f.get_tensor(k)
     return encoder
-        
-def load_student_encoder_from_checkpoint(checkpoint_file_or_dir):
-    student_config = _get_student_model_config()
-    student_model = create_sonar_text_encoder_model(student_config)
-    if os.path.isdir(checkpoint_file_or_dir):
-        student_model_init = _get_rosonar_checkpoint_encoder(checkpoint_file_or_dir)
-    else:
-        student_model_init = _get_nllb_checkpoint_encoder(checkpoint_file_or_dir, student_config)
-    student_model.load_state_dict(student_model_init["model"])
+
+def _get_student_encoder_from_rosonar_checkpoint(checkpoint_dir):
+    checkpoint_file = f"{checkpoint_dir}/model.safetensors"
+    encoder = { 
+        "model": {}
+    }
+    with safe_open(checkpoint_file, framework="pt", device=0) as f:
+        for k in f.keys():
+            encoder["model"][k] = f.get_tensor(k)
+    return encoder
+
+
+def _get_student_encoder_from_sonar(sonar_model):
+    encoder = {
+        "model": {}
+    }
+    for p in sonar_model.named_parameters():
+        param_name = p[0]
+        param_data = p[1]
+        if param_name.startswith("encoder.layers"):
+            i = int(param_name.split(".")[2])
+            if i % 2 == 0:
+                new_param_name = param_name.replace(str(i), str(i//2))
+                encoder["model"][new_param_name] = param_data
+        else:
+            encoder["model"][param_name] = param_data
+    return encoder
+
+
+def load_student_encoder_from_checkpoint(checkpoint_path_or_model, init="rosonar"):
+    student_config = _get_nllb_student_model_config() if init == "nllb" else _get_student_model_config()
+    student_model = create_sonar_text_encoder_model(student_config) # random init
+    if init == "rosonar": # initialize from rosonar checkpoint
+        assert os.path.isdir(checkpoint_path_or_model), f"Checkpoint directory {checkpoint_path_or_model} does not exist"
+        student_model_init = _get_student_encoder_from_rosonar_checkpoint(checkpoint_path_or_model)
+        student_model.load_state_dict(student_model_init["model"])
+    elif init == "nllb": # initialize from nllb checkpoint
+        assert os.path.isfile(checkpoint_path_or_model), f"Checkpoint file {checkpoint_path_or_model} does not exist"
+        student_model_init = _get_student_encoder_from_nllb_checkpoint(checkpoint_path_or_model, student_config)
+        student_model.load_state_dict(student_model_init["model"])
+    elif init == "sonar": # initialize from sonar checkpoint
+        assert isinstance(checkpoint_path_or_model, SonarTextTransformerEncoderModel), "Checkpoint must be a SonarTextTransformerEncoderModel"
+        student_model_init = _get_student_encoder_from_sonar(checkpoint_path_or_model)
+        student_model.load_state_dict(student_model_init["model"])
     return student_model

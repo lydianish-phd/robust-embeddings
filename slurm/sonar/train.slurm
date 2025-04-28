@@ -36,7 +36,7 @@ UGC_EN[1]=False
 
 # Setting the experiment parameters
 
-EXPERIMENT_NUM="047r"
+EXPERIMENT_NUM="047s"
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_$EXPERIMENT_NUM
 
 SEED=42
