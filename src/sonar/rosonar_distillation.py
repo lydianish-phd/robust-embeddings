@@ -88,15 +88,16 @@ def compute_metrics(eval_pred):
     loss = MSELoss(reduction="sum")(predictions, labels)
     return { "loss": loss }
 
-def _get_student_model_config(ffn_inner_dim=1024*8):
+def _get_student_model_config():
     cfg = sonar_text_encoder_archs.get_config("basic")
-    cfg.vocab_info.pad_idx = 0
     cfg.num_encoder_layers = cfg.num_decoder_layers = 12
-    cfg.ffn_inner_dim = ffn_inner_dim
     return cfg
 
 def _get_nllb_student_model_config():
-    return _get_student_model_config(ffn_inner_dim=1024*4)
+    cfg = _get_student_model_config()
+    cfg.vocab_info.pad_idx = 0
+    cfg.ffn_inner_dim = 1024*4
+    return cfg
 
 def _get_student_encoder_from_nllb_checkpoint(checkpoint_file, student_config):
     nllb_checkpoint = torch.load(checkpoint_file)
