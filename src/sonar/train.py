@@ -93,7 +93,7 @@ if __name__=="__main__":
 
     print("Loading teacher model...")
 
-    teacher_model = accelerator.prepare(load_sonar_text_encoder_model("text_sonar_basic_encoder"))
+    teacher_model = load_sonar_text_encoder_model("text_sonar_basic_encoder")
 
     print("Initializing student model...")
 
@@ -104,8 +104,10 @@ if __name__=="__main__":
         student_model = load_student_encoder_from_checkpoint(teacher_model, init=args.init)
     else: # random init
         student_model = load_student_encoder_from_checkpoint()
-
+    
     print("Training student model...")
+
+    teacher_model = accelerator.prepare(teacher_model)
 
     checkpoint_dir = f"{args.output_dir}/models/{args.model_name}"
     tensorboard_dir = f"{args.output_dir}/tensorboard/{args.model_name}"
