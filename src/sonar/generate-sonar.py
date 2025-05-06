@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     print("Loading translation pipeline...")
     if args.model_dir:
-        encoder = load_student_encoder_from_checkpoint(args.model_dir)
+        encoder = load_student_encoder_from_checkpoint(args.model_dir, init="rosonar")
     else:
         encoder = "text_sonar_basic_encoder"
     translator = TextToTextModelPipeline(encoder=encoder,

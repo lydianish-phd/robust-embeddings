@@ -25,7 +25,7 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 # Base models
 
