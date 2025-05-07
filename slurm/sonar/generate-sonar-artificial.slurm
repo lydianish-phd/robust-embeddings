@@ -9,7 +9,7 @@
 #SBATCH --gres=gpu:1        # numper of GPUs per node
 #SBATCH --cpus-per-task=32	# number of cores per task (8x8 = 64 cores, or all the cores)
 #SBATCH --hint=multithread       # we get physical cores not logical
-#SBATCH --time=2:00:00                # Time limit hrs:min:sec
+#SBATCH --time=3:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
 #SBATCH --array=0-4
 
@@ -24,16 +24,16 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047r
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-260000"
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
 
 MODEL[2]=rosonar_std
-MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-260000"
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
 
 CORPUS=rocsmt_artificial
 INPUT_DIR=$DATASETS/rocsmt/artificial
@@ -53,10 +53,11 @@ TGT_LANG[3]=ukr_Cyrl
 SRC_LANG[4]=eng_Latn
 TGT_LANG[4]=rus_Cyrl
 
-#PROBAS="0.1 0.2 0.3 0.4 0.5"
-PROBAS="0.05 0.15 0.25"
+# PROBAS="0.1 0.2 0.3 0.4 0.5"
+# PROBAS="0.05 0.15 0.25"
+PROBAS="0.05 0.1 0.15 0.2 0.25"
 
-for i in {0..0}
+for i in {1..2}
 do
     echo "Model: ${MODEL[$i]}"
 

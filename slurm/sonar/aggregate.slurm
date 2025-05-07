@@ -8,7 +8,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=00:10:00               # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-4
+#SBATCH --array=5 #0-4
 ##SBATCH --partition=prepost
 
 set -e 
@@ -35,7 +35,7 @@ ROSONAR_MODELS=(rosonar rosonar_std)
 ALL_MODELS=(
     ${BASE_MODELS[@]}
     ${FINETUNED_MODELS[@]}
-    ${FINETUNED_MODELS_BAL[@]}
+    # ${FINETUNED_MODELS_BAL[@]}
     # ${FINETUNED_MODELS_PLUS[@]}
     ${ROSONAR_MODELS[@]}
 )
