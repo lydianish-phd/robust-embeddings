@@ -31,7 +31,7 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
     )
 
     print("Writing output embeddings...")
-    embeddings = np.array(embeddings, dtype=np.float16 if fp16 else np.float32)
+    embeddings = np.array(embeddings.cpu(), dtype=np.float16 if fp16 else np.float32)
     with open(output_file, "wb") as fout:
         embeddings.tofile(fout)
     
