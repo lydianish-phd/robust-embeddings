@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from sonar.inference_pipelines.text import TextToEmbeddingModelPipeline
 from rosonar_distillation import load_student_encoder_from_checkpoint
-
+from utils import LANG_CODES, LANG_NAMES
 
 def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_size=32):
     print("Reading input sentences...")
@@ -60,6 +60,13 @@ def get_langs(langs):
     if langs:
         return sorted(langs.split(",")) if isinstance(langs, str) else sorted(langs)
     return []
+
+def get_lang_code(lang):
+    if lang in LANG_NAMES:
+        return lang
+    if lang[-2:] in LANG_CODES:
+        return LANG_CODES[lang[-2:]]
+    raise ValueError(f"Unknown language code: {lang}. Please use a valid language code.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

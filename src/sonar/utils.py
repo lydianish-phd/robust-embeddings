@@ -67,6 +67,16 @@ LANG_NAMES = {
     "jap_Japn": "Japanese"
 }
 
+LANG_CODES = {
+    "en": "eng_Latn",
+    "fr": "fra_Latn",
+    "de": "deu_Latn",
+    "cs": "ces_Latn",
+    "ru": "rus_Cyrl",
+    "uk": "ukr_Cyrl",
+    "ja": "jap_Japn"
+}
+
 ROUND_DECIMALS = 2
 
 MULTILINGUAL_COLUMNS = [
