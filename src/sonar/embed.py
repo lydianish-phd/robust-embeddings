@@ -4,6 +4,18 @@ import numpy as np
 from sonar.inference_pipelines.text import TextToEmbeddingModelPipeline
 from rosonar_distillation import load_student_encoder_from_checkpoint
 from utils import LANG_CODES, LANG_NAMES
+            
+def get_langs(langs):
+    if langs:
+        return sorted(langs.split(",")) if isinstance(langs, str) else sorted(langs)
+    return []
+
+def get_lang_code(lang):
+    if lang in LANG_NAMES:
+        return lang
+    if lang[-2:] in LANG_CODES:
+        return LANG_CODES[lang[-2:]]
+    raise ValueError(f"Unknown language code: {lang}. Please use a valid language code.")
 
 def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_size=32):
     print("Reading input sentences...")
@@ -13,7 +25,7 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
 
     print(f"Generating embeddings for {len(sentences)} sentences...")
     embeddings = embedder.predict(sentences, 
-        source_lang=lang,
+        source_lang=get_lang_code(lang),
         progress_bar=True,
         batch_size=batch_size
     )
@@ -55,18 +67,6 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
                 infile = combined_infile
             
             embed_sentences(embedder, infile, outfile, lang, fp16, batch_size)
-            
-def get_langs(langs):
-    if langs:
-        return sorted(langs.split(",")) if isinstance(langs, str) else sorted(langs)
-    return []
-
-def get_lang_code(lang):
-    if lang in LANG_NAMES:
-        return lang
-    if lang[-2:] in LANG_CODES:
-        return LANG_CODES[lang[-2:]]
-    raise ValueError(f"Unknown language code: {lang}. Please use a valid language code.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
