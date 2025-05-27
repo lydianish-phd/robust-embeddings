@@ -15,6 +15,8 @@ def get_lang_code(lang):
         return lang
     if lang[-2:] in LANG_CODES:
         return LANG_CODES[lang[-2:]]
+    if lang[:2] in LANG_CODES:
+        return LANG_CODES[lang[:2]]
     raise ValueError(f"Unknown language code: {lang}. Please use a valid language code.")
 
 def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_size=32):
@@ -41,7 +43,7 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
 
     print(f"Embeddings saved to {output_file}")
 
-def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[], fp16=False, batch_size=32):
+def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[], fp16=False, batch_size=32, overwrite=False):
         for lang in langs:
             augjson = None
             fname = f"{lang}.{split}"
@@ -65,8 +67,10 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
                         with open(f) as fin:
                             newfile.write(fin.read())
                 infile = combined_infile
-            
-            embed_sentences(embedder, infile, outfile, lang, fp16, batch_size)
+            if overwrite or not os.path.isfile(outfile) or os.path.getsize(outfile) == 0:
+                embed_sentences(embedder, infile, outfile, lang, fp16, batch_size)
+            else:
+                print(f"Skipping {outfile}, already exists and overwrite is False")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -80,6 +84,7 @@ if __name__ == "__main__":
     parser.add_argument("--tgt-aug-langs", type=str, nargs="*", default=[], help="Target augmented languages, comma-separated")
     parser.add_argument("--batch-size", type=int, default=32, help="Batch size for embedding generation")
     parser.add_argument("--fp16", action="store_true", help="Use float16 precision for embeddings")
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing embeddings if they exist")
     args = parser.parse_args()
 
     print("Loading embedding pipeline...")
@@ -103,7 +108,8 @@ if __name__ == "__main__":
         args.split, 
         src_langs, 
         fp16=args.fp16,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        overwrite=args.overwrite
     )
     print(f"Target languages: {tgt_langs}")
     embed(embedder,
@@ -114,5 +120,6 @@ if __name__ == "__main__":
         tgt_langs, 
         tgt_aug_langs=tgt_aug_langs,
         fp16=args.fp16,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
+        overwrite=args.overwrite
     )
