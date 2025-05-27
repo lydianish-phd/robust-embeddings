@@ -193,7 +193,7 @@ CORPUS_PARTS="test"
 for i in {0..2}
 do
     echo "Model: ${MODEL[$i]}"
-
+    
     for CORPUS_PART in $CORPUS_PARTS
     do
         EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$i]}
@@ -203,13 +203,14 @@ do
         echo " - embedding $CORPUS $CORPUS_PART"
         
         python $HOME/robust-embeddings/src/sonar/embed.py              \
-            --model-dir ${MODEL_DIR[$i]}       \
             --data-dir $DATASETS                         \
             --embed-dir $EMBED_DIR                         \
             --corpus $CORPUS                        \
             --split $CORPUS_PART               \
             --src-langs $NOISY_LANGS \
             --tgt-langs $TARGET_LANG \
+            ${MODEL_DIR[$i]}       \
+
         
     done
 done

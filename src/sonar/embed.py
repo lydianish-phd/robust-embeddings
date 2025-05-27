@@ -61,7 +61,7 @@ def get_langs(langs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-dir", type=str)
+    parser.add_argument("-m", "--model-dir", type=str)
     parser.add_argument("--data-dir", type=str, required=True, help="Base directory for data")
     parser.add_argument("--embed-dir", type=str, required=True, help="Directory to save embeddings")
     parser.add_argument("--corpus", type=str, required=True, help="Corpus name")
