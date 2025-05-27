@@ -20,9 +20,13 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
 
     print("Writing output embeddings...")
     embeddings = np.array(embeddings, dtype=np.float16 if fp16 else np.float32)
-    fout = open(output_file, "wb")
-    embeddings.tofile(fout)
-    fout.close()
+    with open(output_file, "wb") as fout:
+        embeddings.tofile(fout)
+    
+    assert (
+        os.path.isfile(output_file) and os.path.getsize(output_file) > 0
+    ), f"Error encoding {input_file}"
+
     print(f"Embeddings saved to {output_file}")
 
 def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[], fp16=False, batch_size=32):
@@ -31,7 +35,7 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
             fname = f"{lang}.{split}"
             input_dir = os.path.join(data_dir, corpus, split)
             infile = os.path.join(input_dir, fname)
-            assert infile.exists(), f"{infile} does not exist"
+            assert os.path.isfile(infile), f"{infile} does not exist"
             output_dir = os.path.join(embed_dir, corpus, split)
             os.makedirs(output_dir, exist_ok=True)
             outfile = os.path.join(output_dir, fname)
@@ -41,19 +45,17 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
                 augment_dir = os.path.join(data_dir, corpus, f"{split}_augmented")
                 augjson = os.path.join(augment_dir, fjname)
                 auginfile = os.path.join(augment_dir, fname)
-                assert augjson.exists(), f"{augjson} does not exist"
-                assert auginfile.exists(), f"{auginfile} does not exist"
+                assert os.path.isfile(augjson), f"{augjson} does not exist"
+                assert os.path.isfile(auginfile), f"{auginfile} does not exist"
                 combined_infile = os.path.join(input_dir, f"combined_{lang}")
                 with open(combined_infile, "w") as newfile:
                     for f in [infile, auginfile]:
                         with open(f) as fin:
                             newfile.write(fin.read())
                 infile = combined_infile
-            assert (
-                os.path.isfile(outfile) and os.path.getsize(outfile) > 0
-            ), f"Error encoding {infile}"
+            
             embed_sentences(embedder, infile, outfile, lang, fp16, batch_size)
-
+            
 def get_langs(langs):
     if langs:
         return sorted(langs.split(",")) if isinstance(langs, str) else sorted(langs)
