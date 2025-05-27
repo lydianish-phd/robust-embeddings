@@ -80,8 +80,7 @@ if __name__ == "__main__":
         encoder = "text_sonar_basic_encoder"
     embedder = TextToEmbeddingModelPipeline(encoder=encoder,
         tokenizer="text_sonar_basic_encoder",
-        device=torch.device("cuda"),
-        dtype=torch.float16 if args.fp16 else torch.float32
+        device=torch.device("cuda")
     )
     src_langs = get_langs(args.src_langs)
     tgt_langs = get_langs(args.tgt_langs)
