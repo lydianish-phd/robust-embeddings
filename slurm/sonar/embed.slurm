@@ -67,7 +67,7 @@ for i in {0..2}
 do
     echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
     
-    for CORPUS_PART in $CORPUS_PARTS[$i]
+    for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
 
         echo " - embedding $CORPUS $CORPUS_PART"
