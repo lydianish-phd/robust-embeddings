@@ -80,6 +80,7 @@ do
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
             ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]} \
+    
     done
 done
 
