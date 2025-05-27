@@ -74,6 +74,7 @@ do
             --tgt-langs ${TGT_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             --cosine-distances \
+            --offline-embeddings \
             --verbose 
 
     done
