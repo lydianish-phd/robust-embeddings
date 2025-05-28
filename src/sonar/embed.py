@@ -32,14 +32,15 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
         embeddings = embedder.encode(
             sentences, 
             batch_size=batch_size, 
-            show_progress_bar=True
+            show_progress_bar=True,
+            convert_to_tensor=True,
         )
     else:
         embeddings = embedder.predict(
             sentences, 
             source_lang=get_lang_code(lang),
             batch_size=batch_size,
-            progress_bar=True
+            progress_bar=True,
         )
 
     print("Writing output embeddings...")
