@@ -80,24 +80,24 @@ do
             --offline-embeddings \
             --verbose 
 
-        echo "${CORPUS[$i]} $CORPUS_PART en-xx"
-        echo " - calculating xsim and cos dist"
+        # echo "${CORPUS[$i]} $CORPUS_PART en-xx"
+        # echo " - calculating xsim and cos dist"
 
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/en-xx
+        # OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/en-xx
 
-        python3 $LASER/source/eval.py \
-            --base-dir $DATASETS \
-            --embed-dir $EMBED_DIR \
-            --corpus ${CORPUS[$i]} \
-            --corpus-part $CORPUS_PART \
-            --margin ratio \
-            --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-            --src-langs ${TGT_LANGS[$i]} \
-            --tgt-langs ${SRC_LANGS[$i]} \
-            --output-dir $OUTPUT_DIR \
-            --cosine-distances \
-            --offline-embeddings \
-            --verbose 
+        # python3 $LASER/source/eval.py \
+        #     --base-dir $DATASETS \
+        #     --embed-dir $EMBED_DIR \
+        #     --corpus ${CORPUS[$i]} \
+        #     --corpus-part $CORPUS_PART \
+        #     --margin ratio \
+        #     --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+        #     --src-langs ${TGT_LANGS[$i]} \
+        #     --tgt-langs ${SRC_LANGS[$i]} \
+        #     --output-dir $OUTPUT_DIR \
+        #     --cosine-distances \
+        #     --offline-embeddings \
+        #     --verbose 
     done
 done
 echo "Done..."

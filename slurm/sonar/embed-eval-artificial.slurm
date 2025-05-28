@@ -44,23 +44,27 @@ eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[0]="eng_Latn"
 TGT_AUG_LANGS[0]="eng_Latn"
+SEEDS[0]="100 101 102 103 104 105 106 107 108 109"
+
 
 #------------------ ROCSMT ------------------#
 
-CORPUS[1]=rocsmt
+CORPUS[1]=rocsmt/artificial
 CORPUS_PARTS[1]="test"
-SRC_LANGS[1]="ref.fr" #,ref.de,ref.cs,ref.uk,ref.ru"
+SRC_LANGS[1]="ref.fr,norm.en_mix_all" #,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="raw.en,norm.en"
 TGT_AUG_LANGS[1]=""
+SEEDS[1]="1000 1001 1002 1003 1004"
 
 
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 
-# loop through corpora
-for i in {0..0}
+echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
+
+for i in {0..0} # loop through corpora
 do
-    for SEED in {100..109}
+    for SEED in ${SEEDS[$i]}
     do
         echo "Seed $SEED"
         for CORPUS_PART in ${CORPUS_PARTS[$i]}
