@@ -44,7 +44,7 @@ eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[0]="eng_Latn"
 TGT_AUG_LANGS[0]="--tgt-aug-langs eng_Latn"
 SEEDS[0]="100 101 102 103 104 105 106 107 108 109"
-NOISE_PROBA[0]=-1
+NOISE_PROBAS[0]="None"
 
 #------------------ ROCSMT AUGMENTED ------------------#
 
@@ -54,7 +54,7 @@ SRC_LANGS[1]="raw.en,norm.en_mix_all"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
 SEEDS[1]="1000 1001 1002 1003 1004"
-NOISE_PROBA[1]=0.1
+NOISE_PROBAS[1]="0.1"
 
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
@@ -70,19 +70,14 @@ do
         do
             echo "${CORPUS[$i]} $CORPUS_PART"
             echo " - calculating xsim(++)"
-
-            if [[ "$SEED" -lt 0 ]]
-            then
-                SEED=""
-            else
-                echo "Seed $SEED"
-            fi
-            if [[ "${NOISE_PROBA[$i]}" -lt 0 ]]
+            echo "Seed $SEED"
+            
+            if [[ "${NOISE_PROBAS[$i]}" = "None" ]]
             then
                 PROBA=""
             else
-                echo "Proba ${NOISE_PROBA[$i]}"
-                PROBA=${NOISE_PROBA[$i]}/ugc
+                echo "Proba ${NOISE_PROBAS[$i]}"
+                PROBA=${NOISE_PROBAS[$i]}/ugc
             fi
             
             EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART

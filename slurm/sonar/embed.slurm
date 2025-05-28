@@ -45,8 +45,8 @@ CORPUS_PARTS[0]="test"
 SRC_LANGS[0]="en.src"
 TGT_LANGS[0]="en.ref"
 TGT_AUG_LANGS[0]=""
-SEEDS[0]="-1"
-NOISE_PROBA[0]=-1
+SEEDS[0]="None"
+NOISE_PROBAS[0]="None"
 
 #------------------ ROCSMT ------------------#
 
@@ -55,8 +55,8 @@ CORPUS_PARTS[1]="test"
 SRC_LANGS[1]="raw.en,ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
-SEEDS[1]="-1"
-NOISE_PROBA[1]=-1
+SEEDS[1]="None"
+NOISE_PROBAS[1]="None"
 
 #------------------ FLORES ------------------#
 
@@ -65,8 +65,8 @@ CORPUS_PARTS[2]="devtest"
 SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
 TGT_AUG_LANGS[2]="eng_Latn"
-SEEDS[2]="-1"
-NOISE_PROBA[2]=-1
+SEEDS[2]="None"
+NOISE_PROBAS[2]="None"
 
 #------------------ FLORES AUGMENTED ------------------#
 
@@ -80,7 +80,7 @@ eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[3]="eng_Latn"
 TGT_AUG_LANGS[3]="eng_Latn"
 SEEDS[3]="100 101 102 103 104 105 106 107 108 109"
-NOISE_PROBA[3]=-1
+NOISE_PROBAS[3]="None"
 
 #------------------ ROCSMT AUGMENTED ------------------#
 
@@ -90,7 +90,7 @@ SRC_LANGS[4]="raw.en,norm.en_mix_all"
 TGT_LANGS[4]="norm.en"
 TGT_AUG_LANGS[4]=""
 SEEDS[4]="1000 1001 1002 1003 1004"
-NOISE_PROBA[4]=0.1
+NOISE_PROBAS[4]="0.1"
 
 EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 mkdir -p $EMBED_DIR
@@ -105,30 +105,33 @@ do
         echo " - embedding ${CORPUS[$i]} $CORPUS_PART"
         for SEED in ${SEEDS[$i]}
         do 
-            if [[ "$SEED" -lt 0 ]]
+            if [[ "$SEED" = "None" ]]
             then
                 SEED=""
             else
                 echo "Seed $SEED"
             fi
-            if [[ "${NOISE_PROBA[$i]}" -lt 0 ]]
-            then
-                PROBA=""
-            else
-                echo "Proba ${NOISE_PROBA[$i]}"
-                PROBA=${NOISE_PROBA[$i]}/ugc
-            fi
-            python $HOME/robust-embeddings/src/sonar/embed.py \
-                --model ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-                --model-path ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
-                --data-dir $DATASETS \
-                --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]}/$SEED/$PROBA \
-                --split $CORPUS_PART \
-                --src-langs ${SRC_LANGS[$i]} \
-                --tgt-langs ${TGT_LANGS[$i]} \
-                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
-                
+            for NOISE_PROBA in ${NOISE_PROBAS[$i]}
+            do
+                if [[ "${NOISE_PROBAS[$i]}" = "None" ]]
+                then
+                    PROBA=""
+                else
+                    echo "Proba $NOISE_PROBA"
+                    PROBA=$NOISE_PROBA/ugc
+                fi
+                python $HOME/robust-embeddings/src/sonar/embed.py \
+                    --model ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+                    --model-path ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
+                    --data-dir $DATASETS \
+                    --embed-dir $EMBED_DIR \
+                    --corpus ${CORPUS[$i]}/$SEED/$PROBA \
+                    --split $CORPUS_PART \
+                    --src-langs ${SRC_LANGS[$i]} \
+                    --tgt-langs ${TGT_LANGS[$i]} \
+                    --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
+
+            done            
         done
     done
 done
