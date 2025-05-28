@@ -98,7 +98,6 @@ do
                 --tgt-langs ${TGT_LANGS[$i]} \
                 ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
             done
-
         else
             python $HOME/robust-embeddings/src/sonar/embed.py \
                 --data-dir $DATASETS \

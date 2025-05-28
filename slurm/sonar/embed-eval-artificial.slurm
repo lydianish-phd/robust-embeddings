@@ -60,9 +60,9 @@ OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 # loop through corpora
 for i in {0..0}
 do
-    echo "Seed $SEED"
     for SEED in {100..109}
     do
+        echo "Seed $SEED"
         for CORPUS_PART in ${CORPUS_PARTS[$i]}
         do
             echo "${CORPUS[$i]} $CORPUS_PART"
