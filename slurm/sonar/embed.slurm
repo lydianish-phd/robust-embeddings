@@ -43,7 +43,7 @@ CORPUS_PARTS[0]="test"
 SRC_LANGS[0]="en.src"
 TGT_LANGS[0]="en.ref"
 TGT_AUG_LANGS[0]=""
-
+SEEDS[0]=""
 #------------------ ROCSMT ------------------#
 
 CORPUS[1]=rocsmt
@@ -51,6 +51,7 @@ CORPUS_PARTS[1]="test"
 SRC_LANGS[1]="raw.en,ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
+SEEDS[1]=""
 
 #------------------ FLORES ------------------#
 
@@ -59,6 +60,7 @@ CORPUS_PARTS[2]="devtest"
 SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
 TGT_AUG_LANGS[2]="eng_Latn"
+SEEDS[2]=""
 
 #------------------ FLORES AUGMENTED ------------------#
 
@@ -71,6 +73,7 @@ eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[3]="eng_Latn"
 TGT_AUG_LANGS[3]="eng_Latn"
+SEEDS[3]="100 101 102 103 104 105 106 107 108 109"
 
 EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 mkdir -p $EMBED_DIR
@@ -83,13 +86,13 @@ do
     do
 
         echo " - embedding $CORPUS[$i] $CORPUS_PART"
-
-        if [ "${CORPUS[$i]}" = "flores200/ugc" ]
-        then 
-            for SEED in {100..109}
-            do 
+        for SEED in ${SEEDS[$i]}
+        do 
+            if [[ -n "$SEED" ]]
+            then
                 echo "Seed $SEED"
-                python $HOME/robust-embeddings/src/sonar/embed.py \
+            fi
+            python $HOME/robust-embeddings/src/sonar/embed.py \
                 --data-dir $DATASETS \
                 --embed-dir $EMBED_DIR \
                 --corpus ${CORPUS[$i]}/$SEED \
@@ -97,19 +100,7 @@ do
                 --src-langs ${SRC_LANGS[$i]} \
                 --tgt-langs ${TGT_LANGS[$i]} \
                 ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
-            done
-        else
-            python $HOME/robust-embeddings/src/sonar/embed.py \
-                --data-dir $DATASETS \
-                --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]} \
-                --split $CORPUS_PART \
-                --src-langs ${SRC_LANGS[$i]} \
-                --tgt-langs ${TGT_LANGS[$i]} \
-                ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
-        
-        fi
-        
+        done
     done
 done
 
