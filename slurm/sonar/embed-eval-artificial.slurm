@@ -43,7 +43,7 @@ eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
 eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
 eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[0]="eng_Latn"
-TGT_AUG_LANGS[0]="eng_Latn"
+TGT_AUG_LANGS[0]="--tgt-aug-langs eng_Latn"
 SEEDS[0]="100 101 102 103 104 105 106 107 108 109"
 
 
@@ -84,7 +84,7 @@ do
                 --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
                 --src-langs ${SRC_LANGS[$i]} \
                 --tgt-langs ${TGT_LANGS[$i]} \
-                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
+                ${TGT_AUG_LANGS[$i]} \
                 --output-dir $OUTPUT_DIR \
                 --cosine-distances \
                 --offline-embeddings \

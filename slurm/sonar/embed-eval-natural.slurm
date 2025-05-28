@@ -74,6 +74,7 @@ do
             --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
+            ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             --cosine-distances \
             --offline-embeddings \

@@ -39,7 +39,7 @@ CORPUS[0]=flores200
 CORPUS_PARTS[0]="devtest"
 SRC_LANGS[0]="fra_Latn" #,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[0]="eng_Latn"
-TGT_AUG_LANGS[0]="eng_Latn"
+TGT_AUG_LANGS[0]="--tgt-aug-langs eng_Latn"
 
 #------------------ ROCSMT ------------------#
 
@@ -47,7 +47,7 @@ CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
 SRC_LANGS[1]="ref.fr" #,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="raw.en,norm.en"
-TGT_AUG_LANGS[1]=""
+TGT_AUG_LANGS[1]="--tgt-aug-langs"
 
 
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
@@ -74,7 +74,7 @@ do
             --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
-            --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
+            ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             --offline-embeddings \
             --verbose \
