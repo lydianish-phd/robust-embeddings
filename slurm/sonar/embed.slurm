@@ -101,6 +101,7 @@ do
                 --split $CORPUS_PART \
                 --src-langs ${SRC_LANGS[$i]} \
                 --tgt-langs ${TGT_LANGS[$i]} \
+                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
                 ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
         done
     done
