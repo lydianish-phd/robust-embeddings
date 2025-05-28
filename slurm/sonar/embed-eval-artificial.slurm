@@ -50,8 +50,8 @@ NOISE_PROBA[0]=-1
 
 CORPUS[1]=rocsmt/artificial
 CORPUS_PARTS[1]="test"
-SRC_LANGS[1]="ref.fr,norm.en_mix_all" #,ref.de,ref.cs,ref.uk,ref.ru"
-TGT_LANGS[1]="raw.en,norm.en"
+SRC_LANGS[1]="raw.en,norm.en_mix_all"
+TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
 SEEDS[1]="1000 1001 1002 1003 1004"
 NOISE_PROBA[1]=0.1

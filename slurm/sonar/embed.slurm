@@ -86,7 +86,7 @@ NOISE_PROBA[3]=-1
 
 CORPUS[4]=rocsmt/artificial
 CORPUS_PARTS[4]="test"
-SRC_LANGS[4]="norm.en_mix_all"
+SRC_LANGS[4]="raw.en,norm.en_mix_all"
 TGT_LANGS[4]="norm.en"
 TGT_AUG_LANGS[4]=""
 SEEDS[4]="1000 1001 1002 1003 1004"
