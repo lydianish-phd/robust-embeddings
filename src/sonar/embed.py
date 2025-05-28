@@ -84,8 +84,8 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--model", type=str, choices=["sonar", "rosonar", "rosonar_std", "rolaser_v2"], default="rosonar",)
-    parser.add_argument("--model-dir", type=str, help="Directory containing the model checkpoint (required for rosonar)")
+    parser.add_argument("-m", "--model", type=str, choices=["sonar", "rosonar", "rosonar_std", "rolaser_v2"], default="sonar",)
+    parser.add_argument("--model-path", type=str, help="Model name or path to checkpoint directory", default=SONAR_BASIC_TEXT_ENCODER)
     parser.add_argument("--data-dir", type=str, required=True, help="Base directory for data")
     parser.add_argument("--embed-dir", type=str, required=True, help="Directory to save embeddings")
     parser.add_argument("--corpus", type=str, required=True, help="Corpus name")
@@ -100,18 +100,18 @@ if __name__ == "__main__":
 
     print("Loading embedding pipeline...")
     
+    assert args.model_path, "Model path must be specified"
     if "sonar" in args.model:
         if args.model == "sonar":
-            encoder = SONAR_BASIC_TEXT_ENCODER
-        else:
-            assert args.model_dir, "Model directory must be specified for rosonar"
-            encoder = load_student_encoder_from_checkpoint(args.model_dir, init="rosonar")
+            encoder = args.model_path
+        else: 
+            encoder = load_student_encoder_from_checkpoint(args.model_path, init="rosonar")
         embedder = TextToEmbeddingModelPipeline(encoder=encoder,
             tokenizer=SONAR_BASIC_TEXT_ENCODER,
             device=torch.device("cuda")
         )
     else:
-        embedder = SentenceTransformer("lydianish/RoLASER-v2", device=torch.device("cuda"))
+        embedder = SentenceTransformer(args.model_path, device=torch.device("cuda"))
     
     src_langs = get_langs(args.src_langs)
     tgt_langs = get_langs(args.tgt_langs)

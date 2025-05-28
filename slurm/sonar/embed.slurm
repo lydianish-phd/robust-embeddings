@@ -27,16 +27,16 @@ set -e
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 MODEL[0]=sonar
-MODEL_DIR[0]=""
+MODEL_PATH[0]="text_sonar_basic_encoder"
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="$EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
+MODEL_PATH[1]="$EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
 
 MODEL[2]=rosonar_std
-MODEL_DIR[2]="$EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+MODEL_PATH[2]="$EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
 
 MODEL[3]=rolaser_v2
-MODEL_DIR[3]=""
+MODEL_PATH[3]="lydianish/RoLASER-v2"
 
 #------------------ LEXNORM ------------------#
 
@@ -120,7 +120,7 @@ do
             fi
             python $HOME/robust-embeddings/src/sonar/embed.py \
                 --model ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-                --model-dir ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]} \
+                --model-path ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
                 --data-dir $DATASETS \
                 --embed-dir $EMBED_DIR \
                 --corpus ${CORPUS[$i]}/$SEED/${PROBA[$i]} \
