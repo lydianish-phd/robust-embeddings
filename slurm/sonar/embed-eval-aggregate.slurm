@@ -46,7 +46,8 @@ do
     python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
         -i $INPUT_DIR \
         -m ${MODEL[$i]} \
-        -p $CORPUS_PARTS \
+        -c $CORPUS \
+        --corpus-parts $CORPUS_PARTS \
         --metrics $METRICS \
         --seeds $SEEDS \
         --gold-model ${MODEL[0]}
