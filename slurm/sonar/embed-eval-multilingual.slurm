@@ -77,7 +77,6 @@ do
             --cosine-distances \
             --offline-embeddings \
             --verbose 
-        fi
 
         echo "${CORPUS[$i]} $CORPUS_PART en-xx"
         echo " - calculating xsim and cos dist"
