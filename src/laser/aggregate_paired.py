@@ -21,6 +21,7 @@ if __name__ == "__main__":
     for metric in args.metrics:
         for corpus_part in args.corpus_parts:
             output_file = os.path.join(args.input_dir, args.model, args.corpus, corpus_part + '-' + _file(metric))
+            os.makedirs(os.path.dirname(output_file), exist_ok=True)
             all_data = pd.DataFrame(columns=["dataset", "src-tgt", _name(metric)])
             for seed in args.seeds:
                 input_file = os.path.join(args.input_dir, args.model, args.corpus, seed, corpus_part, _file(metric))
