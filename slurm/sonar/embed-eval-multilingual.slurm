@@ -4,7 +4,7 @@
 #SBATCH --account=rnh@v100
 #SBATCH --nodes=1		# node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
-##SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
 #SBATCH --cpus-per-task=20	# number of cores per task (4x10 = 40 cores, or all the cores)
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=0:30:00               # Time limit hrs:min:sec
