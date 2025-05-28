@@ -85,7 +85,7 @@ do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
 
-        echo " - embedding $CORPUS[$i] $CORPUS_PART"
+        echo " - embedding ${CORPUS[$i]} $CORPUS_PART"
         for SEED in ${SEEDS[$i]}
         do 
             if [[ -n "$SEED" ]]
