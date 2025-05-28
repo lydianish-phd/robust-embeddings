@@ -30,8 +30,8 @@ MODEL_DIR[0]=""
 MODEL[1]=rosonar
 MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
 
-MODEL[0]=rosonar_std
-MODEL_DIR[0]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+MODEL[2]=rosonar_std
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
 
 #------------------ FLORES ------------------#
 
@@ -47,7 +47,7 @@ CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
 SRC_LANGS[1]="ref.fr" #,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="raw.en,norm.en"
-TGT_AUG_LANGS[1]="--tgt-aug-langs"
+TGT_AUG_LANGS[1]=""
 
 
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}

@@ -30,8 +30,8 @@ MODEL_DIR[0]=""
 MODEL[1]=rosonar
 MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
 
-MODEL[0]=rosonar_std
-MODEL_DIR[0]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+MODEL[2]=rosonar_std
+MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
 
 #------------------ FLORES AUGMENTED ------------------#
 
