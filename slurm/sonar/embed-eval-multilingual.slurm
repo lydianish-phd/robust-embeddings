@@ -55,14 +55,12 @@ OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 
 for i in {0..2}
 do
-    echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
-        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
-
-        echo "$CORPUS_PART"
-        
+        echo "${CORPUS[$i]} $CORPUS_PART xx-en"
         echo " - calculating xsim and cos dist"
+
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/xx-en
 
         python3 $LASER/source/eval.py \
             --base-dir $DATASETS \
@@ -70,12 +68,52 @@ do
             --corpus ${CORPUS[$i]} \
             --corpus-part $CORPUS_PART \
             --margin ratio \
+            --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             --cosine-distances \
+            --offline-embeddings \
             --verbose 
+        
+        if [ "${CORPUS[$i]}" = "flores200" ]
+        then
+            echo " - calculating xsim++"
 
+            python3 $LASER/source/eval.py \
+                --base-dir $DATASETS \
+                --embed-dir $EMBED_DIR \
+                --corpus ${CORPUS[$i]} \
+                --corpus-part $CORPUS_PART \
+                --margin ratio \
+                --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+                --src-langs ${SRC_LANGS[$i]} \
+                --tgt-langs ${TGT_LANGS[$i]} \
+                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
+                --output-dir $OUTPUT_DIR \
+                --cosine-distances \
+                --offline-embeddings \
+                --verbose 
+        fi
+
+        echo "${CORPUS[$i]} $CORPUS_PART en-xx"
+        echo " - calculating xsim and cos dist"
+
+        OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/en-xx
+
+        python3 $LASER/source/eval.py \
+            --base-dir $DATASETS \
+            --embed-dir $EMBED_DIR \
+            --corpus ${CORPUS[$i]} \
+            --corpus-part $CORPUS_PART \
+            --margin ratio \
+            --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+            --src-langs ${TGT_LANGS[$i]} \
+            --tgt-langs ${SRC_LANGS[$i]} \
+            --output-dir $OUTPUT_DIR \
+            --cosine-distances \
+            --offline-embeddings \
+            --verbose 
     done
 done
 echo "Done..."

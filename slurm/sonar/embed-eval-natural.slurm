@@ -46,7 +46,7 @@ TGT_AUG_LANGS[0]=""
 
 CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
-SRC_LANGS[1]="raw.en,ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
+SRC_LANGS[1]="raw.en"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
 
@@ -55,13 +55,11 @@ OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 
 for i in {0..1}
 do
-    echo "${CORPUS[$i]}"
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
 
-        echo "$CORPUS_PART"
-        
+        echo "${CORPUS[$i]} $CORPUS_PART"
         echo " - calculating xsim and cos dist"
 
         python3 $LASER/source/eval.py \
