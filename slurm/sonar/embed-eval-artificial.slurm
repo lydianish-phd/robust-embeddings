@@ -9,7 +9,7 @@
 #SBATCH --hint=nomultithread       # we get physical cores not logical
 #SBATCH --time=6:00:00               # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-2
+#SBATCH --array=0-3
 
 set -e 
 
@@ -25,13 +25,16 @@ source $HOME/.bash_python_exports
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 MODEL[0]=sonar
-MODEL_DIR[0]=""
+EMBEDDINGS[0]="--offline-embeddings"
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
+EMBEDDINGS[1]="--offline-embeddings"
 
 MODEL[2]=rosonar_std
-MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+EMBEDDINGS[2]="--offline-embeddings"
+
+MODEL[3]=lydianish/RoLASER-v2
+EMBEDDINGS[3]="--use-hugging-face"
 
 #------------------ FLORES AUGMENTED ------------------#
 
