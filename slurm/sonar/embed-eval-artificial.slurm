@@ -44,7 +44,7 @@ eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[0]="eng_Latn"
 TGT_AUG_LANGS[0]="--tgt-aug-langs eng_Latn"
 SEEDS[0]="100 101 102 103 104 105 106 107 108 109"
-PROBA[0]=-1
+NOISE_PROBA[0]=-1
 
 #------------------ ROCSMT AUGMENTED ------------------#
 
@@ -54,7 +54,7 @@ SRC_LANGS[1]="ref.fr,norm.en_mix_all" #,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="raw.en,norm.en"
 TGT_AUG_LANGS[1]=""
 SEEDS[1]="1000 1001 1002 1003 1004"
-PROBA[1]=0.1
+NOISE_PROBA[1]=0.1
 
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
@@ -77,21 +77,21 @@ do
             else
                 echo "Seed $SEED"
             fi
-            if [[ "${PROBA[$i]}" -lt 0 ]]
+            if [[ "${NOISE_PROBA[$i]}" -lt 0 ]]
             then
-                PROBA[$i]=""
+                PROBA=""
             else
-                echo "Proba ${PROBA[$i]}"
-                PROBA[$i]=${PROBA[$i]}/ugc
+                echo "Proba ${NOISE_PROBA[$i]}"
+                PROBA=${NOISE_PROBA[$i]}/ugc
             fi
             
-            EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/${PROBA[$i]}/$CORPUS_PART
-            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$SEED/${PROBA[$i]}/$CORPUS_PART
+            EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
+            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
 
             python3 $LASER/source/eval.py \
                 --base-dir $DATASETS \
                 --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]}/$SEED/${PROBA[$i]} \
+                --corpus ${CORPUS[$i]}/$SEED/$PROBA \
                 --corpus-part $CORPUS_PART \
                 --margin ratio \
                 --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
