@@ -65,7 +65,7 @@ do
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
 
         echo "${CORPUS[$i]} $CORPUS_PART"
-        echo " - calculating xsim and cos dist"
+        echo " - calculating xsim(++)"
 
         python3 $LASER/source/eval.py \
             --base-dir $DATASETS \
@@ -78,7 +78,6 @@ do
             --tgt-langs ${TGT_LANGS[$i]} \
             ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
-            --cosine-distances \
             ${EMBEDDINGS[$SLURM_ARRAY_TASK_ID]} \
             --verbose 
 

@@ -63,7 +63,7 @@ do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
         echo "${CORPUS[$i]} $CORPUS_PART xx-en"
-        echo " - calculating xsim(++)" # and cos dist"
+        echo " - calculating xsim(++)"
 
         EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/xx-en
@@ -80,27 +80,8 @@ do
             ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             ${EMBEDDINGS[$SLURM_ARRAY_TASK_ID]} \
-            --verbose \
-            # --cosine-distances \
+            --verbose 
 
-        # echo "${CORPUS[$i]} $CORPUS_PART en-xx"
-        # echo " - calculating xsim and cos dist"
-
-        # OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/en-xx
-
-        # python3 $LASER/source/eval.py \
-        #     --base-dir $DATASETS \
-        #     --embed-dir $EMBED_DIR \
-        #     --corpus ${CORPUS[$i]} \
-        #     --corpus-part $CORPUS_PART \
-        #     --margin ratio \
-        #     --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-        #     --src-langs ${TGT_LANGS[$i]} \
-        #     --tgt-langs ${SRC_LANGS[$i]} \
-        #     --output-dir $OUTPUT_DIR \
-        #     --cosine-distances \
-        #     --offline-embeddings \
-        #     --verbose 
     done
 done
 echo "Done..."
