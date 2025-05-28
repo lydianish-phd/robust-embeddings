@@ -43,7 +43,7 @@ CORPUS_PARTS[0]="test"
 SRC_LANGS[0]="en.src"
 TGT_LANGS[0]="en.ref"
 TGT_AUG_LANGS[0]=""
-SEEDS[0]=""
+SEEDS[0]="-1"
 #------------------ ROCSMT ------------------#
 
 CORPUS[1]=rocsmt
@@ -51,7 +51,7 @@ CORPUS_PARTS[1]="test"
 SRC_LANGS[1]="raw.en,ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
-SEEDS[1]=""
+SEEDS[1]="-1"
 
 #------------------ FLORES ------------------#
 
@@ -60,7 +60,7 @@ CORPUS_PARTS[2]="devtest"
 SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
 TGT_AUG_LANGS[2]="eng_Latn"
-SEEDS[2]=""
+SEEDS[2]="-1"
 
 #------------------ FLORES AUGMENTED ------------------#
 
@@ -88,8 +88,10 @@ do
         echo " - embedding ${CORPUS[$i]} $CORPUS_PART"
         for SEED in ${SEEDS[$i]}
         do 
-            if [[ -n "$SEED" ]]
+            if [[ "$SEED" -lt 0 ]]
             then
+                SEED=""
+            else
                 echo "Seed $SEED"
             fi
             python $HOME/robust-embeddings/src/sonar/embed.py \
