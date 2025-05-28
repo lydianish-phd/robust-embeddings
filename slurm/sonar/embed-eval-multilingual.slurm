@@ -50,7 +50,7 @@ TGT_LANGS[1]="raw.en,norm.en"
 TGT_AUG_LANGS[1]=""
 
 
-EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
+EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 
 for i in {0..2}
@@ -60,6 +60,7 @@ do
         echo "${CORPUS[$i]} $CORPUS_PART xx-en"
         echo " - calculating xsim and cos dist"
 
+        EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/xx-en
 
         python3 $LASER/source/eval.py \
