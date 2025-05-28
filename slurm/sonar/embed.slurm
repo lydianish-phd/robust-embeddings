@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=2:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-##SBATCH --array=0-2
+#SBATCH --array=0-2
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -60,27 +60,57 @@ SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
 TGT_AUG_LANGS[2]="eng_Latn"
 
+#------------------ FLORES AUGMENTED ------------------#
+
+CORPUS[3]=flores200/ugc
+CORPUS_PARTS[3]="devtest"
+SRC_LANGS[3]="eng_abr1_Latn,eng_abr2_Latn,\
+eng_abr3_Latn,eng_cont_Latn,\
+eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
+eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
+eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
+TGT_LANGS[3]="eng_Latn"
+TGT_AUG_LANGS[3]="eng_Latn"
+
 EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 mkdir -p $EMBED_DIR
 
-for i in {0..2}
-do
-    echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
-    
+echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
+
+for i in {0..3} # loop through corpora
+do    
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
 
-        echo " - embedding $CORPUS $CORPUS_PART"
+        echo " - embedding $CORPUS[$i] $CORPUS_PART"
+
+        if [ "${CORPUS[$i]}" = "flores200/ugc" ]
+        then 
+            for SEED in {100..109}
+            do 
+                echo "Seed $SEED"
+                python $HOME/robust-embeddings/src/sonar/embed.py \
+                --data-dir $DATASETS \
+                --embed-dir $EMBED_DIR \
+                --corpus ${CORPUS[$i]}/$SEED \
+                --split $CORPUS_PART \
+                --src-langs ${SRC_LANGS[$i]} \
+                --tgt-langs ${TGT_LANGS[$i]} \
+                ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
+            done
+
+        else
+            python $HOME/robust-embeddings/src/sonar/embed.py \
+                --data-dir $DATASETS \
+                --embed-dir $EMBED_DIR \
+                --corpus ${CORPUS[$i]} \
+                --split $CORPUS_PART \
+                --src-langs ${SRC_LANGS[$i]} \
+                --tgt-langs ${TGT_LANGS[$i]} \
+                ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
         
-        python $HOME/robust-embeddings/src/sonar/embed.py \
-            --data-dir $DATASETS \
-            --embed-dir $EMBED_DIR \
-            --corpus ${CORPUS[$i]} \
-            --split $CORPUS_PART \
-            --src-langs ${SRC_LANGS[$i]} \
-            --tgt-langs ${TGT_LANGS[$i]} \
-            ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]} \
-    
+        fi
+        
     done
 done
 

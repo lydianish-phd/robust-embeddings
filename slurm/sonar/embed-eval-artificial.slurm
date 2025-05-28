@@ -1,0 +1,92 @@
+#!/bin/bash
+
+#SBATCH --job-name=embed-eval-artificial      # Job name
+#SBATCH --account=rnh@v100
+#SBATCH --nodes=1		# node count
+#SBATCH --ntasks=1               # total number of tasks across all nodes
+#SBATCH --gres=gpu:1        # GPU nodes are only available in gpu partition
+#SBATCH --cpus-per-task=20	# number of cores per task (4x10 = 40 cores, or all the cores)
+#SBATCH --hint=nomultithread       # we get physical cores not logical
+#SBATCH --time=6:00:00               # Time limit hrs:min:sec
+#SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
+#SBATCH --array=0-2
+
+set -e 
+
+echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
+
+module purge
+module load cpuarch/amd pytorch-gpu/py3/1.10.0-AMD #anaconda-py3/2022.10
+
+source $HOME/.bashrc
+source $HOME/.bash_profile
+source $HOME/.bash_python_exports
+
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
+
+MODEL[0]=sonar
+MODEL_DIR[0]=""
+
+MODEL[1]=rosonar
+MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
+
+MODEL[0]=rosonar_std
+MODEL_DIR[0]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+
+#------------------ FLORES AUGMENTED ------------------#
+
+CORPUS[0]=flores200/ugc
+CORPUS_PARTS[0]="devtest"
+SRC_LANGS[0]="eng_abr1_Latn,eng_abr2_Latn,\
+eng_abr3_Latn,eng_cont_Latn,\
+eng_dysl_Latn,eng_fing_Latn,eng_homo_Latn,\
+eng_leet_Latn,eng_slng_Latn,eng_spac_Latn,\
+eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
+TGT_LANGS[0]="eng_Latn"
+TGT_AUG_LANGS[0]="eng_Latn"
+
+#------------------ ROCSMT ------------------#
+
+CORPUS[1]=rocsmt
+CORPUS_PARTS[1]="test"
+SRC_LANGS[1]="ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
+TGT_LANGS[1]="raw.en,norm.en"
+TGT_AUG_LANGS[1]=""
+
+
+EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
+OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
+
+# loop through corpora
+for i in {0..0}
+do
+    echo "Seed $SEED"
+    for SEED in {100..109}
+    do
+        for CORPUS_PART in ${CORPUS_PARTS[$i]}
+        do
+            echo "${CORPUS[$i]} $CORPUS_PART"
+            echo " - calculating xsim(++) and cos dist"
+
+            EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/$CORPUS_PART
+            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$SEED/$CORPUS_PART
+
+            python3 $LASER/source/eval.py \
+                --base-dir $DATASETS \
+                --embed-dir $EMBED_DIR \
+                --corpus ${CORPUS[$i]}/$SEED \
+                --corpus-part $CORPUS_PART \
+                --margin ratio \
+                --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+                --src-langs ${SRC_LANGS[$i]} \
+                --tgt-langs ${TGT_LANGS[$i]} \
+                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
+                --output-dir $OUTPUT_DIR \
+                --cosine-distances \
+                --offline-embeddings \
+                --verbose 
+
+        done
+    done
+done
+echo "Done..."

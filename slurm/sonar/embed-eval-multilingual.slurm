@@ -53,7 +53,9 @@ TGT_AUG_LANGS[1]=""
 EMBED_DIR_PREFIX=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 OUTPUT_DIR_PREFIX=$EXPERIMENT_DIR/scores/${MODEL[$SLURM_ARRAY_TASK_ID]}
 
-for i in {0..2}
+echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
+
+for i in {0..1} # loop through corpora
 do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do

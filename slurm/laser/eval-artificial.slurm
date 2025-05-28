@@ -86,6 +86,8 @@ OUTPUT_DIR_PREFIX=$OUTPUT_EXPERIMENT_DIR/scores/${MODEL_NAME[$SLURM_ARRAY_TASK_I
 CORPUS=flores200
 CORPUS_PARTS="devtest"
 
+echo "Model: ${MODEL[$SLURM_ARRAY_TASK_ID]}"
+
 for SEED in {100..109}
 do
     echo "Seed $SEED"
