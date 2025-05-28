@@ -84,7 +84,7 @@ NOISE_PROBA[3]=-1
 
 #------------------ ROCSMT AUGMENTED ------------------#
 
-CORPUS[4]=rocsmt
+CORPUS[4]=rocsmt/artificial
 CORPUS_PARTS[4]="test"
 SRC_LANGS[4]="norm.en_mix_all"
 TGT_LANGS[4]="norm.en"
