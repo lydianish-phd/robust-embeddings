@@ -60,7 +60,7 @@ do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
         echo "${CORPUS[$i]} $CORPUS_PART xx-en"
-        echo " - calculating xsim(++) and cos dist"
+        echo " - calculating xsim(++)" # and cos dist"
 
         EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/xx-en
@@ -76,9 +76,9 @@ do
             --tgt-langs ${TGT_LANGS[$i]} \
             --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
-            --cosine-distances \
             --offline-embeddings \
-            --verbose 
+            --verbose \
+            # --cosine-distances \
 
         # echo "${CORPUS[$i]} $CORPUS_PART en-xx"
         # echo " - calculating xsim and cos dist"
