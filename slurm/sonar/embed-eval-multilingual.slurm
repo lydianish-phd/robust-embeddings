@@ -58,7 +58,7 @@ do
     for CORPUS_PART in ${CORPUS_PARTS[$i]}
     do
         echo "${CORPUS[$i]} $CORPUS_PART xx-en"
-        echo " - calculating xsim and cos dist"
+        echo " - calculating xsim(++) and cos dist"
 
         EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART
         OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$CORPUS_PART/xx-en
@@ -72,29 +72,11 @@ do
             --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
+            --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
             --cosine-distances \
             --offline-embeddings \
             --verbose 
-        
-        if [ "${CORPUS[$i]}" = "flores200" ]
-        then
-            echo " - calculating xsim++"
-
-            python3 $LASER/source/eval.py \
-                --base-dir $DATASETS \
-                --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]} \
-                --corpus-part $CORPUS_PART \
-                --margin ratio \
-                --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-                --src-langs ${SRC_LANGS[$i]} \
-                --tgt-langs ${TGT_LANGS[$i]} \
-                --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
-                --output-dir $OUTPUT_DIR \
-                --cosine-distances \
-                --offline-embeddings \
-                --verbose 
         fi
 
         echo "${CORPUS[$i]} $CORPUS_PART en-xx"

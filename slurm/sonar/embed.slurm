@@ -58,7 +58,7 @@ CORPUS[2]=flores200
 CORPUS_PARTS[2]="devtest"
 SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
-TGT_AUG_LANGS[2]=""
+TGT_AUG_LANGS[2]="eng_Latn"
 
 EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 mkdir -p $EMBED_DIR
