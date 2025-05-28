@@ -13,10 +13,11 @@ def get_langs(langs):
 def get_lang_code(lang):
     if lang in LANG_NAMES:
         return lang
-    if lang[-2:] in LANG_CODES:
-        return LANG_CODES[lang[-2:]]
-    if lang[:2] in LANG_CODES:
-        return LANG_CODES[lang[:2]]
+    splits = lang.split(".")
+    if splits[-1][:2] in LANG_CODES: # extension starts with the language code
+        return LANG_CODES[splits[-1][:2]]
+    if splits[0][:2] in LANG_CODES: # basename starts with the language code
+        return LANG_CODES[splits[0][:2]]
     raise ValueError(f"Unknown language code: {lang}. Please use a valid language code.")
 
 def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_size=32):
