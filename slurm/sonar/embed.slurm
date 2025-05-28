@@ -46,7 +46,7 @@ SRC_LANGS[0]="en.src"
 TGT_LANGS[0]="en.ref"
 TGT_AUG_LANGS[0]=""
 SEEDS[0]="-1"
-PROBA[0]=-1
+NOISE_PROBA[0]=-1
 
 #------------------ ROCSMT ------------------#
 
@@ -56,7 +56,7 @@ SRC_LANGS[1]="raw.en,ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="norm.en"
 TGT_AUG_LANGS[1]=""
 SEEDS[1]="-1"
-PROBA[1]=-1
+NOISE_PROBA[1]=-1
 
 #------------------ FLORES ------------------#
 
@@ -66,7 +66,7 @@ SRC_LANGS[2]="fra_Latn,deu_Latn,ces_Latn,ukr_Cyrl,rus_Cyrl"
 TGT_LANGS[2]="eng_Latn"
 TGT_AUG_LANGS[2]="eng_Latn"
 SEEDS[2]="-1"
-PROBA[2]=-1
+NOISE_PROBA[2]=-1
 
 #------------------ FLORES AUGMENTED ------------------#
 
@@ -80,7 +80,7 @@ eng_spel_Latn,eng_week_Latn,eng_Latn_mix_all"
 TGT_LANGS[3]="eng_Latn"
 TGT_AUG_LANGS[3]="eng_Latn"
 SEEDS[3]="100 101 102 103 104 105 106 107 108 109"
-PROBA[3]=-1
+NOISE_PROBA[3]=-1
 
 #------------------ ROCSMT AUGMENTED ------------------#
 
@@ -90,7 +90,7 @@ SRC_LANGS[4]="norm.en_mix_all"
 TGT_LANGS[4]="norm.en"
 TGT_AUG_LANGS[4]=""
 SEEDS[4]="1000 1001 1002 1003 1004"
-PROBA[4]=0.1
+NOISE_PROBA[4]=0.1
 
 EMBED_DIR=$EXPERIMENT_DIR/embeddings/${MODEL[$SLURM_ARRAY_TASK_ID]}
 mkdir -p $EMBED_DIR
@@ -111,19 +111,19 @@ do
             else
                 echo "Seed $SEED"
             fi
-            if [[ "${PROBA[$i]}" -lt 0 ]]
+            if [[ "${NOISE_PROBA[$i]}" -lt 0 ]]
             then
-                PROBA[$i]=""
+                PROBA=""
             else
-                echo "Proba ${PROBA[$i]}"
-                PROBA[$i]=${PROBA[$i]}/ugc
+                echo "Proba ${NOISE_PROBA[$i]}"
+                PROBA=${NOISE_PROBA[$i]}/ugc
             fi
             python $HOME/robust-embeddings/src/sonar/embed.py \
                 --model ${MODEL[$SLURM_ARRAY_TASK_ID]} \
                 --model-path ${MODEL_PATH[$SLURM_ARRAY_TASK_ID]} \
                 --data-dir $DATASETS \
                 --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]}/$SEED/${PROBA[$i]} \
+                --corpus ${CORPUS[$i]}/$SEED/$PROBA \
                 --split $CORPUS_PART \
                 --src-langs ${SRC_LANGS[$i]} \
                 --tgt-langs ${TGT_LANGS[$i]} \
