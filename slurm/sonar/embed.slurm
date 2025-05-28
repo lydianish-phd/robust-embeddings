@@ -11,7 +11,7 @@
 #SBATCH --hint=multithread       # we get physical cores not logical
 #SBATCH --time=2:00:00                # Time limit hrs:min:sec
 #SBATCH --output=/lustre/fsn1/projects/rech/rnh/udc54vm/logs/robust-embeddings/sonar/%x/%x_%j.log # Standard output and error log
-#SBATCH --array=0-2
+#SBATCH --array=0-3
 
 echo "### Running $SLURM_JOB_NAME $SLURM_ARRAY_TASK_ID ###"
 
@@ -30,11 +30,13 @@ MODEL[0]=sonar
 MODEL_DIR[0]=""
 
 MODEL[1]=rosonar
-MODEL_DIR[1]="-m $EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
+MODEL_DIR[1]="$EXPERIMENT_DIR/models/rosonar/checkpoint-70000"
 
 MODEL[2]=rosonar_std
-MODEL_DIR[2]="-m $EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
+MODEL_DIR[2]="$EXPERIMENT_DIR/models/rosonar_std/checkpoint-70000"
 
+MODEL[3]=rolaser_v2
+MODEL_DIR[3]=""
 
 #------------------ LEXNORM ------------------#
 
@@ -117,6 +119,8 @@ do
                 PROBA[$i]=${PROBA[$i]}/ugc
             fi
             python $HOME/robust-embeddings/src/sonar/embed.py \
+                --model ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+                --model-dir ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]} \
                 --data-dir $DATASETS \
                 --embed-dir $EMBED_DIR \
                 --corpus ${CORPUS[$i]}/$SEED/${PROBA[$i]} \
@@ -124,7 +128,7 @@ do
                 --src-langs ${SRC_LANGS[$i]} \
                 --tgt-langs ${TGT_LANGS[$i]} \
                 --tgt-aug-langs ${TGT_AUG_LANGS[$i]} \
-                ${MODEL_DIR[$SLURM_ARRAY_TASK_ID]}
+                
         done
     done
 done

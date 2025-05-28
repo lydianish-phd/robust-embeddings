@@ -1,3 +1,5 @@
+SONAR_BASIC_TEXT_ENCODER = "text_sonar_basic_encoder"
+
 SCORE_FILE_SUFFIX = ".out.json"
 STATS_FILE_PREFIX = "stats."
 STATS_FILE_SUFFIX = ".json"

@@ -25,16 +25,12 @@ source $HOME/.bash_python_exports
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 MODEL[0]=sonar
-EMBEDDINGS[0]="--offline-embeddings"
 
 MODEL[1]=rosonar
-EMBEDDINGS[1]="--offline-embeddings"
 
 MODEL[2]=rosonar_std
-EMBEDDINGS[2]="--offline-embeddings"
 
-MODEL[3]=lydianish/RoLASER-v2
-EMBEDDINGS[3]="--use-hugging-face"
+MODEL[3]=rolaser_v2
 
 #------------------ FLORES AUGMENTED ------------------#
 

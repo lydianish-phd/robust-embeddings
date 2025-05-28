@@ -3,7 +3,8 @@ import torch
 import numpy as np
 from sonar.inference_pipelines.text import TextToEmbeddingModelPipeline
 from rosonar_distillation import load_student_encoder_from_checkpoint
-from utils import LANG_CODES, LANG_NAMES
+from sentence_transformers import SentenceTransformer
+from utils import LANG_CODES, LANG_NAMES, SONAR_BASIC_TEXT_ENCODER
             
 def get_langs(langs):
     if langs:
@@ -27,11 +28,19 @@ def embed_sentences(embedder, input_file, output_file, lang, fp16=False, batch_s
     sentences = [line.strip() for line in data]
 
     print(f"Generating embeddings for {len(sentences)} sentences...")
-    embeddings = embedder.predict(sentences, 
-        source_lang=get_lang_code(lang),
-        progress_bar=True,
-        batch_size=batch_size
-    )
+    if isinstance(embedder, SentenceTransformer):
+        embeddings = embedder.encode(
+            sentences, 
+            batch_size=batch_size, 
+            show_progress_bar=True
+        )
+    else:
+        embeddings = embedder.predict(
+            sentences, 
+            source_lang=get_lang_code(lang),
+            batch_size=batch_size,
+            progress_bar=True
+        )
 
     print("Writing output embeddings...")
     embeddings = np.array(embeddings.cpu(), dtype=np.float16 if fp16 else np.float32)
@@ -75,7 +84,8 @@ def embed(embedder, data_dir, embed_dir, corpus, split, langs, tgt_aug_langs=[],
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--model-dir", type=str)
+    parser.add_argument("-m", "--model", type=str, choices=["sonar", "rosonar", "rosonar_std", "rolaser_v2"], default="rosonar",)
+    parser.add_argument("--model-dir", type=str, help="Directory containing the model checkpoint (required for rosonar)")
     parser.add_argument("--data-dir", type=str, required=True, help="Base directory for data")
     parser.add_argument("--embed-dir", type=str, required=True, help="Directory to save embeddings")
     parser.add_argument("--corpus", type=str, required=True, help="Corpus name")
@@ -89,14 +99,20 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     print("Loading embedding pipeline...")
-    if args.model_dir:
-        encoder = load_student_encoder_from_checkpoint(args.model_dir, init="rosonar")
+    
+    if "sonar" in args.model:
+        if args.model == "sonar":
+            encoder = SONAR_BASIC_TEXT_ENCODER
+        else:
+            assert args.model_dir, "Model directory must be specified for rosonar"
+            encoder = load_student_encoder_from_checkpoint(args.model_dir, init="rosonar")
+        embedder = TextToEmbeddingModelPipeline(encoder=encoder,
+            tokenizer=SONAR_BASIC_TEXT_ENCODER,
+            device=torch.device("cuda")
+        )
     else:
-        encoder = "text_sonar_basic_encoder"
-    embedder = TextToEmbeddingModelPipeline(encoder=encoder,
-        tokenizer="text_sonar_basic_encoder",
-        device=torch.device("cuda")
-    )
+        embedder = SentenceTransformer("lydianish/RoLASER-v2", device=torch.device("cuda"))
+    
     src_langs = get_langs(args.src_langs)
     tgt_langs = get_langs(args.tgt_langs)
     tgt_aug_langs = get_langs(args.tgt_aug_langs) 
