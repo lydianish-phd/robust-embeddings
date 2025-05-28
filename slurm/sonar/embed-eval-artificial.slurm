@@ -49,7 +49,7 @@ TGT_AUG_LANGS[0]="eng_Latn"
 
 CORPUS[1]=rocsmt
 CORPUS_PARTS[1]="test"
-SRC_LANGS[1]="ref.fr,ref.de,ref.cs,ref.uk,ref.ru"
+SRC_LANGS[1]="ref.fr" #,ref.de,ref.cs,ref.uk,ref.ru"
 TGT_LANGS[1]="raw.en,norm.en"
 TGT_AUG_LANGS[1]=""
 
