@@ -70,6 +70,7 @@ do
             --corpus ${CORPUS[$i]} \
             --corpus-part $CORPUS_PART \
             --margin ratio \
+            --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
             --src-langs ${SRC_LANGS[$i]} \
             --tgt-langs ${TGT_LANGS[$i]} \
             --output-dir $OUTPUT_DIR \
