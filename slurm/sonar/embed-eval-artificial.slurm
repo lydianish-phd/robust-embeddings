@@ -25,11 +25,8 @@ source $HOME/.bash_python_exports
 EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
 
 MODEL[0]=sonar
-
 MODEL[1]=rosonar
-
 MODEL[2]=rosonar_std
-
 MODEL[3]=rolaser_v2
 
 #------------------ FLORES AUGMENTED ------------------#
