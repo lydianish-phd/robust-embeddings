@@ -59,6 +59,10 @@ CORPUS=rocsmt/artificial
 CORPUS_PARTS="test"
 SEEDS="1000 1001 1002 1003 1004"
 PROBAS="0.05 0.1"
+PROBAS_WITH_SUFFIX=""
+for p in $PROBAS; do
+  PROBAS_WITH_SUFFIX+="$p/ugc "
+done
 METRICS="xsim"
 
 echo "Aggregating $METRICS for $CORPUS $CORPUS_PARTS"
@@ -71,6 +75,6 @@ python $HOME/robust-embeddings/src/laser/aggregate_proba.py \
     --corpus-parts $CORPUS_PARTS \
     --metrics $METRICS \
     --seeds $SEEDS \
-    --probas $PROBAS \
+    --probas $PROBAS_WITH_SUFFIX \
 
 echo "Done..."
