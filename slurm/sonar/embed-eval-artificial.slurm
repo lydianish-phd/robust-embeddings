@@ -72,30 +72,33 @@ do
             echo " - calculating xsim(++)"
             echo "Seed $SEED"
             
-            if [[ "${NOISE_PROBAS[$i]}" = "None" ]]
-            then
-                PROBA=""
-            else
-                echo "Proba ${NOISE_PROBAS[$i]}"
-                PROBA=${NOISE_PROBAS[$i]}/ugc
-            fi
+            for NOISE_PROBA in ${NOISE_PROBAS[$i]}
+            do
+                if [[ "${NOISE_PROBAS[$i]}" = "None" ]]
+                then
+                    PROBA=""
+                else
+                    echo "Proba $NOISE_PROBA"
+                    PROBA=$NOISE_PROBA/ugc
+                fi
             
-            EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
-            OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
+                EMBED_DIR=$EMBED_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
+                OUTPUT_DIR=$OUTPUT_DIR_PREFIX/${CORPUS[$i]}/$SEED/$PROBA/$CORPUS_PART
 
-            python3 $LASER/source/eval.py \
-                --base-dir $DATASETS \
-                --embed-dir $EMBED_DIR \
-                --corpus ${CORPUS[$i]}/$SEED/$PROBA \
-                --corpus-part $CORPUS_PART \
-                --margin ratio \
-                --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
-                --src-langs ${SRC_LANGS[$i]} \
-                --tgt-langs ${TGT_LANGS[$i]} \
-                ${TGT_AUG_LANGS[$i]} \
-                --output-dir $OUTPUT_DIR \
-                --offline-embeddings \
-                --verbose
+                python3 $LASER/source/eval.py \
+                    --base-dir $DATASETS \
+                    --embed-dir $EMBED_DIR \
+                    --corpus ${CORPUS[$i]}/$SEED/$PROBA \
+                    --corpus-part $CORPUS_PART \
+                    --margin ratio \
+                    --src-encoder ${MODEL[$SLURM_ARRAY_TASK_ID]} \
+                    --src-langs ${SRC_LANGS[$i]} \
+                    --tgt-langs ${TGT_LANGS[$i]} \
+                    ${TGT_AUG_LANGS[$i]} \
+                    --output-dir $OUTPUT_DIR \
+                    --offline-embeddings \
+                    --verbose
+            done
         done
     done
 done
