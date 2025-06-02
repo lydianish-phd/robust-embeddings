@@ -43,8 +43,8 @@ if __name__=="__main__":
 
     print("Loading datasets...")
 
-    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rosonar")
-    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rosonar")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/bilingual/tokenized/rosonar")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/monolingual/tokenized/rosonar")
 
     all_metadata = {
         "en-fr": {

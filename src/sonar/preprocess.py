@@ -61,10 +61,10 @@ if __name__=="__main__":
 
     args = parser.parse_args()
 
-    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/concatenated")
-    monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/concatenated")
-    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/bilingual/tokenized/rosonar")
-    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar/monolingual/tokenized/rosonar")
+    bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/bilingual/concatenated")
+    monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/monolingual/concatenated")
+    tokenized_bilingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/bilingual/tokenized/rosonar")
+    tokenized_monolingual_data_dir = os.path.join(os.environ["DATASETS"], "rosonar_v2/monolingual/tokenized/rosonar")
 
     all_metadata = {
         "en-fr": {
