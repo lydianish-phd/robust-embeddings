@@ -21,7 +21,7 @@ source $HOME/.bashrc
 source $HOME/.bash_profile
 source $HOME/.bash_python_exports
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047t
 
 MODEL[0]=sonar
 MODEL[1]=rosonar
@@ -39,7 +39,7 @@ METRICS="xsimpp"
 
 echo "Aggregating $METRICS for $CORPUS $CORPUS_PARTS"
 
-for i in {0..3} #loop through models
+for i in {1..2} #loop through models
 do
     echo "- Model: ${MODEL[$i]}"
     python $HOME/robust-embeddings/src/laser/aggregate_paired.py \
