@@ -25,7 +25,7 @@ source $HOME/.bash_profile
 
 set -e
 
-EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047s
+EXPERIMENT_DIR=$EXPERIMENTS/robust-embeddings/sonar/experiment_047t
 
 # Base models
 
@@ -51,29 +51,29 @@ MODEL[4]=nllb600m_ft_nat_fr_en
 MODEL_NAME[4]=facebook/nllb-200-distilled-600m
 MODEL_PATH[4]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
 
-MODEL[5]=nllb600m_ft_syn_en_fr
+MODEL[5]=nllb600m_ft_nat_en_fr_bal
 MODEL_NAME[5]=facebook/nllb-200-distilled-600m
-MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[5]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
-MODEL[6]=nllb600m_ft_nat_en_fr_bal
+MODEL[6]=nllb600m_ft_nat_fr_en_bal
 MODEL_NAME[6]=facebook/nllb-200-distilled-600m
-MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[6]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
 
-MODEL[7]=nllb600m_ft_nat_fr_en_bal
+MODEL[7]=nllb600m_ft_syn_en_fr
 MODEL_NAME[7]=facebook/nllb-200-distilled-600m
-MODEL_PATH[7]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/natural/fra_Latn-eng_Latn/nllb600m/checkpoint_best
+MODEL_PATH[7]=$EXPERIMENTS/finetuning-ugc/experiment_052q/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
 MODEL[8]=nllb600m_ft_syn_en_fr_bal
 MODEL_NAME[8]=facebook/nllb-200-distilled-600m
-MODEL_PATH[8]=$EXPERIMENTS/finetuning-ugc/experiment_052m/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[8]=$EXPERIMENTS/finetuning-ugc/experiment_052r/models/synthetic/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
 MODEL[9]=nllb600m_ft_syn_plus_en_fr
 MODEL_NAME[9]=facebook/nllb-200-distilled-600m
-MODEL_PATH[9]=$EXPERIMENTS/finetuning-ugc/experiment_052k/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[9]=$EXPERIMENTS/finetuning-ugc/experiment_052q/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
 MODEL[10]=nllb600m_ft_syn_plus_en_fr_bal
 MODEL_NAME[10]=facebook/nllb-200-distilled-600m
-MODEL_PATH[10]=$EXPERIMENTS/finetuning-ugc/experiment_052n/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
+MODEL_PATH[10]=$EXPERIMENTS/finetuning-ugc/experiment_052r/models/synthetic_plus/eng_Latn-fra_Latn/nllb600m/checkpoint_best
 
 # Multilingual
 
@@ -223,7 +223,7 @@ INPUT_FILES[22]="${DATA_DIR[22]}/raw.en.test"
 SRC_LANG[22]=eng_Latn
 TGT_LANG[22]=eng_Latn
 
-for i in {10..10}
+for i in {7..10}
 do
     echo "Model: ${MODEL[$i]}"
 
