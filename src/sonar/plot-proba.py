@@ -79,7 +79,7 @@ if __name__ == "__main__":
         ax.set_ylabel(f"{METRIC_NAMES[metric]} score", fontsize=16)
         ax.set_xlabel("Probability of artificial UGC", fontsize=16)
         ax.legend(fontsize=14, loc="center left", bbox_to_anchor=(1, 0.5))
-        # plt.tight_layout()
+
         plt.subplots_adjust(right=0.75)
         plt.savefig(output_file, bbox_inches='tight')
     
