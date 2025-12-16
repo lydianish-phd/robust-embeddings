@@ -64,7 +64,7 @@ if __name__ == "__main__":
     for metric in args.metrics:
         output_file = f"{args.scores_dir}/{metric}_noise_proba_plot.pdf"
         plt.clf()
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(10,6))
         g = plot_probas(
             artificial_scores, 
             multilingual_scores, 
@@ -78,9 +78,10 @@ if __name__ == "__main__":
         )
         ax.set_ylabel(f"{METRIC_NAMES[metric]} score", fontsize=16)
         ax.set_xlabel("Probability of artificial UGC", fontsize=16)
-        ax.legend(fontsize=14)
-        plt.tight_layout()
-        plt.savefig(output_file)
+        ax.legend(fontsize=14, loc="center left", bbox_to_anchor=(1, 0.5))
+        # plt.tight_layout()
+        plt.subplots_adjust(right=0.75)
+        plt.savefig(output_file, bbox_inches='tight')
     
     print("Plotting language scores...")
     output_file = f"{args.scores_dir}/noise_proba_plot_all.pdf"
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     for ax in axes.flat:
         ax.legend_.remove()
     handles, labels = axes[0,0].get_legend_handles_labels()
-    fig.legend(handles, labels, fontsize=14, loc="upper center", bbox_to_anchor=(0.5, 1.075), ncol=3)
+    fig.legend(handles, labels, fontsize=14, loc="upper center", bbox_to_anchor=(0.5, 1.2), ncol=3)
 
     plt.tight_layout()
     plt.savefig(output_file, bbox_inches='tight')
