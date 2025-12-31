@@ -31,13 +31,18 @@ The repository is organised by model and experiment, with a clear separation bet
 ```bash
 ├── src/
 │   ├── rolaser/   # Preprocessing, training, and evaluation code for RoLASER
-│   └── rosonar/   # Preprocessing, training, and evaluation code for RoSONAR
+│   ├── rosonar/   # Preprocessing, training, and evaluation code for RoSONAR
+│   └── mining/    # Experimental scripts for bitext mining using RoLASER (standard ↔ UGC); unfinished
 ├── slurm/
 │   ├── rolaser/   # SLURM scripts for RoLASER training and experiments
-│   └── rosonar/   # SLURM scripts for RoSONAR training and experiments
+│   ├── rosonar/   # SLURM scripts for RoSONAR training and experiments
+│   └── mining/    # SLURM scripts for RoLASER bitext mining experiments; unfinished
 ├── .gitignore
 └── README.md
 ```
+
+> **Note:** The src/mining/ and slurm/mining/ directories contain scripts for exploratory bitext mining using RoLASER to align standard and UGC sentences. These experiments were unfinished.
+
 ---
 
 ## 🔍 Motivation
