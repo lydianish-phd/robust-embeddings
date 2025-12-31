@@ -45,7 +45,9 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 ---
 
-## 🧩 Synthetic UGC Generation
+## 🧪 Experiments
+
+### 🧩 Synthetic UGC Generation
 
 Due to the scarcity of natural user-generated content (UGC) data, we artificially generate non-standard English sentences from standard text. This allows us to **train and evaluate models on a wide range of UGC phenomena** without relying solely on limited real-world datasets.
 
@@ -60,9 +62,7 @@ We also use a **mix_all** transformation, which randomly applies a subset of the
 
 These synthetic datasets enable controlled experimentation, allowing us to **measure model robustness by UGC phenomenon type** and address the lack of large-scale annotated non-standard text.
 
----
-
-## 🧪 RoLASER
+### 🧩 RoLASER
 
 **RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
 
@@ -71,7 +71,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 > Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
 
-### Experimental Setup
+#### Experimental Setup
 
 **Variants:**
 
@@ -89,7 +89,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 - Framework: Fairseq, multi-GPU training
 
 
-### 🔬 Evaluation & Findings
+#### 🔬 Evaluation & Findings
 
 **Metrics:** cosine distance, xSIM / xSIM++  
 **Datasets:** MultiLexNorm, ROCS-MT (natural UGC), FLORES artificial UGC  
@@ -107,13 +107,11 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 - Token-level RoLASER outperforms character-aware c-RoLASER in most settings
 - Character-level models are internally robust but struggle to map outputs to LASER space
 
----
-
-## 🔁 RoSONAR
+### 🧩 RoSONAR
 
 **RoSONAR** extends the RoLASER approach to **machine translation**, training a bilingual English–French sentence encoder aligned with SONAR and paired with a frozen multilingual SONAR decoder.
 
-### Experimental Setup
+#### Experimental Setup
 
 - **Teacher:** Multilingual SONAR encoder  
 - **Student:** Smaller bilingual encoder trained on:
@@ -129,7 +127,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 - Encoder parameters: 514M; combined with SONAR decoder: 1.643B  
 - Optimisation: AdamW, LR 7e-3, BF16 mixed precision, 16 H100 GPUs, effective batch size 1M tokens
 
-### 🔬 Evaluation & Findings
+#### 🔬 Evaluation & Findings
 
 - Evaluated on standard, synthetic, and natural UGC datasets (MultiLexNorm, ROCS-MT, FLORES)  
 - Compared models: RoSONAR, RoSONAR-std (trained only on standard data), SONAR, NLLB  
