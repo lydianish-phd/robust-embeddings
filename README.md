@@ -75,7 +75,7 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 Due to the scarcity of natural user-generated content (UGC) data, we artificially generate non-standard English sentences from standard text. This allows us to **train and evaluate models on a wide range of UGC phenomena** without relying solely on limited real-world datasets.
 
-We apply a set of 12 probabilistic transformations to standard sentences, including:
+We apply a set of probabilistic transformations to standard sentences, including:
 
 - **Abbreviations, acronyms, and slang** 
 - **Contractions and expansions**  
@@ -85,6 +85,9 @@ We apply a set of 12 probabilistic transformations to standard sentences, includ
 We also use a **mix_all** transformation, which randomly applies a subset of these perturbations in shuffled order, simulating realistic UGC variation.  
 
 These synthetic datasets enable controlled experimentation, allowing us to **measure model robustness by UGC phenomenon type** and address the lack of large-scale annotated non-standard text.
+
+> **Note:** The scripts for synthetic UGC generation and data augmentation are available in a separate repository: [https://github.com/lydianish-phd/data-preparation](https://github.com/lydianish-phd/data-preparation)
+
 
 ### 🧩 RoLASER
 
@@ -108,7 +111,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 - Teacher: frozen LASER encoder
 - Training: MSE loss between teacher and student embeddings
-- Data: 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena
+- Data: 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena (12 transformation types)
 - Pooling: max-pooling (works better than CLS/mean for sentence-level alignment)
 - Framework: Fairseq, multi-GPU training
 
