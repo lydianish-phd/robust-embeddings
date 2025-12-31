@@ -3,8 +3,22 @@
 This repository contains the code and experiments for my PhD work on **robust sentence embeddings for user-generated content (UGC)**, focusing on aligning standard and non-standard language in a shared semantic space.  
 It covers **Experiment V (RoLASER)** and provides the foundations for **Experiment VI (RoSONAR)** from my dissertation.
 
-An earlier version of this work was published at **LREC–COLING 2024**.
+---
 
+## 📁 Repository Structure
+
+The repository is organised by model and experiment, with a clear separation between source code and SLURM job scripts:
+
+```bash
+├── src/
+│   ├── rolaser/   # Preprocessing, training, and evaluation code for RoLASER
+│   └── rosonar/   # Preprocessing, training, and evaluation code for RoSONAR
+├── slurm/
+│   ├── rolaser/   # SLURM scripts for RoLASER training and experiments
+│   └── rosonar/   # SLURM scripts for RoSONAR training and experiments
+├── .gitignore
+└── README.md
+```
 ---
 
 ## 🔍 Motivation
@@ -37,8 +51,9 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 **RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
 
-🔗 **RoLASER GitHub repository:**  
-https://github.com/lydianish-phd/RoLASER
+🔗 **RoLASER Demo GitHub repository:** https://github.com/lydianish-phd/RoLASER
+
+> Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
 **Key features:**
 - Teacher: frozen **LASER** encoder
@@ -93,8 +108,6 @@ This repository also provides the conceptual and experimental groundwork for **R
 - pairing it with a frozen multilingual SONAR decoder,
 - evaluating robustness transfer across languages.
 
-> Note: full RoSONAR training code may live in a separate repository.
-
 ---
 
 ## 🛠️ Implementation
@@ -110,7 +123,7 @@ This repository also provides the conceptual and experimental groundwork for **R
 
 ## 📄 Publication
 
-If you use this work, please cite:
+If you use the RoLASER model or ideas from this work, please cite the following paper:
 
 ```bibtex
 @inproceedings{nishimwe-etal-2024-making-sentence,
@@ -137,7 +150,7 @@ If you use this work, please cite:
 
 ## 👤 Author
 
-**Lydiane Nishimwe**  
+**Lydia Nishimwe**  
 PhD in Machine Translation & NLP  
 Focus: UGC robustness, sentence embeddings, multilingual NLP
 
