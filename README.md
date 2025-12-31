@@ -1,92 +1,155 @@
-# Robust Embeddings
+# Robust Sentence Embeddings for User-Generated Content (UGC)
 
+This repository contains the code and experiments for my PhD work on **robust sentence embeddings for user-generated content (UGC)**, focusing on aligning standard and non-standard language in a shared semantic space.  
+It covers **Experiment V (RoLASER)** and provides the foundations for **Experiment VI (RoSONAR)** from my dissertation.
 
+An earlier version of this work was published at **LREC–COLING 2024**.
 
-## Getting started
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 🔍 Motivation
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Most sentence encoders are trained on clean, standard text and degrade sharply when applied to UGC such as social media content, which exhibits:
+- spelling and grammatical errors,
+- slang, acronyms, and abbreviations,
+- expressive typography (emojis, repetitions, leetspeak),
+- tokenisation-breaking character-level perturbations.
 
-## Add your files
+This work tackles robustness **at the sentence level**, framing UGC robustness as a **bitext alignment problem in embedding space**:
+> *How close are the embeddings of a standard sentence and its non-standard counterpart?*
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+---
 
+## 🧠 Core Idea
+
+We propose training **UGC-robust sentence encoders** using:
+- **Knowledge distillation** (teacher–student training),
+- **Synthetic UGC generation** from standard text,
+- **Embedding alignment losses** that minimise the distance between standard and non-standard variants.
+
+Rather than normalising text explicitly, the model learns to **abstract away surface-level variation**.
+
+---
+
+## 🧪 Experiment V — RoLASER
+
+### RoLASER: Robust LASER-style Sentence Embeddings
+
+**RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
+
+🔗 **RoLASER GitHub repository:**  
+https://github.com/lydianish-phd/RoLASER
+
+**Key features:**
+- Teacher: frozen **LASER** encoder
+- Students:
+  - **RoLASER** (token-level, RoBERTa-style)
+  - **cRoLASER** (character-aware variant)
+- Training objective: **MSE loss between teacher and student embeddings**
+- Data: standard English paired with **synthetically generated UGC**
+
+**Main findings:**
+- Substantially improves robustness to both **synthetic and natural UGC**
+- Handles tokenisation-breaking perturbations better than LASER
+- Maintains (or slightly improves) performance on standard text
+- Token-level models outperform character-aware models in this setting
+
+---
+
+## 🔬 Evaluation
+
+Robustness is evaluated as a **sentence alignment task**, using:
+- Average cosine distance
+- **xSIM** and **xSIM++** (bitext mining proxy metrics)
+
+Datasets include:
+- **MultiLexNorm** (natural UGC)
+- **ROCS-MT** (UGC + standardised variants)
+- **FLORES** with controlled synthetic UGC perturbations
+
+Downstream evaluations include:
+- Sentence (pair) classification
+- Semantic Textual Similarity (STS)
+
+---
+
+## 🧩 Synthetic UGC Generation
+
+UGC is generated from standard text using probabilistic combinations of:
+- abbreviations & slang,
+- misspellings & typos,
+- leetspeak,
+- whitespace and segmentation noise,
+- contractions and expansions.
+
+This enables controlled robustness analysis while highlighting the **gap between synthetic and natural UGC**.
+
+---
+
+## 🔁 Experiment VI — RoSONAR (context)
+
+This repository also provides the conceptual and experimental groundwork for **RoSONAR**, which extends the approach to **machine translation** by:
+- training a robust sentence encoder aligned to **SONAR**,
+- pairing it with a frozen multilingual SONAR decoder,
+- evaluating robustness transfer across languages.
+
+> Note: full RoSONAR training code may live in a separate repository.
+
+---
+
+## 🛠️ Implementation
+
+- Frameworks: **Fairseq**, **PyTorch**
+- Architectures: Transformer encoders (token-level & character-aware)
+- Training:
+  - multi-GPU distributed training
+  - synthetic data augmentation
+  - large-scale embedding distillation
+
+---
+
+## 📄 Publication
+
+If you use this work, please cite:
+
+```bibtex
+@inproceedings{nishimwe-etal-2024-making-sentence,
+    title = "Making Sentence Embeddings Robust to User-Generated Content",
+    author = "Nishimwe, Lydia  and
+      Sagot, Beno{\^\i}t  and
+      Bawden, Rachel",
+    editor = "Calzolari, Nicoletta  and
+      Kan, Min-Yen  and
+      Hoste, Veronique  and
+      Lenci, Alessandro  and
+      Sakti, Sakriani  and
+      Xue, Nianwen",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.958",
+    pages = "10984--10998"
+}
 ```
-cd existing_repo
-git remote add origin https://gitlab.inria.fr/lnishimw/robust-embeddings.git
-git branch -M main
-git push -uf origin main
-```
+---
 
-## Integrate with your tools
+## 👤 Author
 
-- [ ] [Set up project integrations](https://gitlab.inria.fr/lnishimw/robust-embeddings/-/settings/integrations)
+**Lydiane Nishimwe**  
+PhD in Machine Translation & NLP  
+Focus: UGC robustness, sentence embeddings, multilingual NLP
 
-## Collaborate with your team
+🔗 Personal GitHub: https://github.com/lydianish  
+🔗 PhD organisation: https://github.com/lydianish-phd
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+---
 
-## Test and Deploy
+## ⚠️ Notes & Limitations
 
-Use the built-in continuous integration in GitLab.
+- Synthetic UGC does not fully capture real-world UGC distributions
+- Robust embeddings do not automatically guarantee robust MT
+- Domain adaptation remains a key challenge
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+This repository should be viewed as a **research artefact** supporting the dissertation rather than a polished end-user library.
