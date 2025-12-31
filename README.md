@@ -13,10 +13,10 @@ It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dis
 4. [🧪 Experiments](#-experiments)
    - [🧩 Synthetic UGC Generation](#-synthetic-ugc-generation)
    - [🧩 RoLASER](#-rolaser)
-     - [Experimental Setup](#experimental-setup)
+     - [⚙️ Experimental Setup](#experimental-setup)
      - [🔬 Evaluation & Findings](#-evaluation--findings)
    - [🧩 RoSONAR](#-rosonar)
-     - [Experimental Setup](#experimental-setup-1)
+     - [⚙️ Experimental Setup](#experimental-setup-1)
      - [🔬 Evaluation & Findings](#-evaluation--findings-1)
 5. [📄 Publication](#-publication)
 6. [👤 Author](#-author)
@@ -90,7 +90,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 > Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
 
-#### Experimental Setup
+#### ⚙️ Experimental Setup
 
 **Variants:**
 
@@ -130,7 +130,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 **RoSONAR** extends the RoLASER approach to **machine translation**, training a bilingual English–French sentence encoder aligned with SONAR and paired with a frozen multilingual SONAR decoder.
 
-#### Experimental Setup
+#### ⚙️ Experimental Setup
 
 - **Teacher:** Multilingual SONAR encoder  
 - **Student:** Smaller bilingual encoder trained on:
