@@ -1,7 +1,26 @@
 # Robust Sentence Embeddings for User-Generated Content (UGC)
 
 This repository contains the code and experiments for my PhD work on **robust sentence embeddings for user-generated content (UGC)**, focusing on aligning standard and non-standard language in a shared semantic space.  
-It covers **Experiment V (RoLASER)** and provides the foundations for **Experiment VI (RoSONAR)** from my dissertation.
+It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dissertation.
+
+---
+
+## 📑 Table of Contents
+
+1. [📁 Repository Structure](#-repository-structure)
+2. [🔍 Motivation](#-motivation)
+3. [🧠 Core Idea](#-core-idea)
+4. [🧪 Experiments](#-experiments)
+   - [🧩 Synthetic UGC Generation](#-synthetic-ugc-generation)
+   - [🧩 RoLASER](#-rolaser)
+     - [Experimental Setup](#experimental-setup)
+     - [🔬 Evaluation & Findings](#-evaluation--findings)
+   - [🧩 RoSONAR](#-rosonar)
+     - [Experimental Setup](#experimental-setup-1)
+     - [🔬 Evaluation & Findings](#-evaluation--findings-1)
+5. [📄 Publication](#-publication)
+6. [👤 Author](#-author)
+7. [⚠️ Notes & Limitations](#-notes--limitations)
 
 ---
 
