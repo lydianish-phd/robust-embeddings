@@ -45,9 +45,24 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 ---
 
-## 🧪 Experiment V — RoLASER
+## 🧩 Synthetic UGC Generation
 
-### RoLASER: Robust LASER-style Sentence Embeddings
+Due to the scarcity of natural user-generated content (UGC) data, we artificially generate non-standard English sentences from standard text. This allows us to **train and evaluate models on a wide range of UGC phenomena** without relying solely on limited real-world datasets.
+
+We apply a set of 12 probabilistic transformations to standard sentences, including:
+
+- **Abbreviations, acronyms, and slang** 
+- **Contractions and expansions**  
+- **Misspellings and typos**
+- **Visual and segmentation perturbations**
+
+We also use a **mix_all** transformation, which randomly applies a subset of these perturbations in shuffled order, simulating realistic UGC variation.  
+
+These synthetic datasets enable controlled experimentation, allowing us to **measure model robustness by UGC phenomenon type** and address the lack of large-scale annotated non-standard text.
+
+---
+
+## 🧪 RoLASER
 
 **RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
 
@@ -55,69 +70,79 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 > Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
-**Key features:**
-- Teacher: frozen **LASER** encoder
-- Students:
-  - **RoLASER** (token-level, RoBERTa-style)
-  - **cRoLASER** (character-aware variant)
-- Training objective: **MSE loss between teacher and student embeddings**
-- Data: standard English paired with **synthetically generated UGC**
+
+### Experimental Setup
+
+**Variants:**
+
+| Model    | Input type      | Architecture                 |
+| -------- | --------------- | ---------------------------- |
+| RoLASER  | Token-level     | RoBERTa-style Transformer    |
+| cRoLASER | Character-level | CNN + Transformer (CharacterBERT) |
+
+**Key points:**
+
+- Teacher: frozen LASER encoder
+- Training: MSE loss between teacher and student embeddings
+- Data: 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena
+- Pooling: max-pooling (works better than CLS/mean for sentence-level alignment)
+- Framework: Fairseq, multi-GPU training
+
+
+### 🔬 Evaluation & Findings
+
+**Metrics:** cosine distance, xSIM / xSIM++  
+**Datasets:** MultiLexNorm, ROCS-MT (natural UGC), FLORES artificial UGC  
+**Downstream tasks:**
+
+1. **Sentence classification** (e.g., TweetSentimentExtraction)
+2. **Sentence pair classification** (e.g., paraphrase detection)
+3. **Semantic Textual Similarity (STS)**
 
 **Main findings:**
-- Substantially improves robustness to both **synthetic and natural UGC**
+
+- RoLASER substantially improves robustness to **synthetic and natural UGC**
 - Handles tokenisation-breaking perturbations better than LASER
 - Maintains (or slightly improves) performance on standard text
-- Token-level models outperform character-aware models in this setting
+- Token-level RoLASER outperforms character-aware c-RoLASER in most settings
+- Character-level models are internally robust but struggle to map outputs to LASER space
 
 ---
 
-## 🔬 Evaluation
+## 🔁 RoSONAR
 
-Robustness is evaluated as a **sentence alignment task**, using:
-- Average cosine distance
-- **xSIM** and **xSIM++** (bitext mining proxy metrics)
+**RoSONAR** extends the RoLASER approach to **machine translation**, training a bilingual English–French sentence encoder aligned with SONAR and paired with a frozen multilingual SONAR decoder.
 
-Datasets include:
-- **MultiLexNorm** (natural UGC)
-- **ROCS-MT** (UGC + standardised variants)
-- **FLORES** with controlled synthetic UGC perturbations
+### Experimental Setup
 
-Downstream evaluations include:
-- Sentence (pair) classification
-- Semantic Textual Similarity (STS)
+- **Teacher:** Multilingual SONAR encoder  
+- **Student:** Smaller bilingual encoder trained on:
+  - Parallel English↔French data (NLLB)
+  - Monolingual English and French data (OSCAR)
+  - Synthetic English UGC (19 transformation types)
+- **Objective:** Minimise MSE between teacher and student embeddings for standard and non-standard sentences
 
----
+**Architecture & Training:**
 
-## 🧩 Synthetic UGC Generation
+- 12 Transformer layers (half of SONAR), 16 attention heads, hidden size 1024, FFN 8192  
+- Tokeniser: SentencePiece, vocab size 256k  
+- Encoder parameters: 514M; combined with SONAR decoder: 1.643B  
+- Optimisation: AdamW, LR 7e-3, BF16 mixed precision, 16 H100 GPUs, effective batch size 1M tokens
 
-UGC is generated from standard text using probabilistic combinations of:
-- abbreviations & slang,
-- misspellings & typos,
-- leetspeak,
-- whitespace and segmentation noise,
-- contractions and expansions.
+### 🔬 Evaluation & Findings
 
-This enables controlled robustness analysis while highlighting the **gap between synthetic and natural UGC**.
+- Evaluated on standard, synthetic, and natural UGC datasets (MultiLexNorm, ROCS-MT, FLORES)  
+- Compared models: RoSONAR, RoSONAR-std (trained only on standard data), SONAR, NLLB  
 
----
+**Main results:**
 
-## 🔁 Experiment VI — RoSONAR (context)
+1. RoSONAR vs RoSONAR-std: nearly identical (<0.5 COMET points), showing limited impact of synthetic UGC at this scale  
+2. Compared to baselines: both RoSONAR variants slightly underperform SONAR but remain close to NLLB; some gains on highly non-standard French (PFS-MB)  
+3. Robustness to perturbations: large models degrade slowly under synthetic UGC; RoSONAR similar to SONAR with limited extra gains  
+4. Cross-lingual transfer: robustness from English synthetic UGC does not reliably transfer to French  
+5. Implication: encoder-level robustness alone is insufficient; natural UGC and domain adaptation are crucial
 
-This repository also provides the conceptual and experimental groundwork for **RoSONAR**, which extends the approach to **machine translation** by:
-- training a robust sentence encoder aligned to **SONAR**,
-- pairing it with a frozen multilingual SONAR decoder,
-- evaluating robustness transfer across languages.
-
----
-
-## 🛠️ Implementation
-
-- Frameworks: **Fairseq**, **PyTorch**
-- Architectures: Transformer encoders (token-level & character-aware)
-- Training:
-  - multi-GPU distributed training
-  - synthetic data augmentation
-  - large-scale embedding distillation
+**Key takeaway:** Large-scale encoders already have inherent robustness to surface-level non-standardness. Synthetic UGC objectives show diminishing returns at scale; in-domain natural UGC is necessary for meaningful MT robustness.
 
 ---
 
