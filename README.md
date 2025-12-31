@@ -108,7 +108,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 | c-RoLASER | Character-level | CNN + Transformer (CharacterBERT) |
 
 - **Teacher:** frozen LASER encoder
-- **Objective:** MSE loss between teacher and student embeddings
+- **Objective:** Minimise MSE loss between teacher and student embeddings
 - **Data:** 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena (12 transformation types)
 - **Framework:** Fairseq, multi-GPU training
 
