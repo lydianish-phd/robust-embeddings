@@ -90,7 +90,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 > Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
 
-#### Experimental Setup
+#### ⚙️ Experimental Setup
 
 **Variants:**
 
