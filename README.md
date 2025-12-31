@@ -13,7 +13,7 @@ It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dis
 4. [🧪 Experiments](#-experiments)
    - [🧩 Synthetic UGC Generation](#-synthetic-ugc-generation)
    - [🧩 RoLASER](#-rolaser)
-     - [⚙️ Experimental Setup](#-experimental-setup)
+     - [⚙️ Experimental Setup](#experimental-setup)
      - [🔬 Evaluation & Findings](#-evaluation--findings)
    - [🧩 RoSONAR](#-rosonar)
      - [⚙️ Experimental Setup](#-experimental-setup-1)
@@ -90,7 +90,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 > Note: The separate RoLASER GitHub repo linked above is the official demo released with the paper and is intended for demonstration purposes, while this repository contains the full research code used in the thesis.
 
 
-#### ⚙️ Experimental Setup
+#### Experimental Setup
 
 **Variants:**
 
