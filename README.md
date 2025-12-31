@@ -16,7 +16,7 @@ It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dis
      - [🔧 Experimental Setup](#-experimental-setup)
      - [🔬 Evaluation & Findings](#-evaluation--findings)
    - [🧩 RoSONAR](#-rosonar)
-     - [⚙️ Experimental Setup](#-experimental-setup-1)
+     - [🔧 Experimental Setup](#-experimental-setup-1)
      - [🔬 Evaluation & Findings](#-evaluation--findings-1)
 5. [📄 Publication](#-publication)
 6. [👤 Author](#-author)
@@ -130,7 +130,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 **RoSONAR** extends the RoLASER approach to **machine translation**, training a bilingual English–French sentence encoder aligned with SONAR and paired with a frozen multilingual SONAR decoder.
 
-#### ⚙️ Experimental Setup
+#### 🔧 Experimental Setup
 
 - **Teacher:** Multilingual SONAR encoder  
 - **Student:** Smaller bilingual encoder trained on:
