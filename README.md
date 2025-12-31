@@ -105,7 +105,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 | Model    | Input type      | Architecture                 |
 | -------- | --------------- | ---------------------------- |
 | RoLASER  | Token-level     | RoBERTa-style Transformer    |
-| cRoLASER | Character-level | CNN + Transformer (CharacterBERT) |
+| c-RoLASER | Character-level | CNN + Transformer (CharacterBERT) |
 
 **Key points:**
 
