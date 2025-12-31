@@ -100,21 +100,17 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 #### 🔧 Experimental Setup
 
-**Variants:**
+**Variants (students):**
 
 | Model    | Input type      | Architecture                 |
 | -------- | --------------- | ---------------------------- |
 | RoLASER  | Token-level     | RoBERTa-style Transformer    |
 | c-RoLASER | Character-level | CNN + Transformer (CharacterBERT) |
 
-**Key points:**
-
-- Teacher: frozen LASER encoder
-- Training: MSE loss between teacher and student embeddings
-- Data: 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena (12 transformation types)
-- Pooling: max-pooling (works better than CLS/mean for sentence-level alignment)
-- Framework: Fairseq, multi-GPU training
-
+- **Teacher:** frozen LASER encoder
+- **Objective:** MSE loss between teacher and student embeddings
+- **Data:** 2M standard sentences from OSCAR, augmented with synthetic UGC phenomena (12 transformation types)
+- **Framework:** Fairseq, multi-GPU training
 
 #### 🔬 Evaluation & Findings
 
@@ -141,18 +137,22 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 #### 🔧 Experimental Setup
 
 - **Teacher:** Multilingual SONAR encoder  
-- **Student:** Smaller bilingual encoder trained on:
-  - Parallel English↔French data (NLLB)
-  - Monolingual English and French data (OSCAR)
-  - Synthetic English UGC (19 transformation types)
+- **Student:** Smaller bilingual encoder (half the layers of SONAR)
 - **Objective:** Minimise MSE between teacher and student embeddings for standard and non-standard sentences
 
 **Architecture & Training:**
-
-- 12 Transformer layers (half of SONAR), 16 attention heads, hidden size 1024, FFN 8192  
+- 12 Transformer layers, 16 attention heads, hidden size 1024, FFN 8192  
 - Tokeniser: SentencePiece, vocab size 256k  
 - Encoder parameters: 514M; combined with SONAR decoder: 1.643B  
 - Optimisation: AdamW, LR 7e-3, BF16 mixed precision, 16 H100 GPUs, effective batch size 1M tokens
+
+**Data:** 
+- Parallel English↔French data from NLLB (≈329M sentence pairs)
+- Monolingual English/French data from OSCAR (36M Fr, 24M En sentences after decontamination).
+- Synthetic English UGC is generated via 19 probabilistic transformations (character and word-level perturbations)
+- Interleaved batches from parallel, monolingual, and synthetic sets; 100k sentences held out for validation.
+
+**Framework:** Transformers, Fairseq2, multi-node and multi-GPU training
 
 #### 🔬 Evaluation & Findings
 
