@@ -39,6 +39,7 @@ The repository is organised by model and experiment, with a clear separation bet
 │   ├── rolaser/   # SLURM scripts for RoLASER training and experiments
 │   ├── rosonar/   # SLURM scripts for RoSONAR training and experiments
 │   └── mining/    # SLURM scripts for RoLASER bitext mining experiments; unfinished
+├── img/           # figures used in the README
 ├── .gitignore
 └── README.md
 ```
@@ -75,7 +76,11 @@ Rather than normalising text explicitly, the model learns to **abstract away sur
 
 ### 🧩 Synthetic UGC Generation
 
-Due to the scarcity of natural user-generated content (UGC) data, we artificially generate non-standard English sentences from standard text. This allows us to **train and evaluate models on a wide range of UGC phenomena** without relying solely on limited real-world datasets.
+<p align="center">
+  <img alt="Data augmentation technique" width="700" src="./img/data_augmentation.png">
+</p>
+
+**Approach:** Due to the scarcity of natural user-generated content (UGC) data, we artificially generate non-standard English sentences from standard text. This allows us to **train and evaluate models on a wide range of UGC phenomena** without relying solely on limited real-world datasets.
 
 We apply a set of probabilistic transformations to standard sentences, including:
 
@@ -94,6 +99,10 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 ### 🧩 RoLASER
 
 **RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
+
+<p align="center">
+  <img alt="RoLASER Teacher-Student Distillation" width="500" src="./img/robust_laser.png">
+</p>
 
 🔗 **RoLASER Paper:** [Making Sentence Embeddings Robust to User-Generated Content](https://aclanthology.org/2024.lrec-main.958/), LREC-COLING 2024.
 
@@ -136,7 +145,16 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 ### 🧩 RoSONAR
 
-**RoSONAR** extends the RoLASER approach to **machine translation**, training a bilingual English–French sentence encoder aligned with SONAR and paired with a frozen multilingual SONAR decoder.
+**RoSONAR** extends the RoLASER approach to **machine translation**. We first train a robust, bilingual English–French sentence encoder aligned with SONAR: 
+
+<p align="center">
+  <img alt="RoSONAR Encoder-Decoder" width="500" src="./img/rosonar_distillation.png">
+</p>
+
+and pair it with a frozen multilingual SONAR decoder:
+<p align="center">
+  <img alt="RoSONAR Encoder-Decoder" width="500" src="./img/rosonar_approach.png">
+</p>
 
 #### 🔧 Experimental Setup
 
