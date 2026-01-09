@@ -39,7 +39,7 @@ The repository is organised by model and experiment, with a clear separation bet
 │   ├── rolaser/   # SLURM scripts for RoLASER training and experiments
 │   ├── rosonar/   # SLURM scripts for RoSONAR training and experiments
 │   └── mining/    # SLURM scripts for RoLASER bitext mining experiments; unfinished
-├── img/           # figures used in the README
+├── img/           # Figures used in the README
 ├── .gitignore
 └── README.md
 ```
@@ -153,7 +153,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 and pair it with a frozen multilingual SONAR decoder:
 <p align="center">
-  <img alt="RoSONAR Encoder-Decoder" width="500" src="./img/rosonar_approach.png">
+  <img alt="RoSONAR Encoder-Decoder" width="400" src="./img/rosonar_approach.png">
 </p>
 
 #### 🔧 Experimental Setup
