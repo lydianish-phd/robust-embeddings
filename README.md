@@ -3,6 +3,8 @@
 This repository contains the code and experiments for my PhD work on **robust sentence embeddings for user-generated content (UGC)**, focusing on aligning standard and non-standard language in a shared semantic space.  
 It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dissertation.
 
+🎓 Read the full thesis here: [Robust Neural Machine Translation of User-Generated Content](https://theses.hal.science/tel-05448644).
+
 ---
 
 ## 📑 Table of Contents
@@ -92,6 +94,8 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 ### 🧩 RoLASER
 
 **RoLASER** is a Transformer-based student encoder trained to map non-standard English sentences close to their standard equivalents in the **LASER embedding space**.
+
+🔗 **RoLASER Paper:** [Making Sentence Embeddings Robust to User-Generated Content](https://aclanthology.org/2024.lrec-main.958/), LREC-COLING 2024.
 
 🔗 **RoLASER Demo GitHub repository:** https://github.com/lydianish-phd/RoLASER
 
