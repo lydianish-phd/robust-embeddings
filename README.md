@@ -20,7 +20,7 @@ It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my dis
    - [🧩 RoSONAR](#-rosonar)
      - [🔧 Experimental Setup](#-experimental-setup-1)
      - [🔬 Evaluation & Findings](#-evaluation--findings-1)
-5. [📄 Publication](#-publication)
+5. [📄 Citation](#-citation)
 6. [👤 Author](#-author)
 7. [⚠️ Notes & Limitations](#-notes--limitations)
 
@@ -175,7 +175,7 @@ These synthetic datasets enable controlled experimentation, allowing us to **mea
 
 ---
 
-## 📄 Publication
+## 📄 Citation
 
 If you use the RoLASER model or ideas from this work, please cite the following paper:
 
@@ -198,6 +198,24 @@ If you use the RoLASER model or ideas from this work, please cite the following 
     publisher = "ELRA and ICCL",
     url = "https://aclanthology.org/2024.lrec-main.958",
     pages = "10984--10998"
+}
+```
+
+If you use the RoSONAR model or ideas from this work, please cite the PhD thesis:
+```bibtex
+@phdthesis{nishimwe:tel-05448644,
+  TITLE = {{Robust Neural Machine Translation of User-Generated Content}},
+  AUTHOR = {Nishimwe, Lydia},
+  URL = {https://theses.hal.science/tel-05448644},
+  NUMBER = {2025SORUS369},
+  SCHOOL = {{Sorbonne Universit{\'e}}},
+  YEAR = {2025},
+  MONTH = Jun,
+  KEYWORDS = {Lexical normalisation ; User-Generated content ; Deep learning ; Robustness ; Non standard texts ; Machine translation ; Normalisation lexicale ; Contenus g{\'e}n{\'e}r{\'e}s par les utilisateurs ; Apprentissage profond ; Robustesse ; Textes non standards ; Traduction automatique},
+  TYPE = {Theses},
+  PDF = {https://theses.hal.science/tel-05448644v1/file/144629_NISHIMWE_2025_archivage.pdf},
+  HAL_ID = {tel-05448644},
+  HAL_VERSION = {v1},
 }
 ```
 ---
