@@ -1,7 +1,7 @@
 # Robust Sentence Embeddings for User-Generated Content (UGC)
 
 This repository contains the code and experiments for my PhD work on **robust sentence embeddings for user-generated content (UGC)**, focusing on aligning standard and non-standard language in a shared semantic space.  
-It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from **Chapter 8** of my dissertation.
+It covers **Experiment V (RoLASER)** and **Experiment VI (RoSONAR)** from my thesis **Chapter 8: Towards Translating UGC with Robust Sentence Embeddings**.
 
 🎓 Read the full thesis here: [Robust Neural Machine Translation of User-Generated Content](https://theses.hal.science/tel-05448644).
 
